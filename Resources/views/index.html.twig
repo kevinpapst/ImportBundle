@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+{% import "macros/widgets.html.twig" as widgets %}
+
+{% block page_title %}{{ 'Importer'|trans }}{% endblock %}
+
+{% block main %}
+
+    {% embed '@AdminLTE/Widgets/box-widget.html.twig' %}
+        {% form_theme form '@AdminLTE/layout/form-theme-horizontal.html.twig' %}
+        {% block box_before %}
+            {{ form_start(form) }}
+        {% endblock %}
+        {% block box_body %}
+            <p>
+                {{ 'importer.introduction'|trans }}:
+                <a href="{{ path('importer_example_customer') }}">{{ 'customers'|trans}}</a>,
+                <a href="{{ path('importer_example_project') }}">{{ 'projects'|trans}}</a>
+            </p>
+
+            <p><strong>{{ 'importer.how_it_works'|trans }}</strong></p>
+
+            <p>{{ 'importer.how_to_upload'|trans }}</p>
+
+            {{ form_errors(form) }}
+            {{ form_row(form.csvFile) }}
+            {{ form_row(form.delimiter) }}
+            {{ form_row(form.preview) }}
+        {% endblock %}
+        {% block box_after %}
+            {{ form_rest(form) }}
+            {{ form_end(form) }}
+        {% endblock %}
+        {% block box_footer %}
+            <button type="submit" class="btn btn-primary">{{ 'upload'|trans }}</button>
+        {% endblock %}
+    {% endembed %}
+
+    {% if data is not null %}
+        {% set importData = data %}
+        {% set countErrors = importData.countErrors() %}
+        {% set boxtype = countErrors > 0 ? 'danger' : 'success' %}
+        {% set headerLength = importData.header|length %}
+        {% set statusTrans = 'importer.status'|trans({'%processed%': importData.rows|length, '%failed%': countErrors}) %}
+
+        {% for status in data.status %}
+            {% set statusTrans = statusTrans ~ ', ' ~ status %}
+        {% endfor %}
+
+        {% if model.preview %}
+            {{ widgets.callout('warning', 'importer.preview'|trans ~ ': ' ~ statusTrans) }}
+        {% endif %}
+
+        {% if countErrors > 0 or model.preview %}
+            {% embed '@AdminLTE/Widgets/box-widget.html.twig' with {'boxtype': boxtype} %}
+                {% block box_title %}{{ (importData.title)|trans }}{% endblock %}
+                {% block box_body_class %}no-padding{% endblock %}
+                {% block box_body %}
+                    <table class="table table-striped">
+                        <thead>
+                        {% for header in importData.header %}
+                            <th>{{ header }}</th>
+                        {% endfor %}
+                        </thead>
+                        <tbody>
+                        {% for row in importData.rows %}
+                            {% set hasError = row.hasError() %}
+                            <tr{% if hasError %} class="warning"{% endif %}>
+                                {% for key, data in row.data %}
+                                    <td>{{ data }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% if hasError %}
+                            <tr class="danger">
+                                <td colspan="{{ headerLength }}">
+                                    <ul>
+                                        {% for error in row.getErrors() %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endblock %}
+            {% endembed %}
+        {% else %}
+            {{ widgets.callout('success', statusTrans, (importData.title)|trans) }}
+        {% endif %}
+    {% endif %}
+
+{% endblock %}
