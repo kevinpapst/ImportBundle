@@ -32,15 +32,9 @@ final class CustomerImporter implements ImporterInterface
     {
         $foundCustomer = false;
         $foundProject = false;
-        $foundMore = false;
 
         foreach ($header as $column) {
             switch (strtolower($column)) {
-                case 'company':
-                case 'account':
-                    $foundMore = true;
-                    break;
-
                 case 'project':
                     $foundProject = true;
                     break;
@@ -52,7 +46,6 @@ final class CustomerImporter implements ImporterInterface
         }
 
         return
-            $foundCustomer && $foundMore ||
             $foundCustomer && !$foundProject
         ;
     }
@@ -97,7 +90,7 @@ final class CustomerImporter implements ImporterInterface
                     if ($value !== null) {
                         $name = trim($value);
                     }
-                    break;
+                    break 2;
             }
         }
 
@@ -147,7 +140,6 @@ final class CustomerImporter implements ImporterInterface
                     $customer->setVatId($value);
                     break;
 
-                case 'comment':
                 case 'description':
                     $customer->setComment($value);
                     break;

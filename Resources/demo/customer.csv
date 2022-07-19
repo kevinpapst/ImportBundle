@@ -1,4 +1,4 @@
-Customer;Company;Account;Country;Tax;Comment;Address;Email;Contact;Currency;Timezone;Phone;Mobile;Fax;Homepage;Color;Visible;Budget;TimeBudget;BudgetType;
+Customer;Company;Account;Country;Tax;Description;Address;Email;Contact;Currency;Timezone;Phone;Mobile;Fax;Homepage;Color;Visible;Budget;TimeBudget;BudgetType;
 Demo Customer;Demo Company;4711;DE;DE0123456789;A possible multiline comment **with markdown support** is great!;"Some Street 123
 1234 City
 Country";demo@example.com;Mr. Demo Demo;EUR;Europe/Vienna;0123456789;0823456789;0323456789;www.example.com;#cccccc;1;25000;99000;;

@@ -115,6 +115,7 @@ final class ProjectImporter implements ImporterInterface
                     if ($value !== null) {
                         $name = trim($value);
                     }
+                    break 2;
             }
         }
 
@@ -139,6 +140,7 @@ final class ProjectImporter implements ImporterInterface
                     if ($value !== null) {
                         $name = trim($value);
                     }
+                    break 2;
             }
         }
 
@@ -174,7 +176,6 @@ final class ProjectImporter implements ImporterInterface
                 $value = null;
             }
             switch (strtolower($name)) {
-                case 'comment':
                 case 'description':
                     $project->setComment($value);
                     break;
