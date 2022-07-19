@@ -5,8 +5,8 @@
 
 {% block main %}
 
-    {% embed '@AdminLTE/Widgets/box-widget.html.twig' %}
-        {% form_theme form '@AdminLTE/layout/form-theme-horizontal.html.twig' %}
+    {% embed '@theme/embeds/card.html.twig' %}
+        {% form_theme form 'form/horizontal.html.twig' %}
         {% block box_before %}
             {{ form_start(form) }}
         {% endblock %}
@@ -51,9 +51,9 @@
         {% endif %}
 
         {% if countErrors > 0 or model.preview %}
-            {% embed '@AdminLTE/Widgets/box-widget.html.twig' with {'boxtype': boxtype} %}
+            {% embed '@theme/embeds/card.html.twig' with {'boxtype': boxtype} %}
                 {% block box_title %}{{ (importData.title)|trans }}{% endblock %}
-                {% block box_body_class %}no-padding{% endblock %}
+                {% block box_body_class %}p-0 table-responsive{% endblock %}
                 {% block box_body %}
                     <table class="table table-striped">
                         <thead>
