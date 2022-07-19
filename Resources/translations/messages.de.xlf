@@ -2,43 +2,43 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file source-language="en" target-language="de" datatype="plaintext" original="messages.en.xlf">
     <body>
-      <trans-unit id="iEnbw47asd0" resname="Importer">
+      <trans-unit id="7Sycs4M" resname="Importer">
         <source>Importer</source>
         <target>Importer</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd" resname="importer.introduction">
+      <trans-unit id="Fc4Ji7L" resname="importer.introduction">
         <source>importer.introduction</source>
         <target>Sie können Kunden und Projekte mit einem einfachen Dateiupload importieren. Download von Beispiel-CSV-Dateien für</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd1" resname="importer.how_it_works">
+      <trans-unit id=".GCKEWk" resname="importer.how_it_works">
         <source>importer.how_it_works</source>
         <target>Wie funktioniert das?</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd2" resname="importer.how_to_upload">
+      <trans-unit id="wLgWnO8" resname="importer.how_to_upload">
         <source>importer.how_to_upload</source>
         <target>Sobald Sie die CSV-Datei hochgeladen haben, wird der Importer diese analysieren. Wenn alles korrekt ist, können Sie die Daten überprüfen und den Import abschließen, indem Sie die Datei erneut hochladen, nachdem Sie die "Importvorschau" deaktiviert haben. Lesen Sie in der Dokumentation nach, wie die CSV-Datei formatiert sein sollte und wie das Hochladen funktioniert.</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd3" resname="importer.preview">
+      <trans-unit id="engvb23" resname="importer.preview">
         <source>importer.preview</source>
         <target>Importvorschau</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd4" resname="importer.delimiter">
+      <trans-unit id="tP3vIsQ" resname="importer.delimiter">
         <source>importer.delimiter</source>
         <target>Trennzeichen</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd5" resname="importer.file_chooser">
+      <trans-unit id="55DUSUf" resname="importer.file_chooser">
         <source>importer.file_chooser</source>
         <target>Dateiauswahl (CSV)</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd6" resname="importer.file_chooser_help">
+      <trans-unit id="l9hFsOV" resname="importer.file_chooser_help">
         <source>importer.file_chooser_help</source>
         <target>Dateiendung: .csv - Max. Dateigröße: 1MB - Max. 1000 Zeilen</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd7" resname="importer.status">
+      <trans-unit id="2POgjJ5" resname="importer.status">
         <source>importer.status</source>
         <target>verarbeitet %processed% Zeilen, fehlerhaft %failed% Zeilen</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd8" resname="importer.button">
+      <trans-unit id="B_9NJtI" resname="importer.button">
         <source>importer.button</source>
         <target>Datei hochladen</target>
       </trans-unit>
