@@ -72,4 +72,12 @@ final class ImportController extends AbstractController
     {
         return $this->file(__DIR__ . '/../Resources/demo/project.csv');
     }
+
+    /**
+     * @Route(path="/example/grandtotal", name="importer_example_grandtotal", methods={"GET"})
+     */
+    public function demoGrandtotal(): Response
+    {
+        return $this->file(__DIR__ . '/../Resources/demo/grandtotal.csv');
+    }
 }

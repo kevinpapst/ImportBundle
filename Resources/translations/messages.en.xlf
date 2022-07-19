@@ -42,6 +42,10 @@
         <source>importer.button</source>
         <target>Upload file</target>
       </trans-unit>
+      <trans-unit id="B_9NJtIsdf" resname="importer.grandtotal">
+        <source>importer.grandtotal</source>
+        <target>Customer (Grandtotal)</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
