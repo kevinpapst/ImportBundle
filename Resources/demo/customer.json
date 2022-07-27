@@ -1,0 +1,22 @@
+[{
+  "Customer": "Demo Customer",
+  "Company": "Demo Company",
+  "Account": "4711",
+  "Country": "DE",
+  "Tax": "DE0123456789",
+  "Description": "A possible multiline comment **with markdown support** is great!",
+  "Address": "Some Street 123\n1234 City\nCountry",
+  "Email": "demo@example.com",
+  "Contact": "Mr. Demo Demo",
+  "Currency": "EUR",
+  "Timezone": "Europe/Vienna",
+  "Phone": "0123456789",
+  "Mobile": "0823456789",
+  "Fax": "0323456789",
+  "Homepage": "www.example.com",
+  "Color": "#cccccc",
+  "Visible": true,
+  "Budget": 25000,
+  "TimeBudget": 99000,
+  "BudgetType": null
+}]

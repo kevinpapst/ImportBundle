@@ -8,7 +8,11 @@
       </trans-unit>
       <trans-unit id="Fc4Ji7L" resname="importer.introduction">
         <source>importer.introduction</source>
-        <target>Sie können Kunden und Projekte mit einem einfachen Dateiupload importieren. Download von Beispiel-CSV-Dateien für</target>
+        <target>Sie können Kunden und Projekte mit einem einfachen Dateiupload importieren.</target>
+      </trans-unit>
+      <trans-unit id="kuOJSXo" resname="importer.download_examples">
+        <source>importer.download_examples</source>
+        <target>Download von Beispiel-Dateien im %format%-Format für:</target>
       </trans-unit>
       <trans-unit id=".GCKEWk" resname="importer.how_it_works">
         <source>importer.how_it_works</source>
@@ -16,7 +20,7 @@
       </trans-unit>
       <trans-unit id="wLgWnO8" resname="importer.how_to_upload">
         <source>importer.how_to_upload</source>
-        <target>Sobald Sie die CSV-Datei hochgeladen haben, wird der Importer diese analysieren. Wenn alles korrekt ist, können Sie die Daten überprüfen und den Import abschließen, indem Sie die Datei erneut hochladen, nachdem Sie die "Importvorschau" deaktiviert haben. Lesen Sie in der Dokumentation nach, wie die CSV-Datei formatiert sein sollte und wie das Hochladen funktioniert.</target>
+        <target>Sobald Sie die Datei hochgeladen haben, wird der Importer diese analysieren. Wenn alles korrekt ist, können Sie die Daten überprüfen und den Import abschließen, indem Sie die Datei erneut hochladen, nachdem Sie die "Importvorschau" deaktiviert haben.</target>
       </trans-unit>
       <trans-unit id="engvb23" resname="importer.preview">
         <source>importer.preview</source>
@@ -24,25 +28,21 @@
       </trans-unit>
       <trans-unit id="tP3vIsQ" resname="importer.delimiter">
         <source>importer.delimiter</source>
-        <target>Trennzeichen</target>
+        <target>Trennzeichen (nur für CSV)</target>
       </trans-unit>
       <trans-unit id="55DUSUf" resname="importer.file_chooser">
         <source>importer.file_chooser</source>
-        <target>Dateiauswahl (CSV)</target>
+        <target>Dateiauswahl (CSV, JSON)</target>
       </trans-unit>
       <trans-unit id="l9hFsOV" resname="importer.file_chooser_help">
         <source>importer.file_chooser_help</source>
-        <target>Dateiendung: .csv - Max. Dateigröße: 1MB - Max. 1000 Zeilen</target>
-      </trans-unit>
-      <trans-unit id="2POgjJ5" resname="importer.status">
-        <source>importer.status</source>
-        <target>verarbeitet %processed% Zeilen, fehlerhaft %failed% Zeilen</target>
+        <target>Max. Dateigröße: 1MB - Max. 1000 Zeilen</target>
       </trans-unit>
       <trans-unit id="B_9NJtI" resname="importer.button">
         <source>importer.button</source>
         <target>Datei hochladen</target>
       </trans-unit>
-      <trans-unit id="B_9NJtIsdf" resname="importer.grandtotal">
+      <trans-unit id="q_.GtCp" resname="importer.grandtotal">
         <source>importer.grandtotal</source>
         <target>Kunden (Grandtotal)</target>
       </trans-unit>

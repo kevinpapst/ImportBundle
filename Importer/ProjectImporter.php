@@ -40,6 +40,7 @@ final class ProjectImporter implements ImporterInterface
     {
         $foundCustomer = false;
         $foundProject = false;
+        $foundTimesheet = false;
 
         foreach ($header as $column) {
             switch (strtolower($column)) {
@@ -50,11 +51,17 @@ final class ProjectImporter implements ImporterInterface
                 case 'customer':
                     $foundCustomer = true;
                     break;
+
+                case 'exported':
+                case 'duration':
+                case 'user':
+                    $foundTimesheet = true;
+                    break;
             }
         }
 
         return
-            $foundCustomer && $foundProject
+            $foundCustomer && $foundProject && !$foundTimesheet
         ;
     }
 
