@@ -1,0 +1,2 @@
+Organization;Department;Salutation;State;Iban;Sepa mandate id;E-mail;Country;Customer number;Tax-id;Note;Title;First name;Middle name;Last name;Street;Zip;City;
+Demo Company;;;;;;demo@example.com;DE;0123456789;DE0123456789;A possible multiline comment **with markdown support** is great!;Mr.;Acme;;Demo;Some Street 123;1234;A city;

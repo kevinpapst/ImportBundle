@@ -12,9 +12,19 @@
         {% endblock %}
         {% block box_body %}
             <p>
-                {{ 'importer.introduction'|trans }}:
-                <a href="{{ path('importer_example_customer') }}">{{ 'customers'|trans}}</a>,
-                <a href="{{ path('importer_example_project') }}">{{ 'projects'|trans}}</a>
+                {{ 'importer.introduction'|trans }}
+            </p>
+            <p>
+                {{ 'importer.download_examples'|trans({'%format%': 'CSV'}) }}
+                <a href="{{ path('importer_example_customer_csv') }}">{{ 'customers'|trans}}</a>,
+                <a href="{{ path('importer_example_grandtotal') }}">{{ 'importer.grandtotal'|trans}}</a>,
+                <a href="{{ path('importer_example_project_csv') }}">{{ 'projects'|trans}}</a>,
+                <a href="{{ path('importer_example_timesheet_csv') }}">{{ 'time_tracking'|trans}}</a>
+                <br>
+                {{ 'importer.download_examples'|trans({'%format%': 'JSON'}) }}
+                <a href="{{ path('importer_example_customer_json') }}">{{ 'customers'|trans}}</a>,
+                <a href="{{ path('importer_example_project_json') }}">{{ 'projects'|trans}}</a>,
+                <a href="{{ path('importer_example_timesheet_json') }}">{{ 'time_tracking'|trans}}</a>
             </p>
 
             <p><strong>{{ 'importer.how_it_works'|trans }}</strong></p>
@@ -22,7 +32,7 @@
             <p>{{ 'importer.how_to_upload'|trans }}</p>
 
             {{ form_errors(form) }}
-            {{ form_row(form.csvFile) }}
+            {{ form_row(form.importFile) }}
             {{ form_row(form.delimiter) }}
             {{ form_row(form.preview) }}
         {% endblock %}
@@ -40,7 +50,11 @@
         {% set countErrors = importData.countErrors() %}
         {% set boxtype = countErrors > 0 ? 'danger' : 'success' %}
         {% set headerLength = importData.header|length %}
-        {% set statusTrans = 'importer.status'|trans({'%processed%': importData.rows|length, '%failed%': countErrors}) %}
+
+        {% set statusTrans = 'processed ' ~ importData.rows|length ~ ' rows' %}
+        {% if countErrors > 0 %}
+            {% set statusTrans = statusTrans ~ ', failed ' ~ countErrors ~ ' rows' %}
+        {% endif %}
 
         {% for status in data.status %}
             {% set statusTrans = statusTrans ~ ', ' ~ status %}

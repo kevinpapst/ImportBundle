@@ -36,11 +36,11 @@ class ImportForm extends AbstractType
                 'label' => 'importer.preview',
                 'required' => false,
             ])
-            ->add('csvFile', FileType::class, [
+            ->add('importFile', FileType::class, [
                 'label' => 'importer.file_chooser',
                 'help' => 'importer.file_chooser_help',
                 'attr' => [
-                    'accept' => 'text/csv',
+                    'accept' => 'text/csv,application/json',
                 ],
                 'constraints' => [
                     new File([

@@ -1,0 +1,14 @@
+[{
+  "Project": "Demo Project",
+  "Customer": "Demo Customer 2222",
+  "OrderNumber": "4711",
+  "OrderDate": "2021-08-31",
+  "StartDate": "2022-01-01",
+  "EndDate": "2023-12-31",
+  "Description": "A possible multiline comment **with markdown support** is great!",
+  "Color": "#cccccc",
+  "Visible": true,
+  "Budget": 500,
+  "TimeBudget": 19800,
+  "BudgetType": "month"
+}]

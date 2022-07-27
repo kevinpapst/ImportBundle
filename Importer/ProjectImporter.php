@@ -40,6 +40,7 @@ final class ProjectImporter implements ImporterInterface
     {
         $foundCustomer = false;
         $foundProject = false;
+        $foundTimesheet = false;
 
         foreach ($header as $column) {
             switch (strtolower($column)) {
@@ -50,11 +51,17 @@ final class ProjectImporter implements ImporterInterface
                 case 'customer':
                     $foundCustomer = true;
                     break;
+
+                case 'exported':
+                case 'duration':
+                case 'user':
+                    $foundTimesheet = true;
+                    break;
             }
         }
 
         return
-            $foundCustomer && $foundProject
+            $foundCustomer && $foundProject && !$foundTimesheet
         ;
     }
 
@@ -115,6 +122,7 @@ final class ProjectImporter implements ImporterInterface
                     if ($value !== null) {
                         $name = trim($value);
                     }
+                    break 2;
             }
         }
 
@@ -139,6 +147,7 @@ final class ProjectImporter implements ImporterInterface
                     if ($value !== null) {
                         $name = trim($value);
                     }
+                    break 2;
             }
         }
 
@@ -174,7 +183,6 @@ final class ProjectImporter implements ImporterInterface
                 $value = null;
             }
             switch (strtolower($name)) {
-                case 'comment':
                 case 'description':
                     $project->setComment($value);
                     break;

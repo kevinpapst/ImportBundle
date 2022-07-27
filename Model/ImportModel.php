@@ -17,7 +17,7 @@ final class ImportModel
     /**
      * @var UploadedFile|null
      */
-    private $csvFile;
+    private $importFile;
     /**
      * @var string
      */
@@ -27,14 +27,14 @@ final class ImportModel
      */
     private $preview = true;
 
-    public function getCsvFile(): ?UploadedFile
+    public function getImportFile(): ?UploadedFile
     {
-        return $this->csvFile;
+        return $this->importFile;
     }
 
-    public function setCsvFile(?UploadedFile $csvFile): void
+    public function setImportFile(?UploadedFile $importFile): void
     {
-        $this->csvFile = $csvFile;
+        $this->importFile = $importFile;
     }
 
     public function getDelimiter(): string

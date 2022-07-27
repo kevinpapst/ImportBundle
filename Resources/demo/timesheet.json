@@ -1,0 +1,17 @@
+[{
+  "Date": "2022-07-27",
+  "From": "07:10",
+  "To": "09:11",
+  "Duration": 7260,
+  "Rate": 231.92,
+  "User": "user@example.com",
+  "Customer": "Customer LLC???",
+  "Project": "My project!!!3  ",
+  "Activity": "1Testing§§§§",
+  "Description": "some work has been done",
+  "Exported": false,
+  "Tags": "foo,bar,import____foo",
+  "HourlyRate": 115.00,
+  "FixedRate": 0,
+  "InternalRate": 65.0
+}]

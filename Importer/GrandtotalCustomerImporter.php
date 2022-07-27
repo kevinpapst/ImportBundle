@@ -17,7 +17,7 @@ use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-final class CustomerImporter implements ImporterInterface
+final class GrandtotalCustomerImporter implements ImporterInterface
 {
     private $customerService;
     private $validator;
@@ -31,22 +31,18 @@ final class CustomerImporter implements ImporterInterface
     public function supports(array $header): bool
     {
         $foundCustomer = false;
-        $foundProject = false;
 
         foreach ($header as $column) {
             switch (strtolower($column)) {
-                case 'project':
-                    $foundProject = true;
-                    break;
-
-                case 'customer':
+                case 'organization':
+                case 'firma':
                     $foundCustomer = true;
                     break;
             }
         }
 
         return
-            $foundCustomer && !$foundProject
+            $foundCustomer
         ;
     }
 
@@ -57,7 +53,7 @@ final class CustomerImporter implements ImporterInterface
      */
     public function import(array $rows, bool $dryRun): ImportData
     {
-        $data = new ImportData('customers', array_keys($rows[0]->getData()));
+        $data = new ImportData('importer.grandtotal', array_keys($rows[0]->getData()));
 
         foreach ($rows as $row) {
             try {
@@ -86,7 +82,8 @@ final class CustomerImporter implements ImporterInterface
 
         foreach ($entry as $key => $value) {
             switch (strtolower($key)) {
-                case 'customer':
+                case 'organization':
+                case 'firma':
                     if ($value !== null) {
                         $name = trim($value);
                     }
@@ -112,92 +109,112 @@ final class CustomerImporter implements ImporterInterface
 
     private function mapEntryToCustomer(Customer $customer, array $row): void
     {
-        foreach ($row as $key => $value) {
+        $names = ['first' => '', 'middle' => '', 'last' => '', 'title' => ''];
+        $address = ['street' => '',  'city' => '', 'code' => ''];
+
+        foreach ($row as $name => $value) {
             if ($value !== null) {
                 $value = trim($value);
             }
             if ($value === '') {
                 $value = null;
             }
-            switch (strtolower($key)) {
-                case 'company':
-                    $customer->setCompany($value);
+            switch (strtolower($name)) {
+                case 'department':
+                case 'abteilung':
+
+                case 'salutation':
+                case 'briefanrede':
+
+                case 'state':
+                case 'bundesland':
+
+                case 'iban':
+                case 'bic':
+
+                case 'sepa mandate id':
+                case 'sepa mandat':
+                    // not supported in Kimai
                     break;
 
-                case 'email':
+                case 'organization':
+                case 'firma':
+                    // used as customer name
+                    break;
+
+                case 'e-mail':
                     $customer->setEmail($value);
                     break;
 
                 case 'country':
+                case 'land':
                     $customer->setCountry($value);
                     break;
 
-                case 'account':
+                case 'customer number':
+                case 'kundennummer':
                     $customer->setNumber($value);
                     break;
 
-                case 'tax':
+                case 'tax-id':
+                case 'umsatzsteuer':
                     $customer->setVatId($value);
                     break;
 
-                case 'description':
+                case 'note':
+                case 'notiz':
+                    if ($value !== null) {
+                        $value = strip_tags($value);
+                    }
                     $customer->setComment($value);
                     break;
 
-                case 'address':
-                    $customer->setAddress($value);
+                case 'title':
+                case 'titel':
+                    $names['title'] = $value;
                     break;
 
-                case 'contact':
-                    $customer->setContact($value);
+                case 'first name':
+                case 'vorname':
+                    $names['first'] = $value;
                     break;
 
-                case 'currency':
-                    $customer->setCurrency($value);
+                case 'middle name':
+                case 'zweiter vorname':
+                    $names['middle'] = $value;
                     break;
 
-                case 'timezone':
-                    if ($value !== null) {
-                        $customer->setTimezone($value);
-                    }
+                case 'last name':
+                case 'nachname':
+                    $names['last'] = $value;
                     break;
 
-                case 'phone':
-                    $customer->setPhone($value);
+                case 'street':
+                case 'straße':
+                    $address['street'] = $value;
                     break;
 
-                case 'mobile':
-                    $customer->setMobile($value);
+                case 'zip':
+                case 'plz':
+                    $address['code'] = $value;
                     break;
 
-                case 'fax':
-                    $customer->setFax($value);
-                    break;
-
-                case 'homepage':
-                    $customer->setHomepage($value);
-                    break;
-
-                case 'color':
-                    $customer->setColor($value);
-                    break;
-
-                case 'visible':
-                    $customer->setVisible((bool) $value);
-                    break;
-
-                case 'budget':
-                    $customer->setBudget((float) $value);
-                    break;
-
-                case 'budgettype':
-                    $customer->setBudgetType($value);
-                    break;
-
-                case 'timebudget':
-                    $customer->setTimeBudget((int) $value);
+                case 'city':
+                case 'ort':
+                    $address['city'] = $value;
                     break;
             }
+        }
+
+        $calculatedAddress = $address['street'] . PHP_EOL . $address['code'] . ' ' . $address['city'];
+        $calculatedContact = $names['title'] . ' ' . $names['first'] . ' ' . $names['middle'] . ' ' . $names['last'];
+
+        if ($calculatedAddress !== '') {
+            $customer->setAddress(trim($calculatedAddress));
+        }
+
+        if ($calculatedContact !== '') {
+            $customer->setContact(trim(str_replace('  ', ' ', $calculatedContact)));
         }
     }
 

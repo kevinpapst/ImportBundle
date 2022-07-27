@@ -2,45 +2,49 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file source-language="en" target-language="en" datatype="plaintext" original="messages.en.xlf">
     <body>
-      <trans-unit id="iEnbw47asd0" resname="Importer">
+      <trans-unit id="7Sycs4M" resname="Importer">
         <source>Importer</source>
         <target>Importer</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd" resname="importer.introduction">
+      <trans-unit id="Fc4Ji7L" resname="importer.introduction">
         <source>importer.introduction</source>
-        <target>You can import customers and projects with one simple file-upload. Download example CSV files for</target>
+        <target>You can import customers and projects with one simple file-upload.</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd1" resname="importer.how_it_works">
+      <trans-unit id="kuOJSXo" resname="importer.download_examples">
+        <source>importer.download_examples</source>
+        <target>Download example files in %format% format for:</target>
+      </trans-unit>
+      <trans-unit id=".GCKEWk" resname="importer.how_it_works">
         <source>importer.how_it_works</source>
         <target>How does it work?</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd2" resname="importer.how_to_upload">
+      <trans-unit id="wLgWnO8" resname="importer.how_to_upload">
         <source>importer.how_to_upload</source>
-        <target> Once, you upload the CSV file the importer will analyse it. Then, if everything is correct, you can review the data and finish the import by re-uploading the file with the "Preview import" checkbox deactivated. See documentation on how the CSV file should be formatted and how uploading works.</target>
+        <target>Once, you upload the file the importer will analyse it. Then, if everything is correct, you can review the data and finish the import by re-uploading the file with the "Preview import" checkbox deactivated.</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd3" resname="importer.preview">
+      <trans-unit id="engvb23" resname="importer.preview">
         <source>importer.preview</source>
         <target>Preview import</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd4" resname="importer.delimiter">
+      <trans-unit id="tP3vIsQ" resname="importer.delimiter">
         <source>importer.delimiter</source>
-        <target>Delimiter</target>
+        <target>Delimiter (only for CSV)</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd5" resname="importer.file_chooser">
+      <trans-unit id="55DUSUf" resname="importer.file_chooser">
         <source>importer.file_chooser</source>
-        <target>File selection (CSV)</target>
+        <target>File selection (CSV, JSON)</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd6" resname="importer.file_chooser_help">
+      <trans-unit id="l9hFsOV" resname="importer.file_chooser_help">
         <source>importer.file_chooser_help</source>
-        <target>File ending: .csv - Max. Filesize: 1MB - Max. 1000 rows</target>
+        <target>Max. Filesize: 1MB - Max. 1000 rows</target>
       </trans-unit>
-      <trans-unit id="iEnbw47asd7" resname="importer.status">
-        <source>importer.status</source>
-        <target>processed %processed% rows, failed %failed% rows</target>
-      </trans-unit>
-      <trans-unit id="iEnbw47asd8" resname="importer.button">
+      <trans-unit id="B_9NJtI" resname="importer.button">
         <source>importer.button</source>
         <target>Upload file</target>
+      </trans-unit>
+      <trans-unit id="q_.GtCp" resname="importer.grandtotal">
+        <source>importer.grandtotal</source>
+        <target>Customers (Grandtotal)</target>
       </trans-unit>
     </body>
   </file>
