@@ -4,7 +4,15 @@ Import data features for Kimai.
 
 ## Features
 
-TODO
+You can import the following data:
+- Customer
+- Project
+- Timesheet
+- Customer (via Grandtotal)
+
+Supported formats: JSON and CSV
+
+For timesheets the user must be existing.
 
 ## Installation
 
@@ -47,7 +55,3 @@ Updating the bundle works the same way as the installation does.
 - Execute all installation steps again:
     - Unzip latest package & copy files
     - Clear cache
-
-## Screenshots
-
-Screenshots are available [in the store page](https://www.kimai.org/store/import-bundle.html).

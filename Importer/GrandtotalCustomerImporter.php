@@ -209,11 +209,11 @@ final class GrandtotalCustomerImporter implements ImporterInterface
         $calculatedAddress = $address['street'] . PHP_EOL . $address['code'] . ' ' . $address['city'];
         $calculatedContact = $names['title'] . ' ' . $names['first'] . ' ' . $names['middle'] . ' ' . $names['last'];
 
-        if (!empty($calculatedAddress)) {
+        if ($calculatedAddress !== '') {
             $customer->setAddress(trim($calculatedAddress));
         }
 
-        if (!empty($calculatedContact)) {
+        if ($calculatedContact !== '') {
             $customer->setContact(trim(str_replace('  ', ' ', $calculatedContact)));
         }
     }
