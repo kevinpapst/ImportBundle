@@ -385,8 +385,7 @@ final class TimesheetImporter implements ImporterInterface
             $tmpCustomer = $this->customerService->findCustomerByName($customer);
 
             if ($tmpCustomer === null) {
-                $tmpCustomer = $this->customerService->createNewCustomer();
-                $tmpCustomer->setName($customer);
+                $tmpCustomer = $this->customerService->createNewCustomer($customer);
                 if (!$dryRun) {
                     $this->customerService->saveNewCustomer($tmpCustomer);
                 }

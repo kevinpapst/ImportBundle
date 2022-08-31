@@ -99,8 +99,7 @@ final class GrandtotalCustomerImporter implements ImporterInterface
             throw new ImportException('Invalid customer name, maximum 150 character allowed');
         }
 
-        $customer = $this->customerService->createNewCustomer();
-        $customer->setName(mb_substr($name, 0, 149));
+        $customer = $this->customerService->createNewCustomer(mb_substr($name, 0, 149));
 
         $this->mapEntryToCustomer($customer, $entry);
 
