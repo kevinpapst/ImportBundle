@@ -3,6 +3,11 @@
 
 {% block page_title %}{{ 'Importer'|trans }}{% endblock %}
 
+{% block page_actions %}
+    {% set event = actions(app.user, 'import', 'index') %}
+    {{ widgets.page_actions(event.actions) }}
+{% endblock %}
+
 {% block main %}
 
     {% embed '@theme/embeds/card.html.twig' %}
