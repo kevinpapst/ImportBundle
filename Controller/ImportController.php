@@ -12,6 +12,7 @@ namespace KimaiPlugin\ImportBundle\Controller;
 
 use App\Controller\AbstractController;
 use App\Utils\FileHelper;
+use App\Utils\PageSetup;
 use KimaiPlugin\ImportBundle\Form\ImportForm;
 use KimaiPlugin\ImportBundle\Importer\ImporterService;
 use KimaiPlugin\ImportBundle\Importer\ImportException;
@@ -50,7 +51,11 @@ final class ImportController extends AbstractController
             }
         }
 
+        $page = new PageSetup('Importer');
+        $page->setHelp('plugin-import.html');
+
         return $this->render('@Import/index.html.twig', [
+            'page_setup' => $page,
             'model' => $model,
             'data' => $data,
             'form' => $editForm->createView()

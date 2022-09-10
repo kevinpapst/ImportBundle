@@ -152,7 +152,9 @@ final class CustomerImporter implements ImporterInterface
                     break;
 
                 case 'currency':
-                    $customer->setCurrency($value);
+                    if ($value !== null) {
+                        $customer->setCurrency($value);
+                    }
                     break;
 
                 case 'timezone':
