@@ -2,7 +2,7 @@
 
 ## 1.1
 
-Compatible with Kimai 1.21.0
+Compatible with Kimai 1.22.0
 
 - Fixed: import of float values for "rate", "hourly rate", "fixed rate" and "internal rate"
 

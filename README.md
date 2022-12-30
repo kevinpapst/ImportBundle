@@ -20,7 +20,7 @@ This plugin is compatible with the following Kimai releases:
 
 | Bundle version | Minimum Kimai version |
 |----------------|-----------------------|
-| 1.0            | 1.22.0                |
+| 1.0 - 1.1      | 1.22.0                |
 
 You find the most notable changes between the versions in the file [CHANGELOG.md](CHANGELOG.md).
 
