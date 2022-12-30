@@ -247,16 +247,16 @@ final class TimesheetImporter implements ImporterInterface
                 }
 
                 if (!empty($record['Rate'])) {
-                    $timesheet->setRate($record['Rate']);
+                    $timesheet->setRate((float) $record['Rate']);
                 }
                 if (!empty($record['HourlyRate'])) {
-                    $timesheet->setHourlyRate($record['HourlyRate']);
+                    $timesheet->setHourlyRate((float) $record['HourlyRate']);
                 }
                 if (!empty($record['FixedRate'])) {
-                    $timesheet->setFixedRate($record['FixedRate']);
+                    $timesheet->setFixedRate((float) $record['FixedRate']);
                 }
                 if (!empty($record['InternalRate'])) {
-                    $timesheet->setInternalRate($record['InternalRate']);
+                    $timesheet->setInternalRate((float) $record['InternalRate']);
                 }
 
                 if (!$dryRun) {
