@@ -3,7 +3,7 @@
     "description": "A Kimai plugin to import data from CSV files via Web UI",
     "homepage": "https://www.kimai.org/store/import-bundle.html",
     "type": "kimai-plugin",
-    "version": "1.0",
+    "version": "1.2",
     "keywords": [
         "kimai",
         "kimai-plugin"
@@ -53,7 +53,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
-        "kevinpapst/kimai2": "^1.21.0",
+        "kevinpapst/kimai2": "^1.22.0",
         "phpstan/phpstan": "^1.0",
         "phpstan/phpstan-symfony": "^1.0",
         "symfony/console": "^4.0",
