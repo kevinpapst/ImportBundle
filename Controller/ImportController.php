@@ -12,6 +12,7 @@ namespace KimaiPlugin\ImportBundle\Controller;
 
 use App\Controller\AbstractController;
 use App\Utils\FileHelper;
+use App\Utils\PageSetup;
 use KimaiPlugin\ImportBundle\Form\ImportForm;
 use KimaiPlugin\ImportBundle\Importer\ImporterService;
 use KimaiPlugin\ImportBundle\Importer\ImportException;
@@ -22,15 +23,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route(path="/importer")
- * @Security("is_granted('importer')")
- */
+#[Route(path: '/importer')]
+#[Security("is_granted('importer')")]
 final class ImportController extends AbstractController
 {
-    /**
-     * @Route(path="/", name="importer", methods={"GET", "POST"})
-     */
+    #[Route(path: '/', name: 'importer', methods: ['GET', 'POST'])]
     public function importer(Request $request, FileHelper $fileHelper, ImporterService $importerService): Response
     {
         $model = new ImportModel();
@@ -50,22 +47,24 @@ final class ImportController extends AbstractController
             }
         }
 
+        $page = new PageSetup('Importer');
+        $page->setHelp('plugin-import.html');
+
         return $this->render('@Import/index.html.twig', [
+            'page_setup' => $page,
             'model' => $model,
             'data' => $data,
             'form' => $editForm->createView()
         ]);
     }
 
-    /**
-     * @Route(path="/example/customer-csv", name="importer_example_customer_csv", methods={"GET"})
-     * @Route(path="/example/customer-json", name="importer_example_customer_json", methods={"GET"})
-     * @Route(path="/example/project-csv", name="importer_example_project_csv", methods={"GET"})
-     * @Route(path="/example/project-json", name="importer_example_project_json", methods={"GET"})
-     * @Route(path="/example/timesheet-csv", name="importer_example_timesheet_csv", methods={"GET"})
-     * @Route(path="/example/timesheet-json", name="importer_example_timesheet_json", methods={"GET"})
-     * @Route(path="/example/grandtotal", name="importer_example_grandtotal", methods={"GET"})
-     */
+    #[Route(path: '/example/customer-csv', name: 'importer_example_customer_csv', methods: ['GET'])]
+    #[Route(path: '/example/customer-json', name: 'importer_example_customer_json', methods: ['GET'])]
+    #[Route(path: '/example/project-csv', name: 'importer_example_project_csv', methods: ['GET'])]
+    #[Route(path: '/example/project-json', name: 'importer_example_project_json', methods: ['GET'])]
+    #[Route(path: '/example/timesheet-csv', name: 'importer_example_timesheet_csv', methods: ['GET'])]
+    #[Route(path: '/example/timesheet-json', name: 'importer_example_timesheet_json', methods: ['GET'])]
+    #[Route(path: '/example/grandtotal', name: 'importer_example_grandtotal', methods: ['GET'])]
     public function demoFiles(Request $request): Response
     {
         switch ($request->get('_route')) {

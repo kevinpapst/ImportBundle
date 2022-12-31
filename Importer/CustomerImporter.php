@@ -102,8 +102,7 @@ final class CustomerImporter implements ImporterInterface
             throw new ImportException('Invalid customer name, maximum 150 character allowed');
         }
 
-        $customer = $this->customerService->createNewCustomer();
-        $customer->setName(mb_substr($name, 0, 149));
+        $customer = $this->customerService->createNewCustomer(mb_substr($name, 0, 149));
 
         $this->mapEntryToCustomer($customer, $entry);
 
@@ -153,7 +152,9 @@ final class CustomerImporter implements ImporterInterface
                     break;
 
                 case 'currency':
-                    $customer->setCurrency($value);
+                    if ($value !== null) {
+                        $customer->setCurrency($value);
+                    }
                     break;
 
                 case 'timezone':
