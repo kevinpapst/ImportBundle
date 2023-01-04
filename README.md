@@ -4,6 +4,8 @@ Import data features for Kimai.
 
 Read the documentation at [https://www.kimai.org/documentation/plugin-import.html](https://www.kimai.org/documentation/plugin-import.html)
 
+Read how to [import data from Kimai 1](https://www.kimai.org/documentation/migration-v1.html)
+
 ## Features
 
 You can import the following data:
@@ -14,8 +16,6 @@ You can import the following data:
 - Kimai v1 (everything)
 
 Supported formats: JSON and CSV
-
-For timesheets the user must be existing.
 
 ## Installation
 
