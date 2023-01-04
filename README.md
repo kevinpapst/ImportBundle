@@ -9,10 +9,19 @@ You can import the following data:
 - Project
 - Timesheet
 - Customer (via Grandtotal)
+- Kimai v1 (everything)
 
 Supported formats: JSON and CSV
 
 For timesheets the user must be existing.
+
+## Documentation
+
+Read the documentation at [https://www.kimai.org/documentation/plugin-import.html](https://www.kimai.org/documentation/plugin-import.html)
+
+## Compatibility
+
+Read the documentation at [https://www.kimai.org/documentation/plugin-import.html](https://www.kimai.org/documentation/plugin-import.html)
 
 ## Installation
 
@@ -20,38 +29,7 @@ This plugin is compatible with the following Kimai releases:
 
 | Bundle version | Minimum Kimai version |
 |----------------|-----------------------|
+| 2.0            | 2.0                   |
 | 1.0 - 1.2      | 1.22.0                |
 
 You find the most notable changes between the versions in the file [CHANGELOG.md](CHANGELOG.md).
-
-### Copy files
-
-Extract the ZIP file and upload the included directory and all files to your Kimai installation to the new directory:  
-`var/plugins/ImportBundle/`
-
-The file structure needs to look like this afterwards:
-
-```bash
-var/plugins/
-├── ImportBundle
-│   ├── ImportBundle.php
-|   └ ... more files and directories follow here ... 
-```
-
-### Clear cache
-
-After uploading the files, Kimai needs to know about the new plugin. It will be found, once the cache was re-built:
-
-```bash
-cd kimai2/
-bin/console kimai:reload --env=prod
-```
-
-## Updating the plugin
-
-Updating the bundle works the same way as the installation does.
-
-- Delete the directory `var/plugins/ImportBundle/` (to remove deleted files)
-- Execute all installation steps again:
-    - Unzip latest package & copy files
-    - Clear cache
