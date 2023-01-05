@@ -667,8 +667,7 @@ final class KimaiImporterCommand extends Command
             foreach ($listeners as $hash => $object) {
                 if ($object instanceof TimesheetSubscriber) {
                     $connection->getEventManager()->removeEventListener([$event], $object);
-                    /* @phpstan-ignore-next-line  */
-                } elseif ($object instanceof \KimaiPlugin\AuditTrailBundle\Doctrine\MetadataSubscriber) {
+                } elseif ($object instanceof \KimaiPlugin\AuditTrailBundle\Doctrine\MetadataSubscriber) { // @phpstan-ignore-line
                     // deactivate audit plugin listener
                     $connection->getEventManager()->removeEventListener([$event], $object);
                 }
