@@ -17,14 +17,14 @@ use KimaiPlugin\ImportBundle\Form\ImportForm;
 use KimaiPlugin\ImportBundle\Importer\ImporterService;
 use KimaiPlugin\ImportBundle\Importer\ImportException;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/importer')]
-#[Security("is_granted('importer')")]
+#[IsGranted('importer')]
 final class ImportController extends AbstractController
 {
     #[Route(path: '/', name: 'importer', methods: ['GET', 'POST'])]
