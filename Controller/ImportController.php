@@ -17,11 +17,11 @@ use KimaiPlugin\ImportBundle\Form\ImportForm;
 use KimaiPlugin\ImportBundle\Importer\ImporterService;
 use KimaiPlugin\ImportBundle\Importer\ImportException;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(path: '/importer')]
 #[IsGranted('importer')]
