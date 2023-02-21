@@ -14,18 +14,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class ImportModel
 {
-    /**
-     * @var UploadedFile|null
-     */
-    private $importFile;
-    /**
-     * @var string
-     */
-    private $delimiter = ';';
-    /**
-     * @var bool
-     */
-    private $preview = true;
+    private ?UploadedFile $importFile = null;
+    private ?string $delimiter = ';';
+    private bool $preview = true;
 
     public function getImportFile(): ?UploadedFile
     {
@@ -37,12 +28,12 @@ final class ImportModel
         $this->importFile = $importFile;
     }
 
-    public function getDelimiter(): string
+    public function getDelimiter(): ?string
     {
         return $this->delimiter;
     }
 
-    public function setDelimiter(string $delimiter): void
+    public function setDelimiter(?string $delimiter): void
     {
         $this->delimiter = $delimiter;
     }

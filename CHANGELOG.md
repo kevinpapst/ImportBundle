@@ -1,8 +1,14 @@
 # Changelog
 
+## 2.0.1
+
+Compatible with Kimai 2.0
+
+- Fixed: fixed import form validation
+
 ## 2.0
 
-Compatible with Kimai 2.0.0
+Compatible with Kimai 2.0
 
 - Fixed: compatibility with 2.0
 - Added: moved Kimai 1 import command from core to plugin 

@@ -18,6 +18,8 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class ImportForm extends AbstractType
 {
@@ -26,11 +28,13 @@ class ImportForm extends AbstractType
         $builder
             ->add('delimiter', ChoiceType::class, [
                 'label' => 'importer.delimiter',
+                'required' => true,
                 'search' => false,
                 'choices' => [
                     'Semicolon ;' => ';',
                     'Comma ,' => ',',
-                ]
+                ],
+                'constraints' => [new NotBlank()]
             ])
             ->add('preview', CheckboxType::class, [
                 'label' => 'importer.preview',
@@ -43,6 +47,7 @@ class ImportForm extends AbstractType
                     'accept' => 'text/csv,application/json',
                 ],
                 'constraints' => [
+                    new NotNull(),
                     new File([
                         'maxSize' => '1024k',
                     ])
