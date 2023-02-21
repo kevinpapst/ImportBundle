@@ -111,6 +111,10 @@ final class ImporterService
                 throw new ImportException('Missing uploaded file');
             }
 
+            if ($model->getDelimiter() === null) {
+                throw new ImportException('Missing delimiter');
+            }
+
             $csv = Reader::createFromFileObject($model->getImportFile()->openFile());
             $csv->setDelimiter($model->getDelimiter());
             $csv->setHeaderOffset(0);
