@@ -5,6 +5,7 @@
 Compatible with Kimai 2.0
 
 - Fixed: fixed import form validation
+- Fixed: replaced "Sensio-FrameworkExtraBundle" with Symfony attribute
 
 ## 2.0
 
