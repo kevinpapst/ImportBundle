@@ -21,16 +21,10 @@ final class ImporterService
     public const MAX_ROWS = 1000;
 
     /**
-     * @var iterable<ImporterInterface>
-     */
-    private $importer;
-
-    /**
      * @param iterable<ImporterInterface> $importer
      */
-    public function __construct(iterable $importer)
+    public function __construct(private iterable $importer)
     {
-        $this->importer = $importer;
     }
 
     /**

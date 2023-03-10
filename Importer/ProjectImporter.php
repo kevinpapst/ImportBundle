@@ -21,19 +21,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class ProjectImporter implements ImporterInterface
 {
-    private $projectService;
-    private $customerService;
-    private $validator;
     /**
      * @var Customer[]
      */
     private $customerCache = [];
 
-    public function __construct(ProjectService $projectService, CustomerService $customerService, ValidatorInterface $validator)
+    public function __construct(private ProjectService $projectService, private CustomerService $customerService, private ValidatorInterface $validator)
     {
-        $this->projectService = $projectService;
-        $this->customerService = $customerService;
-        $this->validator = $validator;
     }
 
     public function supports(array $header): bool

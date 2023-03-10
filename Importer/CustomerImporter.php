@@ -19,13 +19,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class CustomerImporter implements ImporterInterface
 {
-    private $customerService;
-    private $validator;
-
-    public function __construct(CustomerService $customerService, ValidatorInterface $validator)
+    public function __construct(private CustomerService $customerService, private ValidatorInterface $validator)
     {
-        $this->customerService = $customerService;
-        $this->validator = $validator;
     }
 
     public function supports(array $header): bool
