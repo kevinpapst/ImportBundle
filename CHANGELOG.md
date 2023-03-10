@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.2
+
+Compatible with Kimai 2.0
+
+- Fixed: proper error handling for invalid date-times
+- Fixed: proper error handling for unknown users
+
 ## 2.0.1
 
 Compatible with Kimai 2.0

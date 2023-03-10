@@ -259,7 +259,13 @@ final class ProjectImporter implements ImporterInterface
         if ($project->getCustomer() !== null && $project->getCustomer()->getTimezone() !== null) {
             $timezone = $project->getCustomer()->getTimezone();
         }
-        $date = \DateTime::createFromFormat('Y-m-d', $value, new \DateTimeZone($timezone));
+
+        try {
+            $date = \DateTime::createFromFormat('Y-m-d', $value, new \DateTimeZone($timezone));
+        } catch (\Exception $exception) {
+            throw new \InvalidArgumentException($exception->getMessage());
+        }
+
         if ($date === false) {
             throw new \InvalidArgumentException('Invalid order date: ' . $value);
         }

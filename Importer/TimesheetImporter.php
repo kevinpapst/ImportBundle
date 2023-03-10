@@ -31,7 +31,7 @@ final class TimesheetImporter implements ImporterInterface
     /**
      * @var string[]
      */
-    private static $supportedHeader = [
+    private static array $supportedHeader = [
         'Date',
         'From',
         'To',
@@ -49,66 +49,41 @@ final class TimesheetImporter implements ImporterInterface
         'FixedRate',
     ];
 
-    private $customerService;
-    private $projectService;
-    private $activityService;
-    private $userService;
-    private $tagRepository;
-    private $timesheetRepository;
-
     /**
      * @var Customer[]
      */
-    private $customerCache = [];
+    private array $customerCache = [];
     /**
      * @var Project[]
      */
-    private $projectCache = [];
+    private array $projectCache = [];
     /**
      * @var Activity[]
      */
-    private $activityCache = [];
+    private array $activityCache = [];
     /**
      * @var array<User|null>
      */
-    private $userCache = [];
+    private array $userCache = [];
     /**
      * @var Tag[]
      */
-    private $tagCache = [];
+    private array $tagCache = [];
 
     // some statistics to display to the user
-    /**
-     * @var int
-     */
-    private $createdProjects = 0;
-    /**
-     * @var int
-     */
-    private $createdCustomers = 0;
-    /**
-     * @var int
-     */
-    private $createdActivities = 0;
-    /**
-     * @var int
-     */
-    private $createdTags = 0;
+    private int $createdProjects = 0;
+    private int $createdCustomers = 0;
+    private int $createdActivities = 0;
+    private int $createdTags = 0;
 
     public function __construct(
-        CustomerService $customerService,
-        ProjectService $projectService,
-        ActivityService $activityService,
-        UserService $userService,
-        TagRepository $tagRepository,
-        TimesheetService $timesheetRepository
+        private CustomerService $customerService,
+        private ProjectService $projectService,
+        private ActivityService $activityService,
+        private UserService $userService,
+        private TagRepository $tagRepository,
+        private TimesheetService $timesheetRepository
     ) {
-        $this->customerService = $customerService;
-        $this->projectService = $projectService;
-        $this->activityService = $activityService;
-        $this->userService = $userService;
-        $this->tagRepository = $tagRepository;
-        $this->timesheetRepository = $timesheetRepository;
     }
 
     public function supports(array $header): bool
@@ -204,17 +179,49 @@ final class TimesheetImporter implements ImporterInterface
                 $timezone = new \DateTimeZone($user->getTimezone());
 
                 if (empty($record['From']) && empty($record['To'])) {
-                    $begin = new \DateTime($record['Date'] . ' 12:00:00', $timezone);
-                    $end = (new \DateTime())->setTimezone($timezone)->setTimestamp($begin->getTimestamp() + $duration);
+                    try {
+                        $begin = new \DateTime($record['Date'] . ' 12:00:00', $timezone);
+                    } catch (\Exception $exception) {
+                        throw new ImportException($exception->getMessage());
+                    }
+                    try {
+                        $end = (new \DateTime())->setTimezone($timezone)->setTimestamp($begin->getTimestamp() + $duration);
+                    } catch (\Exception $exception) {
+                        throw new ImportException($exception->getMessage());
+                    }
                 } elseif (empty($record['From'])) {
-                    $end = new \DateTime($record['Date'] . ' ' . $record['To'], $timezone);
-                    $begin = (new \DateTime())->setTimezone($timezone)->setTimestamp($end->getTimestamp() - $duration);
+                    try {
+                        $end = new \DateTime($record['Date'] . ' ' . $record['To'], $timezone);
+                    } catch (\Exception $exception) {
+                        throw new ImportException($exception->getMessage());
+                    }
+                    try {
+                        $begin = (new \DateTime())->setTimezone($timezone)->setTimestamp($end->getTimestamp() - $duration);
+                    } catch (\Exception $exception) {
+                        throw new ImportException($exception->getMessage());
+                    }
                 } elseif (empty($record['To'])) {
-                    $begin = new \DateTime($record['Date'] . ' ' . $record['From'], $timezone);
-                    $end = (new \DateTime())->setTimezone($timezone)->setTimestamp($begin->getTimestamp() + $duration);
+                    try {
+                        $begin = new \DateTime($record['Date'] . ' ' . $record['From'], $timezone);
+                    } catch (\Exception $exception) {
+                        throw new ImportException($exception->getMessage());
+                    }
+                    try {
+                        $end = (new \DateTime())->setTimezone($timezone)->setTimestamp($begin->getTimestamp() + $duration);
+                    } catch (\Exception $exception) {
+                        throw new ImportException($exception->getMessage());
+                    }
                 } else {
-                    $begin = new \DateTime($record['Date'] . ' ' . $record['From'], $timezone);
-                    $end = new \DateTime($record['Date'] . ' ' . $record['To'], $timezone);
+                    try {
+                        $begin = new \DateTime($record['Date'] . ' ' . $record['From'], $timezone);
+                    } catch (\Exception $exception) {
+                        throw new ImportException($exception->getMessage());
+                    }
+                    try {
+                        $end = new \DateTime($record['Date'] . ' ' . $record['To'], $timezone);
+                    } catch (\Exception $exception) {
+                        throw new ImportException($exception->getMessage());
+                    }
 
                     // fix dates, which are running over midnight
                     if ($end < $begin) {
@@ -291,7 +298,10 @@ final class TimesheetImporter implements ImporterInterface
     private function getUser(string $user): ?User
     {
         if (!\array_key_exists($user, $this->userCache)) {
-            $tmpUser = $this->userService->findUserByUsernameOrEmail($user);
+            $tmpUser = $this->userService->findUserByEmail($user);
+            if ($tmpUser === null) {
+                $tmpUser = $this->userService->findUserByName($user);
+            }
             $this->userCache[$user] = $tmpUser;
         }
 
