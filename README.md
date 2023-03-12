@@ -9,10 +9,11 @@ Read how to [import data from Kimai 1](https://www.kimai.org/documentation/migra
 ## Features
 
 You can import the following data:
-- Customer
-- Project
 - Timesheet
-- Customer (via Grandtotal)
+- Clockify (Timesheet)
+- Project
+- Customer
+- Grandtotal (Customer)
 - Kimai v1 (everything)
 
 Supported formats: JSON and CSV
@@ -25,7 +26,7 @@ This plugin is compatible with the following Kimai releases:
 
 | Bundle version | Minimum Kimai version |
 |----------------|-----------------------|
-| 2.0 - 2.0.1    | 2.0                   |
+| 2.0 - 2.1.0    | 2.0                   |
 | 1.0 - 1.2      | 1.22.0                |
 
 You find the most notable changes between the versions in the file [CHANGELOG.md](CHANGELOG.md).
