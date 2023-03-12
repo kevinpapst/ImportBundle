@@ -11,12 +11,18 @@
 namespace KimaiPlugin\ImportBundle\Controller;
 
 use App\Controller\AbstractController;
-use App\Utils\FileHelper;
 use App\Utils\PageSetup;
 use KimaiPlugin\ImportBundle\Form\ImportForm;
+use KimaiPlugin\ImportBundle\Form\TimesheetImportForm;
+use KimaiPlugin\ImportBundle\Importer\ClockifyTimesheetImporter;
+use KimaiPlugin\ImportBundle\Importer\CustomerImporter;
+use KimaiPlugin\ImportBundle\Importer\GrandtotalCustomerImporter;
 use KimaiPlugin\ImportBundle\Importer\ImporterService;
 use KimaiPlugin\ImportBundle\Importer\ImportException;
+use KimaiPlugin\ImportBundle\Importer\ProjectImporter;
+use KimaiPlugin\ImportBundle\Importer\TimesheetImporter;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
+use KimaiPlugin\ImportBundle\Model\TimesheetImportModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,11 +34,50 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ImportController extends AbstractController
 {
     #[Route(path: '/', name: 'importer', methods: ['GET', 'POST'])]
-    public function importer(Request $request, FileHelper $fileHelper, ImporterService $importerService): Response
+    #[Route(path: '/timesheet', name: 'importer_timesheet', methods: ['GET', 'POST'])]
+    public function timesheet(Request $request, ImporterService $importerService): Response
     {
-        $model = new ImportModel();
-        $editForm = $this->createForm(ImportForm::class, $model, [
-            'action' => $this->generateUrl('importer'),
+        return $this->showForm($request, new TimesheetImportModel(), TimesheetImportForm::class, 'timesheet', 'importer_timesheet', TimesheetImporter::class, $importerService);
+    }
+
+    #[Route(path: '/customer', name: 'importer_customer', methods: ['GET', 'POST'])]
+    public function customer(Request $request, ImporterService $importerService): Response
+    {
+        return $this->showForm($request, new ImportModel(), ImportForm::class, 'customer', 'importer_customer', CustomerImporter::class, $importerService);
+    }
+
+    #[Route(path: '/project', name: 'importer_project', methods: ['GET', 'POST'])]
+    public function project(Request $request, ImporterService $importerService): Response
+    {
+        return $this->showForm($request, new ImportModel(), ImportForm::class, 'project', 'importer_project', ProjectImporter::class, $importerService);
+    }
+
+    #[Route(path: '/grandtotal', name: 'importer_grandtotal', methods: ['GET', 'POST'])]
+    public function grandtotal(Request $request, ImporterService $importerService): Response
+    {
+        return $this->showForm($request, new ImportModel(), ImportForm::class, 'grandtotal', 'importer_grandtotal', GrandtotalCustomerImporter::class, $importerService);
+    }
+
+    #[Route(path: '/clockify', name: 'importer_clockify', methods: ['GET', 'POST'])]
+    public function clockify(Request $request, ImporterService $importerService): Response
+    {
+        return $this->showForm($request, new TimesheetImportModel(), TimesheetImportForm::class, 'clockify', 'importer_clockify', ClockifyTimesheetImporter::class, $importerService);
+    }
+
+    /**
+     * @param Request $request
+     * @param ImportModel $model
+     * @param class-string $formClass
+     * @param string $tab
+     * @param string $route
+     * @param class-string $importer
+     * @param ImporterService $importerService
+     * @return Response
+     */
+    private function showForm(Request $request, ImportModel $model, string $formClass, string $tab, string $route, string $importer, ImporterService $importerService): Response
+    {
+        $editForm = $this->createForm($formClass, $model, [
+            'action' => $this->generateUrl($route),
             'method' => 'POST',
         ]);
         $data = null;
@@ -41,7 +86,7 @@ final class ImportController extends AbstractController
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             try {
-                $data = $importerService->import($model);
+                $data = $importerService->import($model, $importer);
             } catch (ImportException $importException) {
                 $editForm->addError(new FormError($importException->getMessage()));
             }
@@ -52,6 +97,7 @@ final class ImportController extends AbstractController
 
         return $this->render('@Import/index.html.twig', [
             'page_setup' => $page,
+            'tab' => $tab,
             'model' => $model,
             'data' => $data,
             'form' => $editForm->createView()
@@ -65,6 +111,7 @@ final class ImportController extends AbstractController
     #[Route(path: '/example/timesheet-csv', name: 'importer_example_timesheet_csv', methods: ['GET'])]
     #[Route(path: '/example/timesheet-json', name: 'importer_example_timesheet_json', methods: ['GET'])]
     #[Route(path: '/example/grandtotal', name: 'importer_example_grandtotal', methods: ['GET'])]
+    #[Route(path: '/example/clockify', name: 'importer_example_clockify', methods: ['GET'])]
     public function demoFiles(Request $request): Response
     {
         switch ($request->get('_route')) {
@@ -88,6 +135,9 @@ final class ImportController extends AbstractController
 
             case 'importer_example_grandtotal':
                 return $this->file(__DIR__ . '/../Resources/demo/grandtotal.csv');
+
+            case 'importer_example_clockify':
+                return $this->file(__DIR__ . '/../Resources/demo/clockify.csv');
         }
 
         throw $this->createNotFoundException('Unknown demo file');

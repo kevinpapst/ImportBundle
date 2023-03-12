@@ -16,6 +16,8 @@ use App\Entity\Project;
 use App\Project\ProjectService;
 use App\Validator\ValidationFailedException;
 use KimaiPlugin\ImportBundle\Model\ImportData;
+use KimaiPlugin\ImportBundle\Model\ImportModel;
+use KimaiPlugin\ImportBundle\Model\ImportModelInterface;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -24,7 +26,7 @@ final class ProjectImporter implements ImporterInterface
     /**
      * @var Customer[]
      */
-    private $customerCache = [];
+    private array $customerCache = [];
 
     public function __construct(private ProjectService $projectService, private CustomerService $customerService, private ValidatorInterface $validator)
     {
@@ -60,15 +62,17 @@ final class ProjectImporter implements ImporterInterface
     }
 
     /**
+     * @param ImportModel $model
      * @param array<ImportRow> $rows
-     * @param bool $dryRun
      * @return ImportData
      */
-    public function import(array $rows, bool $dryRun): ImportData
+    public function import(ImportModelInterface $model, array $rows): ImportData
     {
+        $dryRun = $model->isPreview();
         $data = new ImportData('projects', array_keys($rows[0]->getData()));
 
         $createdCustomer = 0;
+        $createdProject = 0;
 
         foreach ($rows as $row) {
             try {
@@ -88,6 +92,7 @@ final class ProjectImporter implements ImporterInterface
                     }
                     $this->projectService->saveNewProject($project);
                 }
+                $createdProject++;
             } catch (ImportException $exception) {
                 $row->addError($exception->getMessage());
             } catch (ValidationFailedException $exception) {
@@ -99,7 +104,11 @@ final class ProjectImporter implements ImporterInterface
         }
 
         if ($createdCustomer > 0) {
-            $data->addStatus('created ' . $createdCustomer . ' customer');
+            $data->addStatus('created ' . $createdCustomer . ' customers');
+        }
+
+        if ($createdProject > 0) {
+            $data->addStatus('created ' . $createdProject . ' projects');
         }
 
         return $data;

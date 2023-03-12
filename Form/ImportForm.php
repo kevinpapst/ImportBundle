@@ -37,7 +37,7 @@ class ImportForm extends AbstractType
                 'constraints' => [new NotBlank()]
             ])
             ->add('preview', CheckboxType::class, [
-                'label' => 'importer.preview',
+                'label' => 'preview',
                 'required' => false,
             ])
             ->add('importFile', FileType::class, [

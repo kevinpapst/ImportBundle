@@ -6,25 +6,13 @@
         <source>Importer</source>
         <target>Importer</target>
       </trans-unit>
-      <trans-unit id="Fc4Ji7L" resname="importer.introduction">
-        <source>importer.introduction</source>
-        <target>Sie können Kunden und Projekte mit einem einfachen Dateiupload importieren.</target>
-      </trans-unit>
       <trans-unit id="kuOJSXo" resname="importer.download_examples">
         <source>importer.download_examples</source>
-        <target>Download von Beispiel-Dateien im %format%-Format für:</target>
-      </trans-unit>
-      <trans-unit id=".GCKEWk" resname="importer.how_it_works">
-        <source>importer.how_it_works</source>
-        <target>Wie funktioniert das?</target>
+        <target>Download von Beispiel-Dateien</target>
       </trans-unit>
       <trans-unit id="wLgWnO8" resname="importer.how_to_upload">
         <source>importer.how_to_upload</source>
-        <target>Sobald Sie die Datei hochgeladen haben, wird der Importer diese analysieren. Wenn alles korrekt ist, können Sie die Daten überprüfen und den Import abschließen, indem Sie die Datei erneut hochladen, nachdem Sie die "Importvorschau" deaktiviert haben.</target>
-      </trans-unit>
-      <trans-unit id="engvb23" resname="importer.preview">
-        <source>importer.preview</source>
-        <target>Importvorschau</target>
+        <target>Nach dem Upload wird der Importer die Datei analysieren. Wenn alles korrekt ist, können Sie die Daten importieren, indem Sie die "Vorschau" deaktivieren und die Datei erneut hochladen.</target>
       </trans-unit>
       <trans-unit id="tP3vIsQ" resname="importer.delimiter">
         <source>importer.delimiter</source>
@@ -44,7 +32,11 @@
       </trans-unit>
       <trans-unit id="q_.GtCp" resname="importer.grandtotal">
         <source>importer.grandtotal</source>
-        <target>Kunden (Grandtotal)</target>
+        <target>Grandtotal (Kunden)</target>
+      </trans-unit>
+      <trans-unit id="p7HgHRI" resname="importer.global_activity">
+        <source>importer.global_activity</source>
+        <target>Globale Tätigkeiten verwenden (deaktivieren für Projekt-spezifische Tätigkeiten)</target>
       </trans-unit>
     </body>
   </file>

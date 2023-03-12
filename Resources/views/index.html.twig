@@ -8,34 +8,58 @@
         {% block box_before %}
             {{ form_start(form) }}
         {% endblock %}
+        {% block box_header %}
+            <ul class="nav nav-pills card-header-pills" data-bs-toggle="tabs">
+                <li class="nav-item" role="presentation">
+                    <a href="{{ path('importer_timesheet') }}" class="nav-link{% if tab == 'timesheet' %} active{% endif %}" role="tab">{{ 'timesheet'|trans }}</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a href="{{ path('importer_customer') }}" class="nav-link{% if tab == 'customer' %} active{% endif %}" role="tab">{{ 'customer'|trans }}</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a href="{{ path('importer_project') }}" class="nav-link{% if tab == 'project' %} active{% endif %}" role="tab">{{ 'project'|trans }}</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a href="{{ path('importer_clockify') }}" class="nav-link{% if tab == 'clockify' %} active{% endif %}" role="tab">Clockify</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a href="{{ path('importer_grandtotal') }}" class="nav-link{% if tab == 'grandtotal' %} active{% endif %}" role="tab">{{ 'importer.grandtotal'|trans }}</a>
+                </li>
+            </ul>
+        {% endblock %}
         {% block box_body %}
-            <p>
-                {{ 'importer.introduction'|trans }}
-            </p>
-            <p>
-                {{ 'importer.download_examples'|trans({'%format%': 'CSV'}) }}
-                <a href="{{ path('importer_example_customer_csv') }}">{{ 'customers'|trans}}</a>,
-                <a href="{{ path('importer_example_grandtotal') }}">{{ 'importer.grandtotal'|trans}}</a>,
-                <a href="{{ path('importer_example_project_csv') }}">{{ 'projects'|trans}}</a>,
-                <a href="{{ path('importer_example_timesheet_csv') }}">{{ 'time_tracking'|trans}}</a>
-                <br>
-                {{ 'importer.download_examples'|trans({'%format%': 'JSON'}) }}
-                <a href="{{ path('importer_example_customer_json') }}">{{ 'customers'|trans}}</a>,
-                <a href="{{ path('importer_example_project_json') }}">{{ 'projects'|trans}}</a>,
-                <a href="{{ path('importer_example_timesheet_json') }}">{{ 'time_tracking'|trans}}</a>
-            </p>
-
-            <p><strong>{{ 'importer.how_it_works'|trans }}</strong></p>
-
-            <p>{{ 'importer.how_to_upload'|trans }}</p>
+            <div class="mb-3 row">
+                <label class="col-form-label col-sm-2">{{ 'importer.download_examples'|trans }}</label>
+                <div class="col-sm-10">
+                    {% if tab == 'timesheet' %}
+                        <a class="btn" href="{{ path('importer_example_timesheet_csv') }}">CSV</a>
+                        <a class="btn" href="{{ path('importer_example_timesheet_json') }}">JSON</a>
+                    {% elseif tab == 'customer' %}
+                        <a class="btn" href="{{ path('importer_example_customer_csv') }}">CSV</a>
+                        <a class="btn" href="{{ path('importer_example_customer_json') }}">JSON</a>
+                    {% elseif tab == 'project' %}
+                        <a class="btn" href="{{ path('importer_example_project_csv') }}">CSV</a>
+                        <a class="btn" href="{{ path('importer_example_project_json') }}">JSON</a>
+                    {% elseif tab == 'clockify' %}
+                        <a class="btn" href="{{ path('importer_example_clockify') }}">CSV</a>
+                    {% elseif tab == 'grandtotal' %}
+                        <a class="btn" href="{{ path('importer_example_grandtotal') }}">CSV</a>
+                    {% endif %}
+                </div>
+            </div>
 
             {{ form_errors(form) }}
             {{ form_row(form.importFile) }}
             {{ form_row(form.delimiter) }}
-            {{ form_row(form.preview) }}
+            {% set preview = form_row(form.preview) %}
+            {{ form_rest(form) }}
+            {{ preview|raw }}
+
+            {% from "macros/widgets.html.twig" import callout %}
+            {{ callout('info', 'importer.how_to_upload', null, 'help') }}
+
         {% endblock %}
         {% block box_after %}
-            {{ form_rest(form) }}
             {{ form_end(form) }}
         {% endblock %}
         {% block box_footer %}
@@ -59,7 +83,7 @@
         {% endfor %}
 
         {% if model.preview %}
-            {{ widgets.callout('warning', 'importer.preview'|trans ~ ': ' ~ statusTrans) }}
+            {{ widgets.callout('warning', 'preview'|trans ~ ': ' ~ statusTrans) }}
         {% endif %}
 
         {% if countErrors > 0 or model.preview %}
@@ -76,13 +100,13 @@
                         <tbody>
                         {% for row in importData.rows %}
                             {% set hasError = row.hasError() %}
-                            <tr{% if hasError %} class="warning"{% endif %}>
+                            <tr{% if hasError %} class="text-warning"{% endif %}>
                                 {% for key, data in row.data %}
                                     <td>{{ data }}</td>
                                 {% endfor %}
                             </tr>
                             {% if hasError %}
-                            <tr class="danger">
+                            <tr class="text-danger">
                                 <td colspan="{{ headerLength }}">
                                     <ul>
                                         {% for error in row.getErrors() %}

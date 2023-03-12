@@ -29,29 +29,48 @@ final class ImporterService
 
     /**
      * @param ImportModel $model
+     * @param class-string $importer
      * @return ImportData
      * @throws ImportException
      */
-    public function import(ImportModel $model): ImportData
+    public function import(ImportModel $model, string $importer): ImportData
     {
         if ($model->getImportFile() === null) {
             throw new ImportException('Missing uploaded file');
         }
 
+        $found = false;
+        foreach ($this->importer as $tmp) {
+            if ($tmp instanceof $importer) {
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            throw new ImportException('Unknown importer requested');
+        }
+
         $file = $model->getImportFile();
 
         if ($file->getMimeType() === 'text/csv' || $file->getClientMimeType() === 'text/csv') {
-            return $this->importCsv($model);
+            return $this->importCsv($model, $importer);
         }
 
         if ($file->getMimeType() === 'application/json' || $file->getClientMimeType() === 'application/json') {
-            return $this->importJson($model);
+            return $this->importJson($model, $importer);
         }
 
         throw new ImportException('Unsupported file given');
     }
 
-    private function importJson(ImportModel $model): ImportData
+    /**
+     * @param ImportModel $model
+     * @param class-string $import
+     * @return ImportData
+     * @throws ImportException
+     */
+    private function importJson(ImportModel $model, string $import): ImportData
     {
         try {
             if ($model->getImportFile() === null) {
@@ -70,16 +89,18 @@ final class ImporterService
                 throw new ImportException('Unsupported file given: empty');
             }
 
+            /** @var array<int, string> $header */
             $header = array_keys($data[0]);
-
-            $preview = $model->isPreview();
 
             if ($totalRows > self::MAX_ROWS) {
                 throw new ImportException('Maximum of 1000 rows allowed per import');
             }
 
             foreach ($this->importer as $importer) {
-                if ($importer->supports($header)) {
+                if ($importer instanceof $import) {
+                    if (!$importer->supports($header)) {
+                        throw new ImportException('Invalid file given, not supported');
+                    }
                     $rows = [];
                     /** @var array<string, mixed> $record */
                     foreach ($data as $record) {
@@ -88,7 +109,7 @@ final class ImporterService
 
                     @unlink($model->getImportFile()->getRealPath());
 
-                    return $importer->import($rows, $preview);
+                    return $importer->import($model, $rows);
                 }
             }
         } catch (\Exception $ex) {
@@ -98,7 +119,13 @@ final class ImporterService
         throw new ImportException('Could not find matching importer');
     }
 
-    private function importCsv(ImportModel $model): ImportData
+    /**
+     * @param ImportModel $model
+     * @param class-string $import
+     * @return ImportData
+     * @throws ImportException
+     */
+    private function importCsv(ImportModel $model, string $import): ImportData
     {
         try {
             if ($model->getImportFile() === null) {
@@ -128,14 +155,15 @@ final class ImporterService
                 throw new ImportException('Unsupported file given: wrong delimiter?');
             }
 
-            $preview = $model->isPreview();
-
             if ($csv->count() > self::MAX_ROWS) {
                 throw new ImportException('Maximum of 1000 rows allowed per import');
             }
 
             foreach ($this->importer as $importer) {
-                if ($importer->supports($header)) {
+                if ($importer instanceof $import) {
+                    if (!$importer->supports($header)) {
+                        throw new ImportException('Invalid file given, not supported');
+                    }
                     $rows = [];
                     /** @var array<string, mixed> $record */
                     foreach ($csv->getRecords() as $record) {
@@ -144,7 +172,7 @@ final class ImporterService
 
                     @unlink($model->getImportFile()->getRealPath());
 
-                    return $importer->import($rows, $preview);
+                    return $importer->import($model, $rows);
                 }
             }
         } catch (LeagueException $ex) {

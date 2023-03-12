@@ -14,6 +14,8 @@ use App\Customer\CustomerService;
 use App\Entity\Customer;
 use App\Validator\ValidationFailedException;
 use KimaiPlugin\ImportBundle\Model\ImportData;
+use KimaiPlugin\ImportBundle\Model\ImportModel;
+use KimaiPlugin\ImportBundle\Model\ImportModelInterface;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -42,13 +44,16 @@ final class GrandtotalCustomerImporter implements ImporterInterface
     }
 
     /**
+     * @param ImportModel $model
      * @param array<ImportRow> $rows
-     * @param bool $dryRun
      * @return ImportData
      */
-    public function import(array $rows, bool $dryRun): ImportData
+    public function import(ImportModelInterface $model, array $rows): ImportData
     {
+        $dryRun = $model->isPreview();
         $data = new ImportData('importer.grandtotal', array_keys($rows[0]->getData()));
+
+        $createdCustomers = 0;
 
         foreach ($rows as $row) {
             try {
@@ -57,6 +62,7 @@ final class GrandtotalCustomerImporter implements ImporterInterface
                 if (!$dryRun) {
                     $this->customerService->saveNewCustomer($customer);
                 }
+                $createdCustomers++;
             } catch (ImportException $exception) {
                 $row->addError($exception->getMessage());
             } catch (ValidationFailedException $exception) {
@@ -66,6 +72,10 @@ final class GrandtotalCustomerImporter implements ImporterInterface
             }
 
             $data->addRow($row);
+        }
+
+        if ($createdCustomers > 0) {
+            $data->addStatus(sprintf('created %s customers', $createdCustomers));
         }
 
         return $data;

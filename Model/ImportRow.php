@@ -13,17 +13,15 @@ namespace KimaiPlugin\ImportBundle\Model;
 final class ImportRow
 {
     /**
-     * @var array<string, mixed>
-     */
-    private $row;
-    /**
      * @var array<string>
      */
-    private $errors = [];
+    private array $errors = [];
 
-    public function __construct(array $row)
+    /**
+     * @param array<string, mixed> $row
+     */
+    public function __construct(private array $row)
     {
-        $this->row = $row;
     }
 
     public function addError(string $error): void

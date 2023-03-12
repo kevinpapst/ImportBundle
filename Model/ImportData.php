@@ -15,24 +15,14 @@ final class ImportData
     /**
      * @var array<ImportRow>
      */
-    private $rows;
+    private array $rows;
     /**
      * @var array<string>
      */
-    private $header;
-    /**
-     * @var array<string>
-     */
-    private $status = [];
-    /**
-     * @var string
-     */
-    private $name;
+    private array $status = [];
 
-    public function __construct(string $title, array $header)
+    public function __construct(private string $name, private array $header)
     {
-        $this->name = $title;
-        $this->header = $header;
     }
 
     public function getTitle(): string

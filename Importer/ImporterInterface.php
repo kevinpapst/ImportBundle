@@ -11,16 +11,20 @@
 namespace KimaiPlugin\ImportBundle\Importer;
 
 use KimaiPlugin\ImportBundle\Model\ImportData;
+use KimaiPlugin\ImportBundle\Model\ImportModelInterface;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
 
 interface ImporterInterface
 {
+    /**
+     * @param array<int, string> $header
+     */
     public function supports(array $header): bool;
 
     /**
+     * @param ImportModelInterface $model
      * @param array<ImportRow> $rows
-     * @param bool $dryRun
      * @return ImportData
      */
-    public function import(array $rows, bool $dryRun): ImportData;
+    public function import(ImportModelInterface $model, array $rows): ImportData;
 }

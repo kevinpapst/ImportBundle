@@ -1,0 +1,3 @@
+Project;Client;Description;Task;User;Group;Email;Tags;Billable;Start Date;Start Time;End Date;End Time;Duration (h);Duration (decimal);Billable Rate (GBP);Billable Amount (GBP)
+Accounting;;;General;Example User;Example Group;user@example.com;clockify;No;7/27/22;1:00 PM;7/27/22;4:30 PM;3:30;3,5;0;0
+Accounting;Demo Import;a short description;General;Susan Maier;Example Group;user2@example.com;foo,clockify;Yes;2022-07-27;13:00;2022-07-27;17:30;3:30;3,5;0;0

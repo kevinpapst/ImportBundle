@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.1.0
+
+Compatible with Kimai 2.0
+
+- Added: new tabs for different importer
+- Added: support creating user during import
+- Added: new importer for Clockify migrations
+- Added: option to choose between global and project-specific activities
+- Fixed: Highlight errors
+
 ## 2.0.2
 
 Compatible with Kimai 2.0

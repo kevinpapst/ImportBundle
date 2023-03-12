@@ -12,7 +12,7 @@ namespace KimaiPlugin\ImportBundle\Model;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-final class ImportModel
+class ImportModel implements ImportModelInterface
 {
     private ?UploadedFile $importFile = null;
     private ?string $delimiter = ';';
