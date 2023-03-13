@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.2
+
+Compatible with Kimai 2.0
+
+- Fixed: catch any Exception during CSV import
+
 ## 2.1.1
 
 Compatible with Kimai 2.0

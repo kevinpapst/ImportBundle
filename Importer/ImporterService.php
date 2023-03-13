@@ -175,7 +175,7 @@ final class ImporterService
                     return $importer->import($model, $rows);
                 }
             }
-        } catch (LeagueException $ex) {
+        } catch (\Exception $ex) {
             throw new ImportException($ex->getMessage());
         }
 
