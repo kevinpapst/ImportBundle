@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.1
+
+Compatible with Kimai 2.0
+
+- Fix: use UserService to create new user with default settings
+
 ## 2.1.0
 
 Compatible with Kimai 2.0

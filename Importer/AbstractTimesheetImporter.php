@@ -308,7 +308,7 @@ abstract class AbstractTimesheetImporter
             }
 
             if ($tmpUser === null) {
-                $tmpUser = new User();
+                $tmpUser = $this->userService->createNewUser();
                 $tmpUser->setEmail($email);
                 $tmpUser->setUserIdentifier($user);
                 $tmpUser->setPlainPassword(uniqid());
