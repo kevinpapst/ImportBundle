@@ -13,7 +13,6 @@ namespace KimaiPlugin\ImportBundle\Importer;
 use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
-use League\Csv\Exception as LeagueException;
 use League\Csv\Reader;
 
 final class ImporterService
