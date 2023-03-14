@@ -4,6 +4,7 @@
 
 Compatible with Kimai 2.0
 
+- Fixed: deactivate listener for import, reducing extra DB queries (now 1k imported rows = ~7k queries, instead of 22k before)
 - Fixed: improved boolean parsing
   - strings `yes`, `true`, `1` = true
   - everything else (e.g. `no`, `false`, `0`, empty string) = false

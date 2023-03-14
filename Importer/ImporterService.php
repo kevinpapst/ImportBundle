@@ -10,6 +10,8 @@
 
 namespace KimaiPlugin\ImportBundle\Importer;
 
+use App\Doctrine\TimesheetSubscriber;
+use Doctrine\DBAL\Connection;
 use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
@@ -22,7 +24,7 @@ final class ImporterService
     /**
      * @param iterable<ImporterInterface> $importer
      */
-    public function __construct(private iterable $importer)
+    public function __construct(private iterable $importer, private Connection $connection)
     {
     }
 
@@ -51,6 +53,19 @@ final class ImporterService
         }
 
         $file = $model->getImportFile();
+
+
+        $allListener = $this->connection->getEventManager()->getAllListeners();
+        foreach ($allListener as $event => $listeners) {
+            foreach ($listeners as $hash => $object) {
+                if ($object instanceof TimesheetSubscriber) {
+                    $this->connection->getEventManager()->removeEventListener([$event], $object);
+                } elseif ($object instanceof \KimaiPlugin\AuditTrailBundle\Doctrine\MetadataSubscriber) { // @ phpstan-ignore-line
+                    // deactivate audit plugin listener
+                    $this->connection->getEventManager()->removeEventListener([$event], $object);
+                }
+            }
+        }
 
         if ($file->getMimeType() === 'text/csv' || $file->getClientMimeType() === 'text/csv') {
             return $this->importCsv($model, $importer);
