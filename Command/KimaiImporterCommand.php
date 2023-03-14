@@ -662,7 +662,7 @@ final class KimaiImporterCommand extends Command
     {
         $connection = $this->getDoctrine()->getConnection();
 
-        $allListener = $connection->getEventManager()->getListeners();
+        $allListener = $connection->getEventManager()->getAllListeners();
         foreach ($allListener as $event => $listeners) {
             foreach ($listeners as $hash => $object) {
                 if ($object instanceof TimesheetSubscriber) {
