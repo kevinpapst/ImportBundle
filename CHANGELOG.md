@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.3
+
+Compatible with Kimai 2.0
+
+- Fixed: improved boolean parsing
+  - strings `yes`, `true`, `1` = true
+  - everything else (e.g. `no`, `false`, `0`, empty string) = false
+
 ## 2.1.2
 
 Compatible with Kimai 2.0

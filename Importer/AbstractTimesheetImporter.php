@@ -69,6 +69,31 @@ abstract class AbstractTimesheetImporter
     ) {
     }
 
+    protected function convertBoolean(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if ($value === null || $value === '') {
+            return false;
+        }
+
+        if (is_int($value)) {
+            return (bool) $value;
+        }
+
+        if (is_string($value)) {
+            $value = strtolower(trim($value));
+
+            if ($value === 'true' || $value === 'on' || $value === '1') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function importRow(Duration $durationParser, ImportData $data, ImportRow $row, bool $dryRun): void
     {
         try {
@@ -212,14 +237,14 @@ abstract class AbstractTimesheetImporter
             $this->timesheetRepository->prepareNewTimesheet($timesheet);
 
             if (\is_bool($record['Billable'])) {
-                $timesheet->setBillable($record['Billable']);
+                $timesheet->setBillable($this->convertBoolean($record['Billable']));
             }
             $timesheet->setActivity($activity);
             $timesheet->setProject($project);
             $timesheet->setBegin($begin);
             $timesheet->setEnd($end);
             $timesheet->setDescription($record['Description']);
-            $timesheet->setExported((bool) $record['Exported']);
+            $timesheet->setExported($this->convertBoolean($record['Exported']));
 
             if (!empty($record['Tags'])) {
                 foreach (explode(',', $record['Tags']) as $tagName) {

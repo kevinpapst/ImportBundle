@@ -83,6 +83,7 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
                 case 'Project':
                 case 'Description':
                 case 'Tags':
+                case 'Billable': // Yes and No will be auto converted by the base class!
                     $values[$key] = $value;
                     break;
                 case 'Client':
@@ -95,9 +96,6 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
                     break;
                 case 'Group':
                     // TODO
-                    break;
-                case 'Billable':
-                    $values['Billable'] = ($value === 'Yes');
                     break;
 
                 case 'Start Date':
