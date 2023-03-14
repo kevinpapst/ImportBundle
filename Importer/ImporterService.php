@@ -59,7 +59,7 @@ final class ImporterService
             foreach ($listeners as $hash => $object) {
                 if ($object instanceof TimesheetSubscriber) {
                     $this->connection->getEventManager()->removeEventListener([$event], $object);
-                } elseif ($object instanceof \KimaiPlugin\AuditTrailBundle\Doctrine\MetadataSubscriber) { // @ phpstan-ignore-line
+                } elseif ($object instanceof \KimaiPlugin\AuditTrailBundle\Doctrine\MetadataSubscriber) { // @phpstan-ignore-line
                     // deactivate audit plugin listener
                     $this->connection->getEventManager()->removeEventListener([$event], $object);
                 }
