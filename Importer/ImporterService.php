@@ -54,7 +54,6 @@ final class ImporterService
 
         $file = $model->getImportFile();
 
-
         $allListener = $this->connection->getEventManager()->getAllListeners();
         foreach ($allListener as $event => $listeners) {
             foreach ($listeners as $hash => $object) {

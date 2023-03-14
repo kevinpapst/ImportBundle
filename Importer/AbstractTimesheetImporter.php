@@ -71,7 +71,7 @@ abstract class AbstractTimesheetImporter
 
     protected function convertBoolean(mixed $value): bool
     {
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             return $value;
         }
 
@@ -79,11 +79,11 @@ abstract class AbstractTimesheetImporter
             return false;
         }
 
-        if (is_int($value)) {
+        if (\is_int($value)) {
             return (bool) $value;
         }
 
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $value = strtolower(trim($value));
 
             if ($value === 'true' || $value === 'on' || $value === '1') {
