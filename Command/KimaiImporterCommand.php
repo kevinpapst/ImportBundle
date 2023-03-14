@@ -10,7 +10,7 @@
 
 namespace KimaiPlugin\ImportBundle\Command;
 
-use App\Doctrine\TimesheetSubscriber;
+use App\Doctrine\DataSubscriberInterface;
 use App\Entity\Activity;
 use App\Entity\ActivityMeta;
 use App\Entity\ActivityRate;
@@ -126,7 +126,7 @@ final class KimaiImporterCommand extends Command
      */
     private array $options = [];
 
-    public function __construct(private UserPasswordHasherInterface $passwordHasher, private ManagerRegistry $doctrine, private ValidatorInterface $validator)
+    public function __construct(private UserPasswordHasherInterface $passwordHasher, private ManagerRegistry $doctrine, private EntityManagerInterface $entityManager, private ValidatorInterface $validator)
     {
         parent::__construct();
     }
@@ -658,18 +658,14 @@ final class KimaiImporterCommand extends Command
     /**
      * Remove the timesheet lifecycle events subscriber, which would overwrite values for imported timesheet records.
      */
-    private function deactivateLifecycleCallbacks()
+    private function deactivateLifecycleCallbacks(): void
     {
-        $connection = $this->getDoctrine()->getConnection();
-
-        $allListener = $connection->getEventManager()->getAllListeners();
+        $evm = $this->entityManager->getEventManager();
+        $allListener = $evm->getAllListeners();
         foreach ($allListener as $event => $listeners) {
             foreach ($listeners as $hash => $object) {
-                if ($object instanceof TimesheetSubscriber) {
-                    $connection->getEventManager()->removeEventListener([$event], $object);
-                } elseif ($object instanceof \KimaiPlugin\AuditTrailBundle\Doctrine\MetadataSubscriber) { // @phpstan-ignore-line
-                    // deactivate audit plugin listener
-                    $connection->getEventManager()->removeEventListener([$event], $object);
+                if ($object instanceof DataSubscriberInterface) {
+                    $evm->removeEventListener([$event], $object);
                 }
             }
         }

@@ -10,8 +10,8 @@
 
 namespace KimaiPlugin\ImportBundle\Importer;
 
-use App\Doctrine\TimesheetSubscriber;
-use Doctrine\DBAL\Connection;
+use App\Doctrine\DataSubscriberInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
@@ -24,7 +24,7 @@ final class ImporterService
     /**
      * @param iterable<ImporterInterface> $importer
      */
-    public function __construct(private iterable $importer, private Connection $connection)
+    public function __construct(private iterable $importer, private EntityManagerInterface $entityManager)
     {
     }
 
@@ -54,14 +54,12 @@ final class ImporterService
 
         $file = $model->getImportFile();
 
-        $allListener = $this->connection->getEventManager()->getAllListeners();
+        $evm = $this->entityManager->getEventManager();
+        $allListener = $evm->getAllListeners();
         foreach ($allListener as $event => $listeners) {
             foreach ($listeners as $hash => $object) {
-                if ($object instanceof TimesheetSubscriber) {
-                    $this->connection->getEventManager()->removeEventListener([$event], $object);
-                } elseif ($object instanceof \KimaiPlugin\AuditTrailBundle\Doctrine\MetadataSubscriber) { // @phpstan-ignore-line
-                    // deactivate audit plugin listener
-                    $this->connection->getEventManager()->removeEventListener([$event], $object);
+                if ($object instanceof DataSubscriberInterface) {
+                    $evm->removeEventListener([$event], $object);
                 }
             }
         }

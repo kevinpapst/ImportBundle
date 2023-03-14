@@ -11,11 +11,6 @@ parameters:
     checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
         -
-            message: "#^Call to an undefined method object\\:\\:getEventManager\\(\\)\\.$#"
-            count: 3
-            path: Command/KimaiImporterCommand.php
-
-        -
             message: "#^Cannot call method getCustomers\\(\\) on App\\\\Entity\\\\Team\\|null\\.$#"
             count: 1
             path: Command/KimaiImporterCommand.php
@@ -57,11 +52,6 @@ parameters:
 
         -
             message: "#^Method KimaiPlugin\\\\ImportBundle\\\\Command\\\\KimaiImporterCommand\\:\\:createActivity\\(\\) should return App\\\\Entity\\\\Activity but returns App\\\\Entity\\\\Activity\\|null\\.$#"
-            count: 1
-            path: Command/KimaiImporterCommand.php
-
-        -
-            message: "#^Method KimaiPlugin\\\\ImportBundle\\\\Command\\\\KimaiImporterCommand\\:\\:deactivateLifecycleCallbacks\\(\\) has no return type specified\\.$#"
             count: 1
             path: Command/KimaiImporterCommand.php
 

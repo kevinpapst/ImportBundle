@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.4
+
+Compatibility: requires minimum Kimai 2.0.9
+
+- Added: identify auto-deactivation during batch imports
+
 ## 2.1.3
 
 Compatible with Kimai 2.0
