@@ -99,9 +99,6 @@ abstract class AbstractTimesheetImporter
         try {
             $record = $row->getData();
 
-            if (!\array_key_exists('Duration', $record)) {
-                $record['Duration'] = 0;
-            }
             if (!\array_key_exists('Tags', $record)) {
                 $record['Tags'] = '';
             }
@@ -156,13 +153,11 @@ abstract class AbstractTimesheetImporter
             $begin = null;
             $end = null;
             $duration = 0;
+            $foundDuration = null;
 
-            if (!empty($record['Duration'])) {
-                if (\is_int($record['Duration'])) {
-                    $duration = $record['Duration'];
-                } else {
-                    $duration = $durationParser->parseDurationString($record['Duration']);
-                }
+            if (!empty($record['Duration']) && \is_string($record['Duration'])) {
+                $duration = $this->parseDuration($durationParser, $record['Duration']);
+                $foundDuration = $duration;
             }
 
             $timezone = new \DateTimeZone($user->getTimezone());
@@ -246,6 +241,12 @@ abstract class AbstractTimesheetImporter
             $timesheet->setDescription($record['Description']);
             $timesheet->setExported($this->convertBoolean($record['Exported']));
 
+            if ($foundDuration !== null) {
+                $timesheet->setDuration($foundDuration);
+            } else {
+                $timesheet->setDuration($timesheet->getDuration());
+            }
+
             if (!empty($record['Tags'])) {
                 foreach (explode(',', $record['Tags']) as $tagName) {
                     if (empty($tagName)) {
@@ -280,6 +281,16 @@ abstract class AbstractTimesheetImporter
             }
         }
         $data->addRow($row);
+    }
+
+    protected function parseDuration(Duration $durationParser, string $duration): int
+    {
+        // we expect plain seconds
+        if (is_numeric($duration) && !str_contains($duration, '.') && !str_contains($duration, ',')) {
+            return (int) $duration;
+        }
+
+        return $durationParser->parseDurationString($duration);
     }
 
     abstract protected function createImportData(ImportRow $row): ImportData;

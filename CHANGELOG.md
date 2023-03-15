@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.5
+
+Compatibility: requires minimum Kimai 2.0.9
+
+- Fixed: duration parsing
+
 ## 2.1.4
 
 Compatibility: requires minimum Kimai 2.0.9
