@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.6
+
+Compatibility: requires minimum Kimai 2.0.9
+
+- Fixed: prevent error is tag name exceeds 500 character
+
 ## 2.1.5
 
 Compatibility: requires minimum Kimai 2.0.9

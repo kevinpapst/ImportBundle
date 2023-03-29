@@ -367,7 +367,7 @@ abstract class AbstractTimesheetImporter
 
             if ($tag === null) {
                 $tag = new Tag();
-                $tag->setName($tagName);
+                $tag->setName(mb_substr($tagName, 0, 100));
                 if (!$dryRun) {
                     $this->tagRepository->saveTag($tag);
                 }
