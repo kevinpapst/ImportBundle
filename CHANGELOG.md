@@ -1,10 +1,23 @@
 # Changelog
 
+## 2.2.0
+
+Compatibility: requires minimum Kimai 2.0.9 
+
+Better use with Kimai 2.0.15 to utilize new `Import` validator group.
+
+- Added: command option `skip-teams` to prevent team sync
+- Added: command option `check-already-imported` to prevent duplicate database entries
+- Added: use `Import` validator group
+- Fixed: `string` vs `int` comparison 
+- Fixed: `isset` vs `array_key_exists`
+- Fixed: `is_int` vs `is_numeric`
+
 ## 2.1.6
 
 Compatibility: requires minimum Kimai 2.0.9
 
-- Fixed: prevent error is tag name exceeds 500 character
+- Fixed: prevent error if tag name exceeds 500 character
 
 ## 2.1.5
 

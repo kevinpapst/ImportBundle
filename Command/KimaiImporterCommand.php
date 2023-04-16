@@ -161,9 +161,11 @@ final class KimaiImporterCommand extends Command
             ->addOption('meta-comment', null, InputOption::VALUE_REQUIRED, 'Name of the meta field which will be used to store the comment field')
             ->addOption('meta-location', null, InputOption::VALUE_REQUIRED, 'Name of the meta field which will be used to store the location field')
             ->addOption('meta-tracking-number', null, InputOption::VALUE_REQUIRED, 'Name of the meta field which will be used to store the trackingNumber field')
+            ->addOption('skip-teams', null, InputOption::VALUE_NONE, 'If set, teams will not be synced')
             ->addOption('skip-team-customers', null, InputOption::VALUE_NONE, 'If given, the team (group) permissions for customers will not be synced')
             ->addOption('skip-team-projects', null, InputOption::VALUE_NONE, 'If given, the team (group) permissions for projects will not be synced')
             ->addOption('skip-team-activities', null, InputOption::VALUE_NONE, 'If given, the team (group) permissions for activities will not be synced')
+            ->addOption('check-already-imported', null, InputOption::VALUE_NONE, 'If set, the import will check for existing users/customers/projects/activities in the existing database')
         ;
     }
 
@@ -192,9 +194,11 @@ final class KimaiImporterCommand extends Command
             'meta-comment' => $input->getOption('meta-comment'),
             'meta-location' => $input->getOption('meta-location'),
             'meta-trackingNumber' => $input->getOption('meta-tracking-number'),
+            'skip-teams' => $input->getOption('skip-teams'),
             'skip-team-customers' => $input->getOption('skip-team-customers'),
             'skip-team-projects' => $input->getOption('skip-team-projects'),
             'skip-team-activities' => $input->getOption('skip-team-activities'),
+            'check-already-imported' => $input->getOption('check-already-imported'),
         ];
     }
 
@@ -249,10 +253,10 @@ final class KimaiImporterCommand extends Command
         $this->deactivateLifecycleCallbacks();
         // create reading database connection to Kimai 1
         $this->connection = $connection = DriverManager::getConnection(['url' => $options['url']]);
-        $this->connection->getConfiguration()->setSQLLogger();
+        $this->connection->getConfiguration()->setSQLLogger(null); // FIXME @deprecated
         /** @var Connection $c */
         $c = $this->doctrine->getConnection();
-        $c->getConfiguration()->setSQLLogger();
+        $c->getConfiguration()->setSQLLogger(null); // FIXME @deprecated
 
         foreach ($options['prefix'] as $prefix) {
             $this->dbPrefix = $prefix;
@@ -369,6 +373,12 @@ final class KimaiImporterCommand extends Command
             }
             $io->success('Pre-validated data, importing now');
 
+            if ($options['check-already-imported']) {
+                // Calling clearCache will fill it as well, so we make sure to NOT import data twice for: users, customer, projects, activities
+                // super useful for testing errors in timesheets
+                $this->clearCache();
+            }
+
             try {
                 $counter = $this->importUsers($io, $options['password'], $users, $rates, $options['timezone'], $options['language']);
                 $allImports += $counter;
@@ -410,24 +420,26 @@ final class KimaiImporterCommand extends Command
                 return Command::FAILURE;
             }
 
-            try {
-                $counter = $this->importGroups($io);
-                $allImports += $counter;
-                $io->success('Imported groups/teams: ' . $counter);
-            } catch (Exception $ex) {
-                $io->error('Failed to import groups/teams: ' . $ex->getMessage() . PHP_EOL . $ex->getTraceAsString());
+            if (!$options['skip-teams']) {
+                try {
+                    $counter = $this->importGroups($io);
+                    $allImports += $counter;
+                    $io->success('Imported groups/teams: ' . $counter);
+                } catch (Exception $ex) {
+                    $io->error('Failed to import groups/teams: ' . $ex->getMessage() . PHP_EOL . $ex->getTraceAsString());
 
-                return Command::FAILURE;
+                    return Command::FAILURE;
+                }
             }
 
-            try {
-                if ($options['instance-team'] && \count($users) > 0) {
+            if ($options['instance-team'] && \count($users) > 0) {
+                try {
                     $this->createInstanceTeam($io, $users, $activities, $prefix);
-                }
-            } catch (Exception $ex) {
-                $io->error('Failed to create instance team: ' . $ex->getMessage() . PHP_EOL . $ex->getTraceAsString());
+                } catch (Exception $ex) {
+                    $io->error('Failed to create instance team: ' . $ex->getMessage() . PHP_EOL . $ex->getTraceAsString());
 
-                return Command::FAILURE;
+                    return Command::FAILURE;
+                }
             }
 
             try {
@@ -736,7 +748,7 @@ final class KimaiImporterCommand extends Command
      */
     private function validateImport(SymfonyStyle $io, $object): bool
     {
-        $errors = $this->validator->validate($object);
+        $errors = $this->validator->validate($object, null, ['Import']);
 
         if ($errors->count() > 0) {
             /** @var ConstraintViolation $error */
@@ -752,13 +764,15 @@ final class KimaiImporterCommand extends Command
         return true;
     }
 
-    private function getCachedUser(int $id): ?User
+    private function getCachedUser(int|string $id): ?User
     {
-        if (isset($this->userIds[$id])) {
+        $id = (string) $id;
+
+        if (array_key_exists($id, $this->userIds)) {
             $id = $this->userIds[$id];
         }
 
-        if (isset($this->users[$id])) {
+        if (array_key_exists($id, $this->users)) {
             return $this->users[$id];
         }
 
@@ -767,9 +781,9 @@ final class KimaiImporterCommand extends Command
 
     private function isKnownUser(SymfonyStyle $io, array $oldUser): bool
     {
-        $cacheId = $oldUser['userID'];
+        $cacheId = (string) $oldUser['userID'];
 
-        if (isset($this->userIds[$cacheId])) {
+        if (array_key_exists($cacheId, $this->userIds)) {
             return true;
         }
 
@@ -820,7 +834,7 @@ final class KimaiImporterCommand extends Command
 
     private function setUserCache(array|int $oldUser, User $user): void
     {
-        $cacheKey = \is_array($oldUser) ? $oldUser['userID'] : $oldUser;
+        $cacheKey = (string) (\is_array($oldUser) ? $oldUser['userID'] : $oldUser);
 
         $this->users[$cacheKey] = $user;
     }
@@ -947,25 +961,29 @@ final class KimaiImporterCommand extends Command
         return $counter;
     }
 
-    private function getCachedCustomer(int $id): ?Customer
+    private function getCachedCustomer(int|string $id): ?Customer
     {
-        if (isset($this->customers[$id])) {
+        $id = (string) $id;
+
+        if (array_key_exists($id, $this->customers)) {
             return $this->customers[$id];
         }
 
         return null;
     }
 
-    private function isKnownCustomer(array|int $oldCustomer): bool
+    private function isKnownCustomer(array|int|string $oldCustomer): bool
     {
-        $cacheId = \is_array($oldCustomer) ? $oldCustomer['customerID'] : $oldCustomer;
+        $cacheId = (string) (\is_array($oldCustomer) ? $oldCustomer['customerID'] : $oldCustomer);
 
-        return isset($this->customers[$cacheId]);
+        return array_key_exists($cacheId, $this->customers);
     }
 
-    private function setCustomerCache(array $oldCustomer, Customer $customer): void
+    private function setCustomerCache(array|int|string $oldCustomer, Customer $customer): void
     {
-        $this->customers[$oldCustomer['customerID']] = $customer;
+        $cacheId = (string) (\is_array($oldCustomer) ? $oldCustomer['customerID'] : $oldCustomer);
+
+        $this->customers[$cacheId] = $customer;
     }
 
     /**
@@ -1067,25 +1085,27 @@ final class KimaiImporterCommand extends Command
         return $counter;
     }
 
-    private function getCachedProject(int $id): ?Project
+    private function getCachedProject(int|string $id): ?Project
     {
-        if (isset($this->projects[$id])) {
+        $id = (string) $id;
+
+        if (array_key_exists($id, $this->projects)) {
             return $this->projects[$id];
         }
 
         return null;
     }
 
-    private function isKnownProject(array|int $oldProject): bool
+    private function isKnownProject(array|int|string $oldProject): bool
     {
-        $cacheId = \is_array($oldProject) ? $oldProject['projectID'] : $oldProject;
+        $cacheId = (string) (\is_array($oldProject) ? $oldProject['projectID'] : $oldProject);
 
-        return isset($this->projects[$cacheId]);
+        return array_key_exists($cacheId, $this->projects);
     }
 
-    private function setProjectCache(array|int $oldProject, Project $project): void
+    private function setProjectCache(array|int|string $oldProject, Project $project): void
     {
-        $cacheId = \is_array($oldProject) ? $oldProject['projectID'] : $oldProject;
+        $cacheId = (string) (\is_array($oldProject) ? $oldProject['projectID'] : $oldProject);
 
         $this->projects[$cacheId] = $project;
     }
@@ -1112,7 +1132,7 @@ final class KimaiImporterCommand extends Command
      * @return int
      * @throws Exception
      */
-    private function importProjects(SymfonyStyle $io, $projects, array $fixedRates, array $rates): int
+    private function importProjects(SymfonyStyle $io, array $projects, array $fixedRates, array $rates): int
     {
         $counter = 0;
         $entityManager = $this->getDoctrine()->getManager();
@@ -1238,7 +1258,7 @@ final class KimaiImporterCommand extends Command
         /** @var Project $project */
         foreach ($projects as $project) {
             $oldId = $project->getMetaField(self::METAFIELD_NAME)?->getValue();
-            if (\is_int($oldId)) {
+            if (\is_numeric($oldId)) {
                 $this->setProjectCache($oldId, $project);
             }
         }
@@ -1252,7 +1272,7 @@ final class KimaiImporterCommand extends Command
         foreach ($activities as $activity) {
             $oldActivity = $activity->getMetaField(self::METAFIELD_NAME)?->getValue();
             $projectId = $activity->getProject()?->getId();
-            if (\is_int($oldActivity)) {
+            if (\is_numeric($oldActivity)) {
                 $this->setActivityCache($oldActivity, $activity, $projectId);
             }
         }
@@ -1265,14 +1285,17 @@ final class KimaiImporterCommand extends Command
         /** @var User $user */
         foreach ($users as $user) {
             $oldId = $user->getPreferenceValue(self::METAFIELD_NAME);
-            if (\is_int($oldId)) {
+            if (\is_numeric($oldId)) {
                 $this->setUserCache($oldId, $user);
             }
         }
     }
 
-    private function getCachedActivity(int $id, ?int $projectId = null): ?Activity
+    private function getCachedActivity(int|string $id, null|int|string $projectId = null): ?Activity
     {
+        $id = (string) $id;
+        $projectId = (string) $projectId;
+
         if (isset($this->activities[$id][$projectId])) {
             return $this->activities[$id][$projectId];
         }
@@ -1280,9 +1303,10 @@ final class KimaiImporterCommand extends Command
         return null;
     }
 
-    private function isKnownActivity(array|int $oldActivity, ?int $projectId = null): bool
+    private function isKnownActivity(array|int|string $oldActivity, null|int|string $projectId = null): bool
     {
-        $cacheId = \is_array($oldActivity) ? $oldActivity['activityID'] : $oldActivity;
+        $cacheId = (string) (\is_array($oldActivity) ? $oldActivity['activityID'] : $oldActivity);
+        $projectId = (string) $projectId;
 
         if (isset($this->activities[$cacheId][$projectId])) {
             return true;
@@ -1291,13 +1315,15 @@ final class KimaiImporterCommand extends Command
         return false;
     }
 
-    private function setActivityCache(array|int $oldActivity, Activity $activity, ?int $projectId = null): void
+    private function setActivityCache(array|int|string $oldActivity, Activity $activity, null|int|string $projectId = null): void
     {
-        $cacheId = \is_array($oldActivity) ? $oldActivity['activityID'] : $oldActivity;
+        $cacheId = (string) (\is_array($oldActivity) ? $oldActivity['activityID'] : $oldActivity);
+        $projectId = (string) $projectId;
 
-        if (!isset($this->activities[$cacheId])) {
+        if (!array_key_exists($cacheId, $this->activities)) {
             $this->activities[$cacheId] = [];
         }
+
         $this->activities[$cacheId][$projectId] = $activity;
     }
 
@@ -1598,7 +1624,7 @@ final class KimaiImporterCommand extends Command
                 ++$activityCounter;
             }
 
-            // this should not happen at all
+            // this should not happen, but data consistency in Kimai v1 didn't rock
             if (null === $activity) {
                 $io->error('Could not import timesheet record, missing activity with ID: ' . $activityId . '/' . $projectId . '/' . $customerId);
                 $failed++;
@@ -1786,9 +1812,9 @@ final class KimaiImporterCommand extends Command
 
     private function isKnownGroup(array $oldGroup): bool
     {
-        $cacheId = $oldGroup['groupID'];
+        $cacheId = (string) $oldGroup['groupID'];
 
-        if (isset($this->teamIds[$cacheId])) {
+        if (array_key_exists($cacheId, $this->teamIds)) {
             return true;
         }
 
