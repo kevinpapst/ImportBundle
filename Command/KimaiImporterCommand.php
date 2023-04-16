@@ -768,11 +768,11 @@ final class KimaiImporterCommand extends Command
     {
         $id = (string) $id;
 
-        if (array_key_exists($id, $this->userIds)) {
+        if (\array_key_exists($id, $this->userIds)) {
             $id = $this->userIds[$id];
         }
 
-        if (array_key_exists($id, $this->users)) {
+        if (\array_key_exists($id, $this->users)) {
             return $this->users[$id];
         }
 
@@ -783,7 +783,7 @@ final class KimaiImporterCommand extends Command
     {
         $cacheId = (string) $oldUser['userID'];
 
-        if (array_key_exists($cacheId, $this->userIds)) {
+        if (\array_key_exists($cacheId, $this->userIds)) {
             return true;
         }
 
@@ -832,7 +832,7 @@ final class KimaiImporterCommand extends Command
         return false;
     }
 
-    private function setUserCache(array|int $oldUser, User $user): void
+    private function setUserCache(array|int|string $oldUser, User $user): void
     {
         $cacheKey = (string) (\is_array($oldUser) ? $oldUser['userID'] : $oldUser);
 
@@ -965,7 +965,7 @@ final class KimaiImporterCommand extends Command
     {
         $id = (string) $id;
 
-        if (array_key_exists($id, $this->customers)) {
+        if (\array_key_exists($id, $this->customers)) {
             return $this->customers[$id];
         }
 
@@ -976,7 +976,7 @@ final class KimaiImporterCommand extends Command
     {
         $cacheId = (string) (\is_array($oldCustomer) ? $oldCustomer['customerID'] : $oldCustomer);
 
-        return array_key_exists($cacheId, $this->customers);
+        return \array_key_exists($cacheId, $this->customers);
     }
 
     private function setCustomerCache(array|int|string $oldCustomer, Customer $customer): void
@@ -1089,7 +1089,7 @@ final class KimaiImporterCommand extends Command
     {
         $id = (string) $id;
 
-        if (array_key_exists($id, $this->projects)) {
+        if (\array_key_exists($id, $this->projects)) {
             return $this->projects[$id];
         }
 
@@ -1100,7 +1100,7 @@ final class KimaiImporterCommand extends Command
     {
         $cacheId = (string) (\is_array($oldProject) ? $oldProject['projectID'] : $oldProject);
 
-        return array_key_exists($cacheId, $this->projects);
+        return \array_key_exists($cacheId, $this->projects);
     }
 
     private function setProjectCache(array|int|string $oldProject, Project $project): void
@@ -1258,8 +1258,8 @@ final class KimaiImporterCommand extends Command
         /** @var Project $project */
         foreach ($projects as $project) {
             $oldId = $project->getMetaField(self::METAFIELD_NAME)?->getValue();
-            if (\is_numeric($oldId)) {
-                $this->setProjectCache($oldId, $project);
+            if (is_numeric($oldId)) {
+                $this->setProjectCache((string) $oldId, $project);
             }
         }
 
@@ -1272,8 +1272,8 @@ final class KimaiImporterCommand extends Command
         foreach ($activities as $activity) {
             $oldActivity = $activity->getMetaField(self::METAFIELD_NAME)?->getValue();
             $projectId = $activity->getProject()?->getId();
-            if (\is_numeric($oldActivity)) {
-                $this->setActivityCache($oldActivity, $activity, $projectId);
+            if (is_numeric($oldActivity)) {
+                $this->setActivityCache((string) $oldActivity, $activity, $projectId);
             }
         }
 
@@ -1285,8 +1285,8 @@ final class KimaiImporterCommand extends Command
         /** @var User $user */
         foreach ($users as $user) {
             $oldId = $user->getPreferenceValue(self::METAFIELD_NAME);
-            if (\is_numeric($oldId)) {
-                $this->setUserCache($oldId, $user);
+            if (is_numeric($oldId)) {
+                $this->setUserCache((string) $oldId, $user);
             }
         }
     }
@@ -1320,7 +1320,7 @@ final class KimaiImporterCommand extends Command
         $cacheId = (string) (\is_array($oldActivity) ? $oldActivity['activityID'] : $oldActivity);
         $projectId = (string) $projectId;
 
-        if (!array_key_exists($cacheId, $this->activities)) {
+        if (!\array_key_exists($cacheId, $this->activities)) {
             $this->activities[$cacheId] = [];
         }
 
@@ -1814,7 +1814,7 @@ final class KimaiImporterCommand extends Command
     {
         $cacheId = (string) $oldGroup['groupID'];
 
-        if (array_key_exists($cacheId, $this->teamIds)) {
+        if (\array_key_exists($cacheId, $this->teamIds)) {
             return true;
         }
 

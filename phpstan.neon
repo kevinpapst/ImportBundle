@@ -86,11 +86,6 @@ parameters:
             path: Command/KimaiImporterCommand.php
 
         -
-            message: "#^Parameter \\#1 \\$user of method App\\\\Entity\\\\Timesheet\\:\\:setUser\\(\\) expects App\\\\Entity\\\\User, App\\\\Entity\\\\User\\|null given\\.$#"
-            count: 1
-            path: Command/KimaiImporterCommand.php
-
-        -
             message: "#^Parameter \\#2 \\$object of method KimaiPlugin\\\\ImportBundle\\\\Command\\\\KimaiImporterCommand\\:\\:validateImport\\(\\) expects object, App\\\\Entity\\\\Team\\|null given\\.$#"
             count: 1
             path: Command/KimaiImporterCommand.php
