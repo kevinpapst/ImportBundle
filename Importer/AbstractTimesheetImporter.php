@@ -316,20 +316,31 @@ abstract class AbstractTimesheetImporter
             $this->importRow($durationParser, $data, $row, $dryRun);
         }
 
+        $create = 'created';
+        if ($dryRun) {
+            $create = 'create';
+        }
+
+        if ($data->countRows() > 0) {
+            $data->addStatus(sprintf('processed %s rows', $data->countRows()));
+        }
+        if ($data->countErrors() > 0) {
+            $data->addStatus(sprintf('failed %s rows', $data->countErrors()));
+        }
         if ($this->createdCustomers > 0) {
-            $data->addStatus(sprintf('created %s customers', $this->createdCustomers));
+            $data->addStatus(sprintf('%s %s customers', $create, $this->createdCustomers));
         }
         if ($this->createdProjects > 0) {
-            $data->addStatus(sprintf('created %s projects', $this->createdProjects));
+            $data->addStatus(sprintf('%s %s projects', $create, $this->createdProjects));
         }
         if ($this->createdActivities > 0) {
-            $data->addStatus(sprintf('created %s activities', $this->createdActivities));
+            $data->addStatus(sprintf('%s %s activities', $create, $this->createdActivities));
         }
         if ($this->createdTags > 0) {
-            $data->addStatus(sprintf('created %s tags', $this->createdTags));
+            $data->addStatus(sprintf('%s %s tags', $create, $this->createdTags));
         }
         if ($this->createdUsers > 0) {
-            $data->addStatus(sprintf('created %s users', $this->createdUsers));
+            $data->addStatus(sprintf('%s %s users', $create, $this->createdUsers));
         }
 
         return $data;
@@ -464,35 +475,47 @@ abstract class AbstractTimesheetImporter
     {
         $fields = [];
 
+        $empty = 'Empty or missing field: ';
+        $encoding = 'Invalid encoding, requires UTF-8: ';
+        $negative = 'Negative values not supported: ';
+
         if (!\array_key_exists('User', $row) || empty($row['User'])) {
-            $fields[] = 'User';
+            $fields[] = $empty . 'User';
         }
 
         if (empty($row['Project'])) {
-            $fields[] = 'Project';
+            $fields[] = $empty . 'Project';
+        } elseif (mb_detect_encoding($row['Project'], 'UTF-8', true) !== 'UTF-8') {
+            $fields[] = $encoding . 'Project';
         }
 
         // negative durations are not supported ...
         if (\is_string($row['Duration']) && $row['Duration'][0] === '-') {
-            $fields[] = 'Duration';
+            $fields[] = $negative . 'Duration';
         } elseif (\is_int($row['Duration']) && $row['Duration'] < 0) {
-            $fields[] = 'Duration';
+            $fields[] = $negative . 'Duration';
         }
 
         if (empty($row['Activity'])) {
-            $fields[] = 'Activity';
+            $fields[] = $empty . 'Activity';
+        } elseif (mb_detect_encoding($row['Activity'], 'UTF-8', true) !== 'UTF-8') {
+            $fields[] = $encoding . 'Activity';
+        }
+
+        if (!empty($row['Description']) && mb_detect_encoding($row['Description'], 'UTF-8', true) !== 'UTF-8') {
+            $fields[] = $encoding . 'Description';
         }
 
         if (empty($row['Date']) && empty($row['Begin'])) {
-            $fields[] = 'Date';
+            $fields[] = $empty . 'Date';
         }
 
         if ((empty($row['From']) || empty($row['To']) || empty($row['End'])) && empty($row['Duration'])) {
-            $fields[] = 'Duration';
+            $fields[] = $empty . 'Duration';
         }
 
         if (!empty($fields)) {
-            throw new ImportException('Empty or missing fields: ' . implode(', ', $fields));
+            throw new ImportException('Validation failed. ' . implode('. ', $fields));
         }
     }
 }

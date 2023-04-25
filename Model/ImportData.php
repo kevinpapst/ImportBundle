@@ -48,6 +48,11 @@ final class ImportData
         return $this->rows;
     }
 
+    public function countRows(): int
+    {
+        return \count($this->rows);
+    }
+
     public function addStatus(string $status): void
     {
         $this->status[] = $status;

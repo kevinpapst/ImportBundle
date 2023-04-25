@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.1
+
+Compatibility: requires minimum Kimai 2.0.9 
+
+- Fixed: detect invalid encoding for fields Activity, Project, Description
+- Added: better preview and import result status
+
 ## 2.2.0
 
 Compatibility: requires minimum Kimai 2.0.9 

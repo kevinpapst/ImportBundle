@@ -1,9 +1,9 @@
 {
     "name": "keleo/import-plugin",
-    "description": "A Kimai plugin to import data from CSV files via Web UI",
+    "description": "Import data from CSV files via Web UI",
     "homepage": "https://www.kimai.org/store/keleo-importer-bundle.html",
     "type": "kimai-plugin",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "keywords": [
         "kimai",
         "kimai-plugin"
