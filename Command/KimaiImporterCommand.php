@@ -64,6 +64,13 @@ final class KimaiImporterCommand extends Command
     public const BATCH_SIZE = 1000;
     private const METAFIELD_NAME = '_imported_id';
 
+    // some validator rules that we skip during import, because they are not relevant here
+    // do not use the class name directly, because that would raise the required kimai version
+    private const SKIP_VALIDATOR_CODES = [
+        'kimai-timesheet-87', 'kimai-timesheet-88', 'kimai-timesheet-89', // timesheet deactivated before 2.0.16
+        'kimai-timesheet-deactivated-activity', 'kimai-timesheet-deactivated-project', 'kimai-timesheet-deactivated-customer',
+    ];
+
     private Connection $connection;
     /**
      * Prefix for the v1 database tables.
@@ -748,17 +755,22 @@ final class KimaiImporterCommand extends Command
      */
     private function validateImport(SymfonyStyle $io, $object): bool
     {
-        $errors = $this->validator->validate($object, null, ['Import']);
+        $errors = $this->validator->validate($object, null);
 
         if ($errors->count() > 0) {
+            $success = true;
             /** @var ConstraintViolation $error */
             foreach ($errors as $error) {
-                $io->error(
-                    (string) $error
-                );
+                // we deactivate some checks which would block many imports and which are not relevant here
+                if (\in_array($error->getCode(), self::SKIP_VALIDATOR_CODES, true)) {
+                    continue;
+                }
+
+                $io->error((string) $error);
+                $success = false;
             }
 
-            return false;
+            return $success;
         }
 
         return true;

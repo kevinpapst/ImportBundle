@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.2
+
+Compatibility: requires minimum Kimai 2.0.9
+
+- Added: deactivate certain validation rules in "Import from Kimai v1" command
+- Removed: use `Import` validator group
+
 ## 2.2.1
 
 Compatibility: requires minimum Kimai 2.0.9 
@@ -15,7 +22,6 @@ Better use with Kimai 2.0.15 to utilize new `Import` validator group.
 
 - Added: command option `skip-teams` to prevent team sync
 - Added: command option `check-already-imported` to prevent duplicate database entries
-- Added: use `Import` validator group
 - Fixed: `string` vs `int` comparison 
 - Fixed: `isset` vs `array_key_exists`
 - Fixed: `is_int` vs `is_numeric`
