@@ -12,7 +12,7 @@
       </trans-unit>
       <trans-unit id="wLgWnO8" resname="importer.how_to_upload">
         <source>importer.how_to_upload</source>
-        <target>After uploading the file, the importer will analyse it. If everything is correct, you can import the data by deactivating the "Preview" and re-uploading the file.</target>
+        <target>THIS IS A PREVIEW: Your file was analyzed and if everything looks correct, you can import the data by deactivating the "Preview" checkbox and re-uploading the file.</target>
       </trans-unit>
       <trans-unit id="tP3vIsQ" resname="importer.delimiter">
         <source>importer.delimiter</source>
@@ -37,6 +37,10 @@
       <trans-unit id="p7HgHRI" resname="importer.global_activity">
         <source>importer.global_activity</source>
         <target>Use global activities (deactivate for project-specific activities)</target>
+      </trans-unit>
+      <trans-unit id="b8jBl28" resname="importer.clockify_info">
+        <source>importer.clockify_info</source>
+        <target>Rate configurations are not imported: if the import creates new user/customer/projects, you have to set up the rates manually afterwards.</target>
       </trans-unit>
     </body>
   </file>

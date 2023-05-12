@@ -4,6 +4,7 @@
 {% block main %}
 
     {% embed '@theme/embeds/card.html.twig' %}
+        {% from "macros/widgets.html.twig" import callout %}
         {% form_theme form 'form/horizontal.html.twig' %}
         {% block box_before %}
             {{ form_start(form) }}
@@ -55,8 +56,9 @@
             {{ form_rest(form) }}
             {{ preview|raw }}
 
-            {% from "macros/widgets.html.twig" import callout %}
-            {{ callout('info', 'importer.how_to_upload', null, 'help') }}
+            {% if tab == 'clockify' %}
+                {{ callout('secondary', 'importer.clockify_info', null, 'details') }}
+            {% endif %}
 
         {% endblock %}
         {% block box_after %}
@@ -82,6 +84,7 @@
         {% endfor %}
 
         {% if model.preview %}
+            {{ widgets.callout('info', 'importer.how_to_upload', null, 'help') }}
             {{ widgets.callout('warning', 'preview'|trans ~ ': ' ~ statusTrans) }}
         {% elseif countErrors > 0 %}
             {{ widgets.callout('warning', statusTrans) }}

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.3
+
+Compatibility: requires minimum Kimai 2.0.9
+
+- Added: hint for Clockify imports, that rate configurations are not imported
+
 ## 2.2.2
 
 Compatibility: requires minimum Kimai 2.0.9
