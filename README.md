@@ -26,7 +26,7 @@ This plugin is compatible with the following Kimai releases:
 
 | Bundle version | Minimum Kimai version |
 |----------------|-----------------------|
-| 2.1.4 - 2.2.3  | 2.0.9                 |
+| 2.1.4 - 2.2.2  | 2.0.9                 |
 | 2.0 - 2.1.3    | 2.0                   |
 | 1.0 - 1.2      | 1.22.0                |
 

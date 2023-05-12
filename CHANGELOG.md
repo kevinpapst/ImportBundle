@@ -1,15 +1,10 @@
 # Changelog
 
-## 2.2.3
-
-Compatibility: requires minimum Kimai 2.0.9
-
-- Added: hint for Clockify imports, that rate configurations are not imported
-
 ## 2.2.2
 
 Compatibility: requires minimum Kimai 2.0.9
 
+- Added: hint for Clockify imports, that rate configurations are not imported
 - Added: deactivate certain validation rules in "Import from Kimai v1" command
 - Removed: use `Import` validator group
 
