@@ -40,9 +40,15 @@ class MenuSubscriber implements EventSubscriberInterface
         }
 
         if ($auth->isGranted('importer')) {
-            $event->getSystemMenu()->addChild(
+            $system = $event->getSystemMenu();
+            $system->addChild(
                 new MenuItemModel('importer', 'Importer', 'importer', [], 'fas fa-file-import')
             );
+            $system->addChildRoute('importer_timesheet');
+            $system->addChildRoute('importer_customer');
+            $system->addChildRoute('importer_project');
+            $system->addChildRoute('importer_grandtotal');
+            $system->addChildRoute('importer_clockify');
         }
     }
 }

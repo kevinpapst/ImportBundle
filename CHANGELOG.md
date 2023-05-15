@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.3
+
+Compatibility: requires minimum Kimai 2.0.9
+
+- Fixed: System-Menu is not highlighted on tabs
+
 ## 2.2.2
 
 Compatibility: requires minimum Kimai 2.0.9
