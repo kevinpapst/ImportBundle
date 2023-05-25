@@ -16,10 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PermissionSectionSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @CloudRequired do not change!
-     */
-    public const SECTION_TITLE = 'Importer (plugin)';
+    public const SECTION_TITLE = 'Importer';
 
     public static function getSubscribedEvents(): array
     {
