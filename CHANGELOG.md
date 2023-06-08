@@ -5,6 +5,7 @@
 Compatibility: requires minimum Kimai 2.0.9
 
 - Added: importer highlights invalid column mapping
+- Removed: "(plugin)" from permission header
 
 ## 2.2.3
 
