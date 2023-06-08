@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0
+
+Compatibility: requires minimum Kimai 2.0.9
+
+- Added: importer highlights invalid column mapping
+
 ## 2.2.3
 
 Compatibility: requires minimum Kimai 2.0.9
