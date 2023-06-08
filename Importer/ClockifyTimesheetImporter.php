@@ -46,6 +46,11 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
         return empty($result);
     }
 
+    public function checkHeader(array $header): array
+    {
+        return array_diff(self::$supportedHeader, $header);
+    }
+
     protected function createImportData(ImportRow $row): ImportData
     {
         $header = [

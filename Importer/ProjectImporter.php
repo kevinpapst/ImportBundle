@@ -24,12 +24,37 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class ProjectImporter implements ImporterInterface
 {
     /**
+     * @var string[]
+     */
+    private static array $supportedHeader = [
+        'project',
+        'customer',
+        'exported',
+        'duration',
+        'user',
+        'description',
+        'orderdate',
+        'user',
+        'startdate',
+        'color',
+        'visible',
+        'budget',
+        'timebudget',
+        'budgettype',
+    ];
+
+    /**
      * @var Customer[]
      */
     private array $customerCache = [];
 
     public function __construct(private ProjectService $projectService, private CustomerService $customerService, private ValidatorInterface $validator)
     {
+    }
+
+    public function checkHeader(array $header): array
+    {
+        return array_diff(self::$supportedHeader, $header);
     }
 
     public function supports(array $header): bool

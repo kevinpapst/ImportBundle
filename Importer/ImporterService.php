@@ -110,7 +110,7 @@ final class ImporterService
             foreach ($this->importer as $importer) {
                 if ($importer instanceof $import) {
                     if (!$importer->supports($header)) {
-                        throw new ImportException('Invalid file given, not supported');
+                        throw new ImportException('Invalid file given, missing and/or invalid columns: ' . implode(', ', $importer->checkHeader($header)));
                     }
                     $rows = [];
                     /** @var array<string, mixed> $record */
@@ -173,7 +173,7 @@ final class ImporterService
             foreach ($this->importer as $importer) {
                 if ($importer instanceof $import) {
                     if (!$importer->supports($header)) {
-                        throw new ImportException('Invalid file given, not supported');
+                        throw new ImportException('Invalid file given, missing and/or invalid columns: ' . implode(', ', $importer->checkHeader($header)));
                     }
                     $rows = [];
                     /** @var array<string, mixed> $record */

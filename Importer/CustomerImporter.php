@@ -21,8 +21,39 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class CustomerImporter implements ImporterInterface
 {
+    /**
+     * @var string[]
+     */
+    private static array $supportedHeader = [
+        'customer',
+        'company',
+        'email',
+        'country',
+        'account',
+        'tax',
+        'description',
+        'address',
+        'contact',
+        'currency',
+        'timezone',
+        'phone',
+        'mobile',
+        'fax',
+        'homepage',
+        'color',
+        'visible',
+        'budget',
+        'budgettype',
+        'timebudget',
+    ];
+
     public function __construct(private CustomerService $customerService, private ValidatorInterface $validator)
     {
+    }
+
+    public function checkHeader(array $header): array
+    {
+        return array_diff(self::$supportedHeader, $header);
     }
 
     public function supports(array $header): bool

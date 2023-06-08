@@ -22,6 +22,12 @@ interface ImporterInterface
     public function supports(array $header): bool;
 
     /**
+     * Returns a list of invalid header
+     * @param array<int, string> $header
+     */
+    public function checkHeader(array $header): array;
+
+    /**
      * @param ImportModelInterface $model
      * @param array<ImportRow> $rows
      * @return ImportData

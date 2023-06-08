@@ -21,8 +21,54 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class GrandtotalCustomerImporter implements ImporterInterface
 {
+    /**
+     * @var string[]
+     */
+    private static array $supportedHeader = [
+        'department',
+        'abteilung',
+        'salutation',
+        'briefanrede',
+        'state',
+        'bundesland',
+        'iban',
+        'bic',
+        'sepa mandate id',
+        'sepa mandat',
+        'organization',
+        'firma',
+        'e-mail',
+        'country',
+        'land',
+        'customer number',
+        'kundennummer',
+        'tax-id',
+        'umsatzsteuer',
+        'note',
+        'notiz',
+        'title',
+        'titel',
+        'first name',
+        'vorname',
+        'middle name',
+        'zweiter vorname',
+        'last name',
+        'nachname',
+        'street',
+        'straße',
+        'zip',
+        'plz',
+        'city',
+        'ort',
+    ];
+
     public function __construct(private CustomerService $customerService, private ValidatorInterface $validator)
     {
+    }
+
+    public function checkHeader(array $header): array
+    {
+        return array_diff(self::$supportedHeader, $header);
     }
 
     public function supports(array $header): bool

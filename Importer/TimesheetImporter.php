@@ -43,6 +43,11 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
         return empty($result);
     }
 
+    public function checkHeader(array $header): array
+    {
+        return array_diff(self::$supportedHeader, $header);
+    }
+
     protected function createImportData(ImportRow $row): ImportData
     {
         return new ImportData('time_tracking', array_keys($row->getData()));
