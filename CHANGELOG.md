@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.4.0
+
+Compatibility: requires minimum Kimai 2.0.9
+
+- Added: support for meta-fields via column "meta.XXX" for customers
+- Added: support for meta-fields via column "meta.XXX" for projects
+- Added: support for column "name" for customer
+- Added: support for column "name" for project
+
 ## 2.3.0
 
 Compatibility: requires minimum Kimai 2.0.9

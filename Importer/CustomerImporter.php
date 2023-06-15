@@ -12,6 +12,7 @@ namespace KimaiPlugin\ImportBundle\Importer;
 
 use App\Customer\CustomerService;
 use App\Entity\Customer;
+use App\Entity\CustomerMeta;
 use App\Validator\ValidationFailedException;
 use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
@@ -25,6 +26,7 @@ final class CustomerImporter implements ImporterInterface
      * @var string[]
      */
     private static array $supportedHeader = [
+        'name',
         'customer',
         'company',
         'email',
@@ -67,6 +69,7 @@ final class CustomerImporter implements ImporterInterface
                     $foundProject = true;
                     break;
 
+                case 'name':
                 case 'customer':
                     $foundCustomer = true;
                     break;
@@ -122,6 +125,7 @@ final class CustomerImporter implements ImporterInterface
 
         foreach ($entry as $key => $value) {
             switch (strtolower($key)) {
+                case 'name':
                 case 'customer':
                     if ($value !== null) {
                         $name = trim($value);
@@ -154,7 +158,8 @@ final class CustomerImporter implements ImporterInterface
             if ($value === '') {
                 $value = null;
             }
-            switch (strtolower($key)) {
+            $key = strtolower($key);
+            switch ($key) {
                 case 'company':
                     $customer->setCompany($value);
                     break;
@@ -234,6 +239,17 @@ final class CustomerImporter implements ImporterInterface
                 case 'timebudget':
                     $customer->setTimeBudget((int) $value);
                     break;
+            }
+
+            if (str_starts_with($key, 'meta.')) {
+                $metaName = str_replace('meta.', '', $key);
+                $meta = $customer->getMetaField($metaName);
+                if ($meta === null) {
+                    $meta = new CustomerMeta();
+                    $meta->setName($metaName);
+                }
+                $meta->setValue($value);
+                $customer->setMetaField($meta);
             }
         }
     }

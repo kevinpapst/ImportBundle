@@ -1,5 +1,5 @@
 [{
-  "Customer": "Demo Customer",
+  "name": "Demo Customer",
   "Company": "Demo Company",
   "Account": "4711",
   "Country": "DE",
@@ -18,5 +18,6 @@
   "Visible": true,
   "Budget": 25000,
   "TimeBudget": 99000,
-  "BudgetType": null
+  "BudgetType": null,
+  "meta.test_import": "Some demo content"
 }]

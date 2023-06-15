@@ -13,6 +13,7 @@ namespace KimaiPlugin\ImportBundle\Importer;
 use App\Customer\CustomerService;
 use App\Entity\Customer;
 use App\Entity\Project;
+use App\Entity\ProjectMeta;
 use App\Project\ProjectService;
 use App\Validator\ValidationFailedException;
 use KimaiPlugin\ImportBundle\Model\ImportData;
@@ -27,6 +28,7 @@ final class ProjectImporter implements ImporterInterface
      * @var string[]
      */
     private static array $supportedHeader = [
+        'name',
         'project',
         'customer',
         'exported',
@@ -65,6 +67,7 @@ final class ProjectImporter implements ImporterInterface
 
         foreach ($header as $column) {
             switch (strtolower($column)) {
+                case 'name':
                 case 'project':
                     $foundProject = true;
                     break;
@@ -146,6 +149,7 @@ final class ProjectImporter implements ImporterInterface
         $name = null;
         foreach ($entry as $key => $value) {
             switch (strtolower($key)) {
+                case 'name':
                 case 'project':
                     if ($value !== null) {
                         $name = trim($value);
@@ -209,7 +213,8 @@ final class ProjectImporter implements ImporterInterface
             if ($value === '') {
                 $value = null;
             }
-            switch (strtolower($name)) {
+            $key = strtolower($name);
+            switch ($key) {
                 case 'description':
                     $project->setComment($value);
                     break;
@@ -277,6 +282,17 @@ final class ProjectImporter implements ImporterInterface
                 case 'timebudget':
                     $project->setTimeBudget((int) $value);
                     break;
+            }
+
+            if (str_starts_with($key, 'meta.')) {
+                $metaName = str_replace('meta.', '', $key);
+                $meta = $project->getMetaField($metaName);
+                if ($meta === null) {
+                    $meta = new ProjectMeta();
+                    $meta->setName($metaName);
+                }
+                $meta->setValue($value);
+                $project->setMetaField($meta);
             }
         }
     }
