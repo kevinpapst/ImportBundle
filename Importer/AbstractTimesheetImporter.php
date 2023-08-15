@@ -23,6 +23,7 @@ use App\Timesheet\TimesheetService;
 use App\User\UserService;
 use App\Utils\Duration;
 use App\Validator\ValidationFailedException;
+use KimaiPlugin\ImportBundle\ImportBundle;
 use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportModelInterface;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
@@ -65,7 +66,7 @@ abstract class AbstractTimesheetImporter
         private ActivityService $activityService,
         private UserService $userService,
         private TagRepository $tagRepository,
-        private TimesheetService $timesheetRepository
+        private TimesheetService $timesheetService
     ) {
     }
 
@@ -228,8 +229,8 @@ abstract class AbstractTimesheetImporter
                 }
             }
 
-            $timesheet = $this->timesheetRepository->createNewTimesheet($user);
-            $this->timesheetRepository->prepareNewTimesheet($timesheet);
+            $timesheet = $this->timesheetService->createNewTimesheet($user);
+            $this->timesheetService->prepareNewTimesheet($timesheet);
 
             if (\is_bool($record['Billable'])) {
                 $timesheet->setBillable($this->convertBoolean($record['Billable']));
@@ -271,7 +272,7 @@ abstract class AbstractTimesheetImporter
             }
 
             if (!$dryRun) {
-                $this->timesheetRepository->saveNewTimesheet($timesheet);
+                $this->timesheetService->saveNewTimesheet($timesheet);
             }
         } catch (ImportException $exception) {
             $row->addError($exception->getMessage());
@@ -308,6 +309,8 @@ abstract class AbstractTimesheetImporter
 
         $dryRun = $model->isPreview();
         $data = $this->createImportData($rows[0]);
+
+        $this->timesheetService->setIgnoreValidationCodes(ImportBundle::SKIP_VALIDATOR_CODES);
 
         $durationParser = new Duration();
         $this->globalActivity = $model->isGlobalActivities();

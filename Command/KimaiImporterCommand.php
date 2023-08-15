@@ -39,6 +39,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Exception;
+use KimaiPlugin\ImportBundle\ImportBundle;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -63,13 +64,6 @@ final class KimaiImporterCommand extends Command
 
     public const BATCH_SIZE = 1000;
     private const METAFIELD_NAME = '_imported_id';
-
-    // some validator rules that we skip during import, because they are not relevant here
-    // do not use the class name directly, because that would raise the required kimai version
-    private const SKIP_VALIDATOR_CODES = [
-        'kimai-timesheet-87', 'kimai-timesheet-88', 'kimai-timesheet-89', // timesheet deactivated before 2.0.16
-        'kimai-timesheet-deactivated-activity', 'kimai-timesheet-deactivated-project', 'kimai-timesheet-deactivated-customer',
-    ];
 
     private Connection $connection;
     /**
@@ -762,7 +756,7 @@ final class KimaiImporterCommand extends Command
             /** @var ConstraintViolation $error */
             foreach ($errors as $error) {
                 // we deactivate some checks which would block many imports and which are not relevant here
-                if (\in_array($error->getCode(), self::SKIP_VALIDATOR_CODES, true)) {
+                if (\in_array($error->getCode(), ImportBundle::SKIP_VALIDATOR_CODES, true)) {
                     continue;
                 }
 

@@ -2,6 +2,12 @@
 
 ## 2.3.0
 
+Compatibility: requires minimum Kimai 2.0.30
+
+- Added: skip some validations during timesheet import
+
+## 2.3.0
+
 Compatibility: requires minimum Kimai 2.0.9
 
 - Added: support for meta-fields via column "meta.XXX" for customers
