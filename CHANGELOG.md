@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.0
+## 2.4.0
 
 Compatibility: requires minimum Kimai 2.0.30
 
