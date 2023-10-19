@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.5.0
+
+Compatibility: requires minimum Kimai 2.1.0
+
+- Use annotation type for routes
+
 ## 2.4.0
 
 Compatibility: requires minimum Kimai 2.0.30
