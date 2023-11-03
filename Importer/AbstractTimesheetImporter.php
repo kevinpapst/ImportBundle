@@ -232,9 +232,7 @@ abstract class AbstractTimesheetImporter
             $timesheet = $this->timesheetService->createNewTimesheet($user);
             $this->timesheetService->prepareNewTimesheet($timesheet);
 
-            if (\is_bool($record['Billable'])) {
-                $timesheet->setBillable($this->convertBoolean($record['Billable']));
-            }
+            $timesheet->setBillable($this->convertBoolean($record['Billable']));
             $timesheet->setActivity($activity);
             $timesheet->setProject($project);
             $timesheet->setBegin($begin);

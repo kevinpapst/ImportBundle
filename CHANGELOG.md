@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.5.1 (03.11.2023)
+
+Compatibility: requires minimum Kimai 2.1.0
+
+- Fixed: Column "Billable" is not correctly imported
+
 ## Version 2.5.0
 
 Compatibility: requires minimum Kimai 2.1.0
