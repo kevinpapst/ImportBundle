@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 2.5.1 (03.11.2023)
+## Version 2.5.1 (03 Oct. 2023)
 
 Compatibility: requires minimum Kimai 2.1.0
 
