@@ -89,11 +89,6 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
         return $this->translatedHeader;
     }
 
-    private function getSupportedHeaders(): array
-    {
-        return array_merge(self::$supportedHeader, array_keys($this->getTranslatedHeaders()));
-    }
-
     public function checkHeader(array $header): array
     {
         $known = [];
