@@ -16,6 +16,7 @@ use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
 use League\Csv\Reader;
+use Psr\Log\LoggerInterface;
 
 final class ImporterService
 {
@@ -24,7 +25,7 @@ final class ImporterService
     /**
      * @param iterable<ImporterInterface> $importer
      */
-    public function __construct(private iterable $importer, private EntityManagerInterface $entityManager)
+    public function __construct(private iterable $importer, private EntityManagerInterface $entityManager, private LoggerInterface $logger)
     {
     }
 
@@ -64,15 +65,22 @@ final class ImporterService
             }
         }
 
-        if ($file->getMimeType() === 'text/csv' || $file->getClientMimeType() === 'text/csv') {
+        $mimetype = $file->getMimeType();
+        $userMimetype = $file->getClientMimeType();
+
+        $this->logger->info('Received file "{file}" ({bytes} bytes). Mimetype "{mimetype}", reported by user as "{user_mimetype}".', ['file' => $file->getClientOriginalName(), 'mimetype' => $mimetype, 'user_mimetype' => $userMimetype, 'bytes' => $file->getSize(), 'bundle' => 'importer']);
+
+        if ($mimetype === 'text/csv' || $userMimetype === 'text/csv') {
             return $this->importCsv($model, $importer);
         }
 
-        if ($file->getMimeType() === 'application/json' || $file->getClientMimeType() === 'application/json') {
+        if ($mimetype === 'application/json' || $userMimetype === 'application/json') {
             return $this->importJson($model, $importer);
         }
 
-        throw new ImportException('Unsupported file given');
+        throw new ImportException(
+            sprintf('Unsupported file given, invalid mimetype (%s). Try to use another browser.', $mimetype)
+        );
     }
 
     /**
@@ -163,7 +171,7 @@ final class ImporterService
             }
 
             if (\count($header) === 1 && stripos($header[0], $oppositeDelimiter) !== false) {
-                throw new ImportException('Unsupported file given: wrong delimiter?');
+                throw new ImportException(sprintf('Unsupported file given: retry with the "%s" delimiter', $oppositeDelimiter));
             }
 
             if ($csv->count() > self::MAX_ROWS) {
@@ -183,7 +191,11 @@ final class ImporterService
 
                     @unlink($model->getImportFile()->getRealPath());
 
-                    return $importer->import($model, $rows);
+                    $result = $importer->import($model, $rows);
+
+                    $this->logger->notice('Imported file for "{title}": {status} (Columns: {columns}"', ['title' => $result->getTitle(), 'status' => implode(', ', $result->getStatus()), 'columns' => implode(', ', $result->getHeader()), 'bundle' => 'importer']);
+
+                    return $result;
                 }
             }
         } catch (\Exception $ex) {

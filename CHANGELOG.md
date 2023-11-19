@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 2.6.0 (19 Nov. 2023)
+
+Compatibility: requires minimum Kimai 2.4.0
+
+- Improved importing visible flags for customers and projects
+- Support Kimai Export CSV for import
+- Improve user mapping (and support setting the Alias during import)
+- Added logging for simpler debugging
+
 ## Version 2.5.1 (03 Oct. 2023)
 
 Compatibility: requires minimum Kimai 2.1.0

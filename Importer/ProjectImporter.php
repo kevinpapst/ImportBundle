@@ -268,7 +268,7 @@ final class ProjectImporter implements ImporterInterface
                     break;
 
                 case 'visible':
-                    $project->setVisible((bool) $value);
+                    $project->setVisible(ImporterHelper::convertBoolean($value));
                     break;
 
                 case 'budget':

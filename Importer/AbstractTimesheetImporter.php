@@ -28,6 +28,7 @@ use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportModelInterface;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
 use KimaiPlugin\ImportBundle\Model\TimesheetImportModel;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractTimesheetImporter
 {
@@ -66,33 +67,9 @@ abstract class AbstractTimesheetImporter
         private ActivityService $activityService,
         private UserService $userService,
         private TagRepository $tagRepository,
-        private TimesheetService $timesheetService
+        private TimesheetService $timesheetService,
+        protected TranslatorInterface $translator,
     ) {
-    }
-
-    protected function convertBoolean(mixed $value): bool
-    {
-        if (\is_bool($value)) {
-            return $value;
-        }
-
-        if ($value === null || $value === '') {
-            return false;
-        }
-
-        if (\is_int($value)) {
-            return (bool) $value;
-        }
-
-        if (\is_string($value)) {
-            $value = strtolower(trim($value));
-
-            if ($value === 'true' || $value === 'on' || $value === '1') {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public function importRow(Duration $durationParser, ImportData $data, ImportRow $row, bool $dryRun): void
@@ -140,11 +117,12 @@ abstract class AbstractTimesheetImporter
 
             $this->validateRow($record);
 
-            $user = $record['User'];
-            $email = \array_key_exists('Email', $record) ? $record['Email'] : $user;
-            if (null === ($user = $this->getUser($user, $email, $dryRun))) {
+            $username = \array_key_exists('Username', $record) ? $record['Username'] : $record['User'];
+            $alias = \array_key_exists('Name', $record) ? $record['Name'] : (\array_key_exists('User', $record) ? $record['User'] : $username);
+            $email = \array_key_exists('Email', $record) ? $record['Email'] : $username;
+            if (null === ($user = $this->getUser($username, $alias, $email, $dryRun))) {
                 throw new ImportException(
-                    sprintf('Unknown user %s', $record['User'])
+                    sprintf('Unknown user %s', $username)
                 );
             }
 
@@ -232,13 +210,13 @@ abstract class AbstractTimesheetImporter
             $timesheet = $this->timesheetService->createNewTimesheet($user);
             $this->timesheetService->prepareNewTimesheet($timesheet);
 
-            $timesheet->setBillable($this->convertBoolean($record['Billable']));
+            $timesheet->setBillable(ImporterHelper::convertBoolean($record['Billable']));
             $timesheet->setActivity($activity);
             $timesheet->setProject($project);
             $timesheet->setBegin($begin);
             $timesheet->setEnd($end);
             $timesheet->setDescription($record['Description']);
-            $timesheet->setExported($this->convertBoolean($record['Exported']));
+            $timesheet->setExported(ImporterHelper::convertBoolean($record['Exported']));
 
             if ($foundDuration !== null) {
                 $timesheet->setDuration($foundDuration);
@@ -347,17 +325,21 @@ abstract class AbstractTimesheetImporter
         return $data;
     }
 
-    private function getUser(string $user, string $email, bool $dryRun): ?User
+    private function getUser(string $user, string $alias, string $email, bool $dryRun): ?User
     {
         if (!\array_key_exists($user, $this->userCache)) {
             $tmpUser = $this->userService->findUserByEmail($email);
             if ($tmpUser === null) {
                 $tmpUser = $this->userService->findUserByName($user);
             }
+            if ($tmpUser === null) {
+                $tmpUser = $this->userService->findUserByDisplayName($alias);
+            }
 
             if ($tmpUser === null) {
                 $tmpUser = $this->userService->createNewUser();
                 $tmpUser->setEmail($email);
+                $tmpUser->setAlias($alias);
                 $tmpUser->setUserIdentifier($user);
                 $tmpUser->setPlainPassword(uniqid());
                 if (!$dryRun) {

@@ -225,7 +225,7 @@ final class CustomerImporter implements ImporterInterface
                     break;
 
                 case 'visible':
-                    $customer->setVisible((bool) $value);
+                    $customer->setVisible(ImporterHelper::convertBoolean($value));
                     break;
 
                 case 'budget':
