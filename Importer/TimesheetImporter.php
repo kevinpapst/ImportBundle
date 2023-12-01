@@ -106,7 +106,6 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
             'Date' => ['Date'],
             'From' => ['From', 'Begin'],
             'To' => ['End', 'To', 'Duration'],
-            'Rate' => ['Rate'],
             'User' => ['User', 'Username', 'Name'],
             'Customer' => ['Customer'],
             'Project' => ['Project'],

@@ -1,6 +1,12 @@
 # Changelog
 
-## Version 2.6.0 (19 Nov. 2023)
+## Version 2.7.0
+
+Compatibility: requires minimum Kimai 2.5.0
+
+- Fixed: Column "Rate" is not required for Timesheets
+
+## Version 2.6.0
 
 Compatibility: requires minimum Kimai 2.4.0
 
