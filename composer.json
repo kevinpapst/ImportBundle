@@ -17,8 +17,8 @@
     ],
     "extra": {
         "kimai": {
-            "require": 20400,
-            "name": "CSV Importer"
+            "require": 20500,
+            "name": "Importer"
         }
     },
     "autoload": {

@@ -2,10 +2,6 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file source-language="en" target-language="de" datatype="plaintext" original="messages.en.xlf">
     <body>
-      <trans-unit id="7Sycs4M" resname="Importer">
-        <source>Importer</source>
-        <target>Importer</target>
-      </trans-unit>
       <trans-unit id="kuOJSXo" resname="importer.download_examples">
         <source>importer.download_examples</source>
         <target>Download von Beispiel-Dateien</target>
