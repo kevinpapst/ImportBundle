@@ -890,9 +890,7 @@ final class KimaiImporterCommand extends Command
             $isActive = $oldUser['active'] && !(bool) $oldUser['trash'] && !(bool) $oldUser['ban'];
             $role = (1 === (int) $oldUser['globalRoleID']) ? User::ROLE_SUPER_ADMIN : User::DEFAULT_ROLE;
 
-            $user = new User();
-            $user->setUserIdentifier($oldUser['name']);
-            $user->setEmail($oldUser['mail']);
+            $user = $this->createUser($oldUser['name'], $oldUser['mail']);
             $user->setPlainPassword($password);
             $user->setEnabled($isActive);
             $user->setRoles([$role]);
@@ -1644,10 +1642,8 @@ final class KimaiImporterCommand extends Command
                 $tempUserName = uniqid();
                 $tempPassword = uniqid() . uniqid();
 
-                $user = new User();
-                $user->setUserIdentifier($tempUserName);
+                $user = $this->createUser($tempUserName, $tempUserName . '@example.com');
                 $user->setAlias('Import: ' . $tempUserName);
-                $user->setEmail($tempUserName . '@example.com');
                 $user->setPlainPassword($tempPassword);
                 $user->setEnabled(false);
                 $user->setRoles([USER::ROLE_USER]);
@@ -2132,5 +2128,15 @@ final class KimaiImporterCommand extends Command
                 }
             }
         }
+    }
+
+    private function createUser(string $userIdentifier, string $email): User
+    {
+        $user = new User();
+        $user->setUserIdentifier($userIdentifier);
+        $user->setEmail($email);
+        $user->setRequiresPasswordReset(true);
+
+        return $user;
     }
 }
