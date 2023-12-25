@@ -1,5 +1,5 @@
 controllers:
-    resource: '../../Controller/'
+    resource: '@ImportBundle/Controller/'
     type: attribute
     prefix: "/{_locale}"
     requirements:
