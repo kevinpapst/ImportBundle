@@ -79,7 +79,7 @@ final class ImporterService
         }
 
         throw new ImportException(
-            sprintf('Unsupported file given, invalid mimetype (%s). Try to use another browser.', $mimetype)
+            sprintf('Unsupported file given, invalid mimetype (%s / %s). Try to use another browser.', $mimetype, $userMimetype)
         );
     }
 
