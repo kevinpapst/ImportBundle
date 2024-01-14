@@ -18,6 +18,7 @@ use App\Entity\Project;
 use App\Entity\Tag;
 use App\Entity\User;
 use App\Project\ProjectService;
+use App\Repository\ProjectRepository;
 use App\Repository\TagRepository;
 use App\Timesheet\TimesheetService;
 use App\User\UserService;
@@ -62,12 +63,13 @@ abstract class AbstractTimesheetImporter
     private bool $globalActivity = true;
 
     public function __construct(
-        private CustomerService $customerService,
-        private ProjectService $projectService,
-        private ActivityService $activityService,
-        private UserService $userService,
-        private TagRepository $tagRepository,
-        private TimesheetService $timesheetService,
+        private readonly CustomerService $customerService,
+        private readonly ProjectService $projectService,
+        private readonly ProjectRepository $projectRepository,
+        private readonly ActivityService $activityService,
+        private readonly UserService $userService,
+        private readonly TagRepository $tagRepository,
+        private readonly TimesheetService $timesheetService,
         protected TranslatorInterface $translator,
     ) {
     }
@@ -412,13 +414,7 @@ abstract class AbstractTimesheetImporter
 
         if (!\array_key_exists($cacheKey, $this->projectCache)) {
             $tmpCustomer = $this->getCustomer($customer, $dryRun);
-            $tmpProject = $this->projectService->findProjectByName($project);
-
-            if (null !== $tmpProject && $tmpProject->getCustomer() !== null) {
-                if ($tmpProject->getCustomer()->getName() !== null && $tmpCustomer->getName() !== null && strcasecmp($tmpProject->getCustomer()->getName(), $tmpCustomer->getName()) !== 0) {
-                    $tmpProject = null;
-                }
-            }
+            $tmpProject = $this->projectRepository->findOneBy(['name' => $project, 'customer' => $tmpCustomer->getId()]);
 
             if ($tmpProject === null) {
                 $tmpProject = $this->projectService->createNewProject($tmpCustomer);
