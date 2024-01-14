@@ -3,7 +3,7 @@
     "description": "Import data from CSV files via Web UI",
     "homepage": "https://www.kimai.org/store/keleo-importer-bundle.html",
     "type": "kimai-plugin",
-    "version": "2.8.0",
+    "version": "2.9.0",
     "keywords": [
         "kimai",
         "kimai-plugin"

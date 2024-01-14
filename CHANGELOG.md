@@ -1,3 +1,10 @@
+## Version 2.9.0
+
+Compatibility: requires minimum Kimai 2.5.0
+
+- Fixed: timesheet importer created project multiple times (if it existed under the same name multiple times) - see #11
+- Change: import route annotation from correct namespace
+
 ## Version 2.8.0
 
 Compatibility: requires minimum Kimai 2.5.0
