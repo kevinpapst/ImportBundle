@@ -2094,6 +2094,17 @@ final class KimaiImporterCommand extends Command
     private function fixEncoding(): void
     {
         // https://onlineasciitools.com/convert-ascii-to-utf8
+
+        /**
+         * MORE THINGS I SAW, PROBABLY SAVING MULTIPLE TIMES???
+         *
+         * UPDATE `kimai_zef` SET zef_comment = REPLACE(zef_comment, "ÃƒÂ¼", "ü") WHERE zef_comment like "%ÃƒÂ¼%";
+         * UPDATE `kimai_zef` SET zef_comment = REPLACE(zef_comment, "ÃƒÆ’Ã‚Â¼", "ü") WHERE zef_comment like "%ÃƒÆ’Ã‚Â¼%";
+         * UPDATE `kimai_zef` SET zef_comment = REPLACE(zef_comment, "ÃƒÆ’Ã‚Â¤", "ä") WHERE zef_comment like "%ÃƒÆ’Ã‚Â¤%";
+         * UPDATE `kimai_zef` SET zef_comment = REGEXP_REPLACE(zef_comment, ' fÃ(.+)r ', ' für ') WHERE zef_comment like "% fÃ%r %";
+         * UPDATE `kimai_zef` SET zef_comment = REGEXP_REPLACE(zef_comment, 'AktivitÃƒ(.+)t', 'Aktivität') WHERE zef_comment like "%AktivitÃƒ%t%";
+         * UPDATE `kimai_zef` SET zef_comment = REPLACE(zef_comment, "ÃƒÂ¤", "ä") WHERE zef_comment like "%ÃƒÂ¤%";
+         */
         $searchReplace = [
             'Ã¤' => 'ä',
             'Ã„' => 'Ä',
