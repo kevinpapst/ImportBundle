@@ -11,6 +11,7 @@
 namespace KimaiPlugin\ImportBundle\Command;
 
 use App\Doctrine\DataSubscriberInterface;
+use App\Doctrine\DsnParserFactory;
 use App\Entity\Activity;
 use App\Entity\ActivityMeta;
 use App\Entity\ActivityRate;
@@ -32,6 +33,7 @@ use DateTime;
 use DateTimeZone;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Logging;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
@@ -127,7 +129,12 @@ final class KimaiImporterCommand extends Command
      */
     private array $options = [];
 
-    public function __construct(private UserPasswordHasherInterface $passwordHasher, private ManagerRegistry $doctrine, private EntityManagerInterface $entityManager, private ValidatorInterface $validator)
+    public function __construct(
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly ManagerRegistry $doctrine,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ValidatorInterface $validator
+    )
     {
         parent::__construct();
     }
@@ -136,7 +143,7 @@ final class KimaiImporterCommand extends Command
     {
         $this
             ->setDescription('Import data from a Kimai v1 installation')
-            ->setHelp('This command allows you to import the most important data from a Kimi v1 installation.')
+            ->setHelp('This command allows you to import the most important data from a Kimai v1 installation.')
             ->addArgument(
                 'connection',
                 InputArgument::REQUIRED,
@@ -252,16 +259,30 @@ final class KimaiImporterCommand extends Command
         Type::overrideType(Types::DATETIME_MUTABLE, DateTimeType::class);
         // don't calculate rates ... this was done in Kimai 1
         $this->deactivateLifecycleCallbacks();
-        // create reading database connection to Kimai 1
-        $this->connection = $connection = DriverManager::getConnection(['url' => $options['url']]);
-        $this->connection->getConfiguration()->setSQLLogger(null); // FIXME @deprecated
+
         /** @var Connection $c */
         $c = $this->doctrine->getConnection();
-        $c->getConfiguration()->setSQLLogger(null); // FIXME @deprecated
+        // remove existing logging middleware
+        $mws = $c->getConfiguration()->getMiddlewares();
+        $newMws = [];
+        foreach ($mws as $mw) {
+            if (!$mw instanceof Logging\Middleware) {
+                $newMws[] = $mw;
+            }
+        }
+        $c->getConfiguration()->setMiddlewares($newMws);
+        $configuration = $c->getConfiguration();
+
+        // create reading database connection to Kimai 1
+        $params = (new DsnParserFactory())->parse($options['url']);
+        $this->connection = DriverManager::getConnection(
+            $params, // @phpstan-ignore-line
+            $configuration
+        );
 
         foreach ($options['prefix'] as $prefix) {
             $this->dbPrefix = $prefix;
-            if (!$this->checkDatabaseVersion($connection, $io)) {
+            if (!$this->checkDatabaseVersion($this->connection, $io)) {
                 return Command::FAILURE;
             }
         }
@@ -574,11 +595,6 @@ final class KimaiImporterCommand extends Command
     /**
      * Checks if the given database connection for import has an underlying database with a compatible structure.
      * This is checked against the Kimai version and database revision.
-     *
-     * @param Connection $connection
-     * @param SymfonyStyle $io
-     * @return bool
-     * @throws \Doctrine\DBAL\Exception
      */
     private function checkDatabaseVersion(Connection $connection, SymfonyStyle $io): bool
     {

@@ -3,6 +3,7 @@
 Compatibility: requires minimum Kimai 2.11.0
 
 - Simplify timesheet example data to prevent confusion
+- Fix Doctrine deprecations
 
 ## Version 2.9.0
 
