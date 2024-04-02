@@ -21,7 +21,7 @@ final class ImportData
      */
     private array $status = [];
 
-    public function __construct(private string $name, private array $header)
+    public function __construct(private readonly string $name, private readonly array $header)
     {
     }
 
