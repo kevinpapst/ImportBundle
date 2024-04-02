@@ -46,7 +46,9 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
 
     public function supports(array $header): bool
     {
-        return empty($this->checkHeader($header));
+        $missing = $this->checkHeader($header);
+
+        return count($missing) === 0;
     }
 
     private function getTranslatedHeaders(): array
