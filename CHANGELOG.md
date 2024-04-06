@@ -3,6 +3,7 @@
 Compatibility: requires minimum Kimai 2.11.0
 
 - Added: Validate Hourly/Internal/Fixed rate
+- Changed: Translate detected column headers
 
 ## Version 2.10.0
 

@@ -134,27 +134,43 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
 
     protected function createImportData(ImportRow $row): ImportData
     {
-        return new ImportData('time_tracking', array_keys($row->getData()));
+        $translated = $this->getTranslatedHeaders();
+        $converted = [];
+
+        foreach ($row->getData() as $key => $value) {
+            if (\array_key_exists($key, $translated)) {
+                $converted[] = $translated[$key];
+            } else {
+                $converted[] = $key;
+            }
+        }
+
+        return new ImportData('time_tracking', $converted);
     }
 
     public function importRow(Duration $durationParser, ImportData $data, ImportRow $row, bool $dryRun): void
     {
         $rawData = $row->getData();
         $translated = $this->getTranslatedHeaders();
+        $converted = [];
 
         foreach ($rawData as $key => $value) {
             if (\array_key_exists($key, $translated)) {
-                if (($newKey = $translated[$key]) === $key) {
+                $newKey = $translated[$key];
+                $converted[$newKey] = trim($value);
+                if ($newKey === $key) {
                     continue;
                 }
                 if (\array_key_exists($newKey, $rawData)) {
                     // prevent that existing key will be overwritten (e.g. Date using the export CSV)
                     continue;
                 }
-                $rawData[$newKey] = $value;
+                $rawData[$newKey] = trim($value);
+            } else {
+                $converted[$key] = trim($value);
             }
         }
 
-        parent::importRow($durationParser, $data, new ImportRow($rawData), $dryRun);
+        parent::importRow($durationParser, $data, new ImportRow($converted), $dryRun);
     }
 }
