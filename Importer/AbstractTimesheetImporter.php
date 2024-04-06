@@ -136,7 +136,7 @@ abstract class AbstractTimesheetImporter
             $duration = 0;
             $foundDuration = null;
 
-            if (\is_string($record['Duration']) && strlen($record['Duration']) > 0) {
+            if (\is_string($record['Duration']) && \strlen($record['Duration']) > 0) {
                 $duration = $this->parseDuration($durationParser, $record['Duration']);
                 $foundDuration = $duration;
             }

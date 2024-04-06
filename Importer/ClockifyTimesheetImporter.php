@@ -43,7 +43,7 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
     {
         $result = array_diff(self::$supportedHeader, $header);
 
-        return count($result) === 0;
+        return \count($result) === 0;
     }
 
     public function checkHeader(array $header): array
