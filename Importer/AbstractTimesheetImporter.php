@@ -70,7 +70,7 @@ abstract class AbstractTimesheetImporter
         private readonly UserService $userService,
         private readonly TagRepository $tagRepository,
         private readonly TimesheetService $timesheetService,
-        protected TranslatorInterface $translator,
+        protected readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -136,7 +136,7 @@ abstract class AbstractTimesheetImporter
             $duration = 0;
             $foundDuration = null;
 
-            if (!empty($record['Duration']) && \is_string($record['Duration'])) {
+            if (\is_string($record['Duration']) && strlen($record['Duration']) > 0) {
                 $duration = $this->parseDuration($durationParser, $record['Duration']);
                 $foundDuration = $duration;
             }
@@ -457,6 +457,7 @@ abstract class AbstractTimesheetImporter
         $empty = 'Empty or missing field: ';
         $encoding = 'Invalid encoding, requires UTF-8: ';
         $negative = 'Negative values not supported: ';
+        $float = 'Invalid numeric value: ';
 
         if (!\array_key_exists('User', $row) || empty($row['User'])) {
             $fields[] = $empty . 'User';
@@ -489,8 +490,20 @@ abstract class AbstractTimesheetImporter
             $fields[] = $empty . 'Date';
         }
 
-        if ((empty($row['From']) || empty($row['To']) || empty($row['End'])) && empty($row['Duration'])) {
+        if ((empty($row['From']) || empty($row['To']) || empty($row['End'])) && ($row['Duration'] === '')) {
             $fields[] = $empty . 'Duration';
+        }
+
+        if ($row['HourlyRate'] !== null && $row['HourlyRate'] !== '' && !is_numeric($row['HourlyRate'])) {
+            $fields[] = $float . 'HourlyRate';
+        }
+
+        if ($row['InternalRate'] !== null && $row['InternalRate'] !== '' && !is_numeric($row['InternalRate'])) {
+            $fields[] = $float . 'InternalRate';
+        }
+
+        if ($row['FixedRate'] !== null && $row['FixedRate'] !== '' && !is_numeric($row['FixedRate'])) {
+            $fields[] = $float . 'FixedRate';
         }
 
         if (!empty($fields)) {

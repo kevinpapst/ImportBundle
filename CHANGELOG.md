@@ -1,3 +1,9 @@
+## Version 2.11.0
+
+Compatibility: requires minimum Kimai 2.11.0
+
+- Added: Validate Hourly/Internal/Fixed rate
+
 ## Version 2.10.0
 
 Compatibility: requires minimum Kimai 2.11.0
