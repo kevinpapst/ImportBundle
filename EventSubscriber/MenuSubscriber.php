@@ -17,11 +17,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class MenuSubscriber implements EventSubscriberInterface
 {
-    private $security;
-
-    public function __construct(AuthorizationCheckerInterface $security)
+    public function __construct(private readonly AuthorizationCheckerInterface $security)
     {
-        $this->security = $security;
     }
 
     public static function getSubscribedEvents(): array
