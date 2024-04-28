@@ -18,9 +18,9 @@ final class ImportRow
     private array $errors = [];
 
     /**
-     * @param array<string, mixed> $row
+     * @param array<string, string> $row
      */
-    public function __construct(private array $row)
+    public function __construct(private readonly array $row)
     {
     }
 
@@ -42,6 +42,9 @@ final class ImportRow
         return \count($this->errors) > 0;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getData(): array
     {
         return $this->row;
