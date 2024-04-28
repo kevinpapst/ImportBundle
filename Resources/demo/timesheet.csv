@@ -1,2 +1,2 @@
-Date;From;To;Duration;Rate;User;Customer;Project;Activity;Description;Exported;Tags;HourlyRate;FixedRate;InternalRate
-2022-07-27;07:10;09:11;7260;231.92;user@example.com;Acme company;Import project name;Imported activity;some work has been done;0;foo,bar,import;115.0;0;65.0
+Date;From;To;Duration;Rate;User;Email;Customer;Project;Activity;Description;Exported;Tags;HourlyRate;FixedRate;InternalRate
+2022-07-27;07:10;09:11;7260;231.92;Example User;user@example.com;Acme company;Import project name;Imported activity;some work has been done;0;foo,bar,import;115.0;0;65.0

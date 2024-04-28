@@ -17,32 +17,35 @@ use KimaiPlugin\ImportBundle\Model\ImportRow;
 final class TimesheetImporter extends AbstractTimesheetImporter implements ImporterInterface
 {
     /**
-     * @var string[]
-     */
-    private static array $supportedHeader = [
-        'Date',
-        'From',
-        'To',
-        'Duration',
-        'Rate',
-        'User',
-        'Username',
-        'Customer',
-        'Project',
-        'Activity',
-        'Description',
-        'Exported',
-        'Tags',
-        'HourlyRate',
-        'InternalRate',
-        'FixedRate',
-        'Billable',
-    ];
-
-    /**
      * @var array<string, string>
      */
-    private array $translatedHeader = [];
+    private array $translatedHeader = [
+        'internal_rate' => 'InternalRate',
+        'rate_internal' => 'InternalRate',
+        'internalrate' => 'InternalRate',
+        'hourly_rate' => 'HourlyRate',
+        'rate_hourly' => 'HourlyRate',
+        'hourlyrate' => 'HourlyRate',
+        'fixed_rate' => 'FixedRate',
+        'rate_fixed' => 'FixedRate',
+        'fixedrate' => 'FixedRate',
+        'user' => 'User',
+        'username' => 'User',
+        'name' => 'User',
+        'email' => 'Email',
+        'date' => 'Date',
+        'from' => 'From',
+        'to' => 'To',
+        'duration' => 'Duration',
+        'rate' => 'Rate',
+        'customer' => 'Customer',
+        'project' => 'Project',
+        'activity' => 'Activity',
+        'description' => 'Description',
+        'exported' => 'Exported',
+        'billable' => 'Billable',
+        'tags' => 'Tags',
+    ];
 
     public function supports(array $header): bool
     {
@@ -51,80 +54,40 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
         return \count($missing) === 0;
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function getTranslatedHeaders(): array
     {
-        if (\count($this->translatedHeader) === 0) {
-            // some old versions of the export CSV had translation issues
-            $this->translatedHeader = [
-                'rate_internal' => 'InternalRate',
-                'internalRate' => 'InternalRate',
-                'internal_rate' => 'InternalRate',
-                'username' => 'Username',
-            ];
-
-            $locales = ['en', null]; // order "en" than current (null) locale
-
-            foreach ($locales as $locale) {
-                $this->translatedHeader = array_merge($this->translatedHeader, [
-                    $this->translator->trans('date', [], null, $locale) => 'Date',
-                    $this->translator->trans('begin', [], null, $locale) => 'From',
-                    $this->translator->trans('end', [], null, $locale) => 'To',
-                    $this->translator->trans('duration', [], null, $locale) => 'Duration',
-                    $this->translator->trans('rate', [], null, $locale) => 'Rate',
-                    $this->translator->trans('internalRate', [], null, $locale) => 'InternalRate',
-                    $this->translator->trans('username', [], null, $locale) => 'Username',
-                    $this->translator->trans('name', [], null, $locale) => 'User',
-                    $this->translator->trans('user', [], null, $locale) => 'Username',
-                    $this->translator->trans('customer', [], null, $locale) => 'Customer',
-                    $this->translator->trans('project', [], null, $locale) => 'Project',
-                    $this->translator->trans('activity', [], null, $locale) => 'Activity',
-                    $this->translator->trans('description', [], null, $locale) => 'Description',
-                    $this->translator->trans('exported', [], null, $locale) => 'Exported',
-                    $this->translator->trans('billable', [], null, $locale) => 'Billable',
-                    $this->translator->trans('tags', [], null, $locale) => 'Tags',
-                    $this->translator->trans('hourlyRate', [], null, $locale) => 'HourlyRate',
-                    $this->translator->trans('fixedRate', [], null, $locale) => 'FixedRate',
-                ]);
-            }
-        }
-
         return $this->translatedHeader;
     }
 
     public function checkHeader(array $header): array
     {
         $known = [];
-        $translated = $this->getTranslatedHeaders();
 
         foreach ($header as $name) {
-            if (\array_key_exists($name, $translated)) {
-                $known[] = $translated[$name];
-            } elseif (\array_key_exists($name, self::$supportedHeader)) {
-                $known[] = $name;
+            $name = strtolower($name);
+            if (\array_key_exists($name, $this->translatedHeader)) {
+                $known[] = $this->translatedHeader[$name];
             }
         }
+        $known = array_unique($known);
 
         $required = [
-            'Date' => ['Date'],
-            'From' => ['From', 'Begin'],
-            'To' => ['End', 'To', 'Duration'],
-            'User' => ['User', 'Username', 'Name'],
-            'Customer' => ['Customer'],
-            'Project' => ['Project'],
-            'Activity' => ['Activity'],
+            'Date',
+            'From',
+            'To',
+            'User',
+            'Email',
+            'Customer',
+            'Project',
+            'Activity',
         ];
 
         $missing = [];
-
-        foreach ($required as $name => $columns) {
-            $found = false;
-            foreach ($columns as $column) {
-                if (\in_array($column, $known, true)) {
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
+        foreach ($required as $name) {
+            if (!\in_array($name, $known, true)) {
                 $missing[] = $name;
             }
         }
@@ -138,11 +101,11 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
         $converted = [];
 
         foreach ($row->getData() as $key => $value) {
-            if (\array_key_exists($key, $translated)) {
-                $converted[] = $translated[$key];
-            } else {
-                $converted[] = $key;
+            $k = strtolower($key);
+            if (\array_key_exists($k, $translated)) {
+                $key = $translated[$k];
             }
+            $converted[] = $key;
         }
 
         return new ImportData('time_tracking', $converted);
@@ -155,20 +118,11 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
         $converted = [];
 
         foreach ($rawData as $key => $value) {
+            $k = strtolower($key);
             if (\array_key_exists($key, $translated)) {
-                $newKey = $translated[$key];
-                $converted[$newKey] = trim($value);
-                if ($newKey === $key) {
-                    continue;
-                }
-                if (\array_key_exists($newKey, $rawData)) {
-                    // prevent that existing key will be overwritten (e.g. Date using the export CSV)
-                    continue;
-                }
-                $rawData[$newKey] = trim($value);
-            } else {
-                $converted[$key] = trim($value);
+                $key = $translated[$k];
             }
+            $converted[$key] = trim($value);
         }
 
         parent::importRow($durationParser, $data, new ImportRow($converted), $dryRun);
