@@ -25,7 +25,11 @@ final class ImporterService
     /**
      * @param iterable<ImporterInterface> $importer
      */
-    public function __construct(private iterable $importer, private EntityManagerInterface $entityManager, private LoggerInterface $logger)
+    public function __construct(
+        private readonly iterable $importer,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LoggerInterface $logger
+    )
     {
     }
 
@@ -121,7 +125,7 @@ final class ImporterService
                         throw new ImportException('Invalid file given, missing and/or invalid columns: ' . implode(', ', $importer->checkHeader($header)));
                     }
                     $rows = [];
-                    /** @var array<string, mixed> $record */
+                    /** @var array<string, string> $record */
                     foreach ($data as $record) {
                         $rows[] = new ImportRow($record);
                     }
@@ -184,7 +188,7 @@ final class ImporterService
                         throw new ImportException('Invalid file given, missing and/or invalid columns: ' . implode(', ', $importer->checkHeader($header)));
                     }
                     $rows = [];
-                    /** @var array<string, mixed> $record */
+                    /** @var array<string, string> $record */
                     foreach ($csv->getRecords() as $record) {
                         $rows[] = new ImportRow($record);
                     }

@@ -21,6 +21,7 @@ use KimaiPlugin\ImportBundle\Importer\ImporterService;
 use KimaiPlugin\ImportBundle\Importer\ImportException;
 use KimaiPlugin\ImportBundle\Importer\ProjectImporter;
 use KimaiPlugin\ImportBundle\Importer\TimesheetImporter;
+use KimaiPlugin\ImportBundle\Importer\TogglTimesheetImporter;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
 use KimaiPlugin\ImportBundle\Model\TimesheetImportModel;
 use Symfony\Component\Form\FormError;
@@ -64,15 +65,18 @@ final class ImportController extends AbstractController
         return $this->showForm($request, new TimesheetImportModel(), TimesheetImportForm::class, 'clockify', 'importer_clockify', ClockifyTimesheetImporter::class, $importerService);
     }
 
+    #[Route(path: '/toggl', name: 'importer_toggl', methods: ['GET', 'POST'])]
+    public function toggl(Request $request, ImporterService $importerService): Response
+    {
+        $model = new TimesheetImportModel();
+        $model->setDelimiter(',');
+
+        return $this->showForm($request, $model, TimesheetImportForm::class, 'toggl', 'importer_toggl', TogglTimesheetImporter::class, $importerService);
+    }
+
     /**
-     * @param Request $request
-     * @param ImportModel $model
      * @param class-string $formClass
-     * @param string $tab
-     * @param string $route
      * @param class-string $importer
-     * @param ImporterService $importerService
-     * @return Response
      */
     private function showForm(Request $request, ImportModel $model, string $formClass, string $tab, string $route, string $importer, ImporterService $importerService): Response
     {
@@ -112,6 +116,7 @@ final class ImportController extends AbstractController
     #[Route(path: '/example/timesheet-json', name: 'importer_example_timesheet_json', methods: ['GET'])]
     #[Route(path: '/example/grandtotal', name: 'importer_example_grandtotal', methods: ['GET'])]
     #[Route(path: '/example/clockify', name: 'importer_example_clockify', methods: ['GET'])]
+    #[Route(path: '/example/toggl', name: 'importer_example_toggl', methods: ['GET'])]
     public function demoFiles(Request $request): Response
     {
         switch ($request->get('_route')) {
@@ -138,6 +143,9 @@ final class ImportController extends AbstractController
 
             case 'importer_example_clockify':
                 return $this->file(__DIR__ . '/../Resources/demo/clockify.csv');
+
+            case 'importer_example_toggl':
+                return $this->file(__DIR__ . '/../Resources/demo/toggl.csv');
         }
 
         throw $this->createNotFoundException('Unknown demo file');

@@ -1,3 +1,9 @@
+## Version 2.12.0
+
+Compatibility: requires minimum Kimai 2.11.0
+
+- Added: toggl timesheet importer
+
 ## Version 2.11.0
 
 Compatibility: requires minimum Kimai 2.11.0

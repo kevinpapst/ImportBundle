@@ -29,7 +29,7 @@ final class ImporterHelper
         if (\is_string($value)) {
             $value = strtolower(trim($value));
 
-            if ($value === 'true' || $value === 'on' || $value === '1') {
+            if ($value === 'true' || $value === 'yes' || $value === 'on' || $value === '1') {
                 return true;
             }
         }

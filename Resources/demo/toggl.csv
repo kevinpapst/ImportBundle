@@ -1,0 +1,5 @@
+User,Email,Client,Project,Task,Description,Billable,Start date,Start time,End date,End time,Duration,Tags,Amount (USD)
+Bob,bob@example.com,Paid Client,Paid Project,,Work to update docs,Yes,2024-04-25,13:32:00,2024-04-25,13:48:00,00:16:00,Docs,26.67
+Bob,bob@example.com,Paid Client,Paid Project,,Work to update docs,Yes,2024-04-24,10:17:00,2024-04-24,11:00:00,00:43:00,Docs,71.67
+John Smith,johnsmith@example.com,Client 2,Project 1,,Some task,No,2024-04-23,16:30:00,2024-04-23,17:00:00,00:30:00,Tag 1,
+John Smith,johnsmith@example.com,Client 1,Project 3,,another task,No,2024-04-20,18:30:00,2024-04-20,19:30:00,01:00:00,Tag 1,

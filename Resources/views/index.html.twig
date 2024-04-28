@@ -24,6 +24,9 @@
                     <a href="{{ path('importer_clockify') }}" class="nav-link{% if tab == 'clockify' %} active{% endif %}" role="tab">Clockify</a>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <a href="{{ path('importer_toggl') }}" class="nav-link{% if tab == 'toggl' %} active{% endif %}" role="tab">Toggl</a>
+                </li>
+                <li class="nav-item" role="presentation">
                     <a href="{{ path('importer_grandtotal') }}" class="nav-link{% if tab == 'grandtotal' %} active{% endif %}" role="tab">{{ 'importer.grandtotal'|trans }}</a>
                 </li>
             </ul>
@@ -43,6 +46,8 @@
                         <a class="btn" href="{{ path('importer_example_project_json') }}">JSON</a>
                     {% elseif tab == 'clockify' %}
                         <a class="btn" href="{{ path('importer_example_clockify') }}">CSV</a>
+                    {% elseif tab == 'toggl' %}
+                        <a class="btn" href="{{ path('importer_example_toggl') }}">CSV</a>
                     {% elseif tab == 'grandtotal' %}
                         <a class="btn" href="{{ path('importer_example_grandtotal') }}">CSV</a>
                     {% endif %}
