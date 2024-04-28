@@ -98,10 +98,16 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
     protected function createImportData(ImportRow $row): ImportData
     {
         $translated = $this->getTranslatedHeaders();
-        $converted = [];
+        $converted = [
+            'Begin',
+            'End'
+        ];
 
         foreach ($row->getData() as $key => $value) {
             $k = strtolower($key);
+            if ($k === 'date' || $k === 'from' || $k === 'to') {
+                continue;
+            }
             if (\array_key_exists($k, $translated)) {
                 $key = $translated[$k];
             }
@@ -115,14 +121,45 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
     {
         $rawData = $row->getData();
         $translated = $this->getTranslatedHeaders();
-        $converted = [];
+
+        if (\array_key_exists('From', $rawData) && \is_string($rawData['From']) && $rawData['From'] !== '') {
+            $len = \strlen($rawData['From']);
+            if ($len === 1) {
+                $rawData['From'] = '0' . $rawData['From'] . ':00';
+            } elseif ($len == 2) {
+                $rawData['From'] = $rawData['From'] . ':00';
+            }
+        }
+
+        if (\array_key_exists('To', $rawData) && \is_string($rawData['To']) && $rawData['To'] !== '') {
+            $len = \strlen($rawData['To']);
+            if ($len === 1) {
+                $rawData['To'] = '0' . $rawData['To'] . ':00';
+            } elseif ($len == 2) {
+                $rawData['To'] = $rawData['To'] . ':00';
+            }
+        }
+
+        $converted = [
+            'Begin' => $rawData['Date'] . ' ' . $rawData['From'],
+            'End' => $rawData['Date'] . ' ' . $rawData['To'],
+        ];
 
         foreach ($rawData as $key => $value) {
             $k = strtolower($key);
-            if (\array_key_exists($key, $translated)) {
-                $key = $translated[$k];
+            switch ($k) {
+                case 'date':
+                case 'from':
+                case 'to':
+                    // nothing to do
+                    break;
+                default:
+                    if (\array_key_exists($k, $translated)) {
+                        $key = $translated[$k];
+                    }
+                    $converted[$key] = \is_string($value) ? trim($value) : $value;
+                    break;
             }
-            $converted[$key] = trim($value);
         }
 
         parent::importRow($durationParser, $data, new ImportRow($converted), $dryRun);

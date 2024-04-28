@@ -3,6 +3,8 @@
 Compatibility: requires minimum Kimai 2.11.0
 
 - Added: toggl timesheet importer
+- Added: format values in preview
+- Added: internal API improvements
 - Fix: user column name detection 
 - Removed: Translate detected column headers (caused too many problems)
 

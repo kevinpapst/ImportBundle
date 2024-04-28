@@ -65,7 +65,7 @@ final class TogglTimesheetImporter extends AbstractTimesheetImporter implements 
             'Duration',
         ];
 
-        return new ImportData('Clockify', $header);
+        return new ImportData('Toggl', $header);
     }
 
     public function importRow(Duration $durationParser, ImportData $data, ImportRow $row, bool $dryRun): void
@@ -81,7 +81,7 @@ final class TogglTimesheetImporter extends AbstractTimesheetImporter implements 
             'User' => '',
             'Email' => '',
             'Tags' => '',
-            'Billable' => '',
+            'Billable' => true,
             'Rate' => '0.0',
             'Duration' => '',
         ];
@@ -93,8 +93,10 @@ final class TogglTimesheetImporter extends AbstractTimesheetImporter implements 
                 case 'project':
                 case 'description':
                 case 'tags':
-                case 'billable': // Yes and No will be auto converted by the base class!
                     $values[$key] = $value;
+                    break;
+                case 'billable':
+                    $values[$key] = ImporterHelper::convertBoolean($value);
                     break;
                 case 'client':
                     if ($value !== '') {
@@ -113,7 +115,7 @@ final class TogglTimesheetImporter extends AbstractTimesheetImporter implements 
                     // nothing to do
                     break;
                 case 'duration':
-                    $values['Duration'] = $value;
+                    $values['Duration'] = $durationParser->parseDurationString((string) $value);
                     break;
                 default:
                     if (str_starts_with($key, 'Amount') && $value !== '') {
@@ -124,10 +126,5 @@ final class TogglTimesheetImporter extends AbstractTimesheetImporter implements 
         }
 
         parent::importRow($durationParser, $data, new ImportRow($values), $dryRun);
-    }
-
-    protected function parseDuration(Duration $durationParser, string $duration): int
-    {
-        return $durationParser->parseDurationString($duration);
     }
 }

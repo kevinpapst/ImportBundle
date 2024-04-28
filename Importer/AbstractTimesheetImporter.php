@@ -77,54 +77,14 @@ abstract class AbstractTimesheetImporter
     public function importRow(Duration $durationParser, ImportData $data, ImportRow $row, bool $dryRun): void
     {
         try {
+            /** @var array<string, string> $record */
             $record = $row->getData();
-
-            if (!\array_key_exists('Tags', $record)) {
-                $record['Tags'] = '';
-            }
-            if (!\array_key_exists('Exported', $record)) {
-                $record['Exported'] = false;
-            }
-            if (!\array_key_exists('Rate', $record)) {
-                $record['Rate'] = null;
-            }
-            if (!\array_key_exists('HourlyRate', $record)) {
-                $record['HourlyRate'] = null;
-            }
-            if (!\array_key_exists('InternalRate', $record)) {
-                $record['InternalRate'] = null;
-            }
-            if (!\array_key_exists('FixedRate', $record)) {
-                $record['FixedRate'] = null;
-            }
-            if (!\array_key_exists('Billable', $record)) {
-                $record['Billable'] = true;
-            }
-            if (!empty($record['From'])) {
-                $len = \strlen($record['From']);
-                if ($len === 1) {
-                    $record['From'] = '0' . $record['From'] . ':00';
-                } elseif ($len == 2) {
-                    $record['From'] = $record['From'] . ':00';
-                }
-            }
-            if (!empty($record['To'])) {
-                $len = \strlen($record['To']);
-                if ($len === 1) {
-                    $record['To'] = '0' . $record['To'] . ':00';
-                } elseif ($len == 2) {
-                    $record['To'] = $record['To'] . ':00';
-                }
-            }
 
             $this->validateRow($record);
 
-            $username = \array_key_exists('Username', $record) ? $record['Username'] : $record['User'];
-            $alias = \array_key_exists('Name', $record) ? $record['Name'] : (\array_key_exists('User', $record) ? $record['User'] : $username);
-            $email = \array_key_exists('Email', $record) ? $record['Email'] : $username;
-            if (null === ($user = $this->getUser($username, $alias, $email, $dryRun))) {
+            if (null === ($user = $this->getUser($record['User'], $record['Email'], $dryRun))) {
                 throw new ImportException(
-                    sprintf('Unknown user %s', $username)
+                    sprintf('Unknown user %s', $record['User'])
                 );
             }
 
@@ -136,6 +96,7 @@ abstract class AbstractTimesheetImporter
             $duration = 0;
             $foundDuration = null;
 
+            // most importers should provide seconds via int
             if (\is_string($record['Duration']) && \strlen($record['Duration']) > 0) {
                 $duration = $this->parseDuration($durationParser, $record['Duration']);
                 $foundDuration = $duration;
@@ -143,82 +104,34 @@ abstract class AbstractTimesheetImporter
 
             $timezone = new \DateTimeZone($user->getTimezone());
 
-            if (\array_key_exists('Begin', $record) && \array_key_exists('End', $record)) {
-                try {
-                    $begin = new \DateTime($record['Begin'], $timezone);
-                } catch (\Exception $exception) {
-                    throw new ImportException($exception->getMessage());
-                }
-                try {
-                    $end = new \DateTime($record['End'], $timezone);
-                } catch (\Exception $exception) {
-                    throw new ImportException($exception->getMessage());
-                }
-            } elseif (empty($record['From']) && empty($record['To'])) {
-                try {
-                    $begin = new \DateTime($record['Date'] . ' 12:00:00', $timezone);
-                } catch (\Exception $exception) {
-                    throw new ImportException($exception->getMessage());
-                }
-                try {
-                    $end = (new \DateTime())->setTimezone($timezone)->setTimestamp($begin->getTimestamp() + $duration);
-                } catch (\Exception $exception) {
-                    throw new ImportException($exception->getMessage());
-                }
-            } elseif (empty($record['From'])) {
-                try {
-                    $end = new \DateTime($record['Date'] . ' ' . $record['To'], $timezone);
-                } catch (\Exception $exception) {
-                    throw new ImportException($exception->getMessage());
-                }
-                try {
-                    $begin = (new \DateTime())->setTimezone($timezone)->setTimestamp($end->getTimestamp() - $duration);
-                } catch (\Exception $exception) {
-                    throw new ImportException($exception->getMessage());
-                }
-            } elseif (empty($record['To'])) {
-                try {
-                    $begin = new \DateTime($record['Date'] . ' ' . $record['From'], $timezone);
-                } catch (\Exception $exception) {
-                    throw new ImportException($exception->getMessage());
-                }
-                try {
-                    $end = (new \DateTime())->setTimezone($timezone)->setTimestamp($begin->getTimestamp() + $duration);
-                } catch (\Exception $exception) {
-                    throw new ImportException($exception->getMessage());
-                }
-            } else {
-                try {
-                    $begin = new \DateTime($record['Date'] . ' ' . $record['From'], $timezone);
-                } catch (\Exception $exception) {
-                    throw new ImportException($exception->getMessage());
-                }
-                try {
-                    $end = new \DateTime($record['Date'] . ' ' . $record['To'], $timezone);
-                } catch (\Exception $exception) {
-                    throw new ImportException($exception->getMessage());
-                }
+            try {
+                $begin = new \DateTime($record['Begin'], $timezone);
+            } catch (\Exception $exception) {
+                throw new ImportException($exception->getMessage());
+            }
+            try {
+                $end = new \DateTime($record['End'], $timezone);
+            } catch (\Exception $exception) {
+                throw new ImportException($exception->getMessage());
+            }
 
-                // fix dates, which are running over midnight
-                if ($end < $begin) {
-                    if ($duration > 0) {
-                        $end = (new \DateTime())->setTimezone($timezone)->setTimestamp($begin->getTimestamp() + $duration);
-                    } else {
-                        $end->add(new \DateInterval('P1D'));
-                    }
+            // fix dates, which are running over midnight
+            if ($end < $begin) {
+                if ($duration > 0) {
+                    $end = (new \DateTime())->setTimezone($timezone)->setTimestamp($begin->getTimestamp() + $duration);
+                } else {
+                    $end->add(new \DateInterval('P1D'));
                 }
             }
 
             $timesheet = $this->timesheetService->createNewTimesheet($user);
             $this->timesheetService->prepareNewTimesheet($timesheet);
 
-            $timesheet->setBillable(ImporterHelper::convertBoolean($record['Billable']));
             $timesheet->setActivity($activity);
             $timesheet->setProject($project);
             $timesheet->setBegin($begin);
             $timesheet->setEnd($end);
             $timesheet->setDescription($record['Description']);
-            $timesheet->setExported(ImporterHelper::convertBoolean($record['Exported']));
 
             if ($foundDuration !== null) {
                 $timesheet->setDuration($foundDuration);
@@ -226,7 +139,15 @@ abstract class AbstractTimesheetImporter
                 $timesheet->setDuration($timesheet->getDuration());
             }
 
-            if (!empty($record['Tags'])) {
+            if (\array_key_exists('Exported', $record)) {
+                $timesheet->setExported(ImporterHelper::convertBoolean($record['Exported']));
+            }
+
+            if (\array_key_exists('Billable', $record)) {
+                $timesheet->setBillable(ImporterHelper::convertBoolean($record['Billable']));
+            }
+
+            if (\array_key_exists('Tags', $record) && !empty($record['Tags'])) {
                 foreach (explode(',', $record['Tags']) as $tagName) {
                     if (empty($tagName)) {
                         continue;
@@ -236,16 +157,16 @@ abstract class AbstractTimesheetImporter
                 }
             }
 
-            if (!empty($record['Rate'])) {
+            if (\array_key_exists('Rate', $record) && is_numeric($record['Rate'])) {
                 $timesheet->setRate((float) $record['Rate']);
             }
-            if (!empty($record['HourlyRate'])) {
+            if (\array_key_exists('HourlyRate', $record) && is_numeric($record['HourlyRate'])) {
                 $timesheet->setHourlyRate((float) $record['HourlyRate']);
             }
-            if (!empty($record['FixedRate'])) {
+            if (\array_key_exists('FixedRate', $record) && is_numeric($record['FixedRate'])) {
                 $timesheet->setFixedRate((float) $record['FixedRate']);
             }
-            if (!empty($record['InternalRate'])) {
+            if (\array_key_exists('InternalRate', $record) && is_numeric($record['InternalRate'])) {
                 $timesheet->setInternalRate((float) $record['InternalRate']);
             }
 
@@ -327,21 +248,17 @@ abstract class AbstractTimesheetImporter
         return $data;
     }
 
-    private function getUser(string $user, string $alias, string $email, bool $dryRun): ?User
+    private function getUser(string $user, string $email, bool $dryRun): ?User
     {
         if (!\array_key_exists($user, $this->userCache)) {
             $tmpUser = $this->userService->findUserByEmail($email);
             if ($tmpUser === null) {
                 $tmpUser = $this->userService->findUserByName($user);
             }
-            if ($tmpUser === null) {
-                $tmpUser = $this->userService->findUserByDisplayName($alias);
-            }
 
             if ($tmpUser === null) {
                 $tmpUser = $this->userService->createNewUser();
                 $tmpUser->setEmail($email);
-                $tmpUser->setAlias($alias);
                 $tmpUser->setUserIdentifier($user);
                 $tmpUser->setPlainPassword(uniqid());
                 if (!$dryRun) {
@@ -450,6 +367,9 @@ abstract class AbstractTimesheetImporter
         return $this->customerCache[$customer];
     }
 
+    /**
+     * @param array<string, string> $row
+     */
     private function validateRow(array $row): void
     {
         $fields = [];
@@ -461,6 +381,18 @@ abstract class AbstractTimesheetImporter
 
         if (!\array_key_exists('User', $row) || empty($row['User'])) {
             $fields[] = $empty . 'User';
+        }
+
+        if (!\array_key_exists('Email', $row) || empty($row['Email'])) {
+            $fields[] = $empty . 'Email';
+        }
+
+        if (!\array_key_exists('Begin', $row) || empty($row['Begin'])) {
+            $fields[] = $empty . 'Begin';
+        }
+
+        if (!\array_key_exists('End', $row) || empty($row['End'])) {
+            $fields[] = $empty . 'End';
         }
 
         if (empty($row['Project'])) {
@@ -486,23 +418,15 @@ abstract class AbstractTimesheetImporter
             $fields[] = $encoding . 'Description';
         }
 
-        if (empty($row['Date']) && empty($row['Begin'])) {
-            $fields[] = $empty . 'Date';
-        }
-
-        if ((empty($row['From']) || empty($row['To']) || empty($row['End'])) && ($row['Duration'] === '')) {
-            $fields[] = $empty . 'Duration';
-        }
-
-        if ($row['HourlyRate'] !== null && $row['HourlyRate'] !== '' && !is_numeric($row['HourlyRate'])) {
+        if (\array_key_exists('HourlyRate', $row) && $row['HourlyRate'] !== null && $row['HourlyRate'] !== '' && !is_numeric($row['HourlyRate'])) {
             $fields[] = $float . 'HourlyRate';
         }
 
-        if ($row['InternalRate'] !== null && $row['InternalRate'] !== '' && !is_numeric($row['InternalRate'])) {
+        if (\array_key_exists('InternalRate', $row) && $row['InternalRate'] !== null && $row['InternalRate'] !== '' && !is_numeric($row['InternalRate'])) {
             $fields[] = $float . 'InternalRate';
         }
 
-        if ($row['FixedRate'] !== null && $row['FixedRate'] !== '' && !is_numeric($row['FixedRate'])) {
+        if (\array_key_exists('FixedRate', $row) && $row['FixedRate'] !== null && $row['FixedRate'] !== '' && !is_numeric($row['FixedRate'])) {
             $fields[] = $float . 'FixedRate';
         }
 

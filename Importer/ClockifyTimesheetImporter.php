@@ -54,9 +54,9 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
     protected function createImportData(ImportRow $row): ImportData
     {
         $header = [
-            'Customer',
-            'Start',
+            'Begin',
             'End',
+            'Customer',
             'Project',
             'Description',
             'Activity',
@@ -76,9 +76,19 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
     {
         $rawData = $row->getData();
         $values = [
-            'Customer' => 'Importer',
             'Begin' => $rawData['Start Date'] . ' ' . $rawData['Start Time'],
             'End' => $rawData['End Date'] . ' ' . $rawData['End Time'],
+            'Customer' => 'Importer',
+            'Project' => '',
+            'Description' => '',
+            'Activity' => '',
+            'User' => '',
+            'Email' => '',
+            'Tags' => '',
+            'Billable' => true,
+            'Duration' => '',
+            'HourlyRate' => '',
+            'Rate' => '',
         ];
 
         foreach ($rawData as $key => $value) {
@@ -88,8 +98,10 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
                 case 'Project':
                 case 'Description':
                 case 'Tags':
-                case 'Billable': // Yes and No will be auto converted by the base class!
                     $values[$key] = $value;
+                    break;
+                case 'Billable':
+                    $values[$key] = ImporterHelper::convertBoolean($value);
                     break;
                 case 'Client':
                     if ($value !== '') {
@@ -111,7 +123,7 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
                     // nothing to do
                     break;
                 case 'Duration (decimal)':
-                    $values['Duration'] = $value;
+                    $values['Duration'] = $durationParser->parseDurationString((string) $value);
                     break;
                 default:
                     if (str_starts_with($key, 'Billable Rate')) {
@@ -124,10 +136,5 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
         }
 
         parent::importRow($durationParser, $data, new ImportRow($values), $dryRun);
-    }
-
-    protected function parseDuration(Duration $durationParser, string $duration): int
-    {
-        return $durationParser->parseDurationString($duration);
     }
 }

@@ -18,7 +18,7 @@ final class ImportRow
     private array $errors = [];
 
     /**
-     * @param array<string, string> $row
+     * @param array<string, bool|int|string> $row
      */
     public function __construct(private readonly array $row)
     {
@@ -43,7 +43,7 @@ final class ImportRow
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, bool|int|string>
      */
     public function getData(): array
     {

@@ -99,6 +99,7 @@
 
         {% if countErrors > 0 or model.preview %}
             {% embed '@theme/embeds/card.html.twig' with {'boxtype': boxtype} %}
+                {% from "macros/widgets.html.twig" import label_boolean %}
                 {% block box_title %}{{ (importData.title)|trans }}{% endblock %}
                 {% block box_body_class %}p-0 table-responsive{% endblock %}
                 {% block box_body %}
@@ -116,7 +117,17 @@
                                 <tr{% if hasError %} class="text-warning"{% endif %}>
                                     <td>{{ loop.index + 1 }}</td>
                                     {% for key, data in row.data %}
-                                        <td>{{ data }}</td>
+                                        <td>
+                                            {% if key == 'Begin' or key == 'End' %}
+                                                {{ data|date_time }}
+                                            {% elseif key == 'Billable' or key == 'Exported' %}
+                                                {{ label_boolean(data) }}
+                                            {% elseif key == 'Duration' %}
+                                                {{ data|duration }}
+                                            {% else %}
+                                                {{ data }}
+                                            {% endif %}
+                                        </td>
                                     {% endfor %}
                                 </tr>
                                 {% if hasError %}
