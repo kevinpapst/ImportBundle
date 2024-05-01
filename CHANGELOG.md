@@ -2,18 +2,17 @@
 
 Compatibility: requires minimum Kimai 2.11.0
 
-- Added: toggl timesheet importer
-- Added: format values in preview
-- Added: internal API improvements
-- Fix: user column name detection 
-- Removed: Translate detected column headers (caused too many problems)
+- Added toggl timesheet importer
+- Format certain values in preview
+- Fixed user column name detection in timesheet import
+- Removed support for translated column headers (caused too many problems)
 
 ## Version 2.11.0
 
 Compatibility: requires minimum Kimai 2.11.0
 
-- Added: Validate Hourly/Internal/Fixed rate
-- Changed: Translate detected column headers
+- Validate Hourly/Internal/Fixed rate
+- Translate detected column headers (removed in 2.12)
 
 ## Version 2.10.0
 
