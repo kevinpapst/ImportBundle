@@ -262,7 +262,7 @@ abstract class AbstractTimesheetImporter
                 $tmpUser->setUserIdentifier($user);
                 $tmpUser->setPlainPassword(uniqid());
                 if (!$dryRun) {
-                    $this->userService->saveNewUser($tmpUser);
+                    $this->userService->saveUser($tmpUser);
                 }
                 $this->createdUsers++;
             }
