@@ -96,9 +96,9 @@ abstract class AbstractTimesheetImporter
             $duration = 0;
             $foundDuration = null;
 
-            if (array_key_exists('Duration', $record)) {
+            if (\array_key_exists('Duration', $record)) {
                 // most importers should provide seconds via int
-                if (is_int($record['Duration'])) {
+                if (\is_int($record['Duration'])) {
                     $duration = $record['Duration'];
                     $foundDuration = $duration;
                 } elseif (\is_string($record['Duration']) && \strlen($record['Duration']) > 0) {
