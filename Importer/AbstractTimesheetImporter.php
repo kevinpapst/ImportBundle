@@ -96,10 +96,15 @@ abstract class AbstractTimesheetImporter
             $duration = 0;
             $foundDuration = null;
 
-            // most importers should provide seconds via int
-            if (\is_string($record['Duration']) && \strlen($record['Duration']) > 0) {
-                $duration = $this->parseDuration($durationParser, $record['Duration']);
-                $foundDuration = $duration;
+            if (array_key_exists('Duration', $record)) {
+                // most importers should provide seconds via int
+                if (is_int($record['Duration'])) {
+                    $duration = $record['Duration'];
+                    $foundDuration = $duration;
+                } elseif (\is_string($record['Duration']) && \strlen($record['Duration']) > 0) {
+                    $duration = $this->parseDuration($durationParser, $record['Duration']);
+                    $foundDuration = $duration;
+                }
             }
 
             $timezone = new \DateTimeZone($user->getTimezone());
