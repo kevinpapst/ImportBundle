@@ -49,5 +49,6 @@ class MenuSubscriber implements EventSubscriberInterface
         $system->addChildRoute('importer_project');
         $system->addChildRoute('importer_grandtotal');
         $system->addChildRoute('importer_clockify');
+        $system->addChildRoute('importer_toggl');
     }
 }
