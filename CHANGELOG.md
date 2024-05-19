@@ -1,3 +1,10 @@
+## Version 2.13.0
+
+Compatibility: requires minimum Kimai 2.11.0
+
+- Support importing seconds
+- Fixed Clockify duration import rounding issue (see [#4838](https://github.com/kimai/kimai/issues/4838))
+
 ## Version 2.12.0
 
 Compatibility: requires minimum Kimai 2.11.0

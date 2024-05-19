@@ -119,11 +119,14 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
                 case 'Start Time':
                 case 'End Date':
                 case 'End Time':
-                case 'Duration (h)':
                     // nothing to do
                     break;
-                case 'Duration (decimal)':
+                case 'Duration (h)':
                     $values['Duration'] = $durationParser->parseDurationString((string) $value);
+                    break;
+                case 'Duration (decimal)':
+                    // see https://github.com/kimai/kimai/issues/4838 - rounding issues cause minute loss
+                    // $values['Duration'] = $durationParser->parseDurationString((string) $value);
                     break;
                 default:
                     if (str_starts_with($key, 'Billable Rate')) {
