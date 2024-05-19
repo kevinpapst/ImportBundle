@@ -50,7 +50,11 @@ final class ProjectImporter implements ImporterInterface
      */
     private array $customerCache = [];
 
-    public function __construct(private ProjectService $projectService, private CustomerService $customerService, private ValidatorInterface $validator)
+    public function __construct(
+        private readonly ProjectService $projectService,
+        private readonly CustomerService $customerService,
+        private readonly ValidatorInterface $validator
+    )
     {
     }
 
@@ -317,11 +321,7 @@ final class ProjectImporter implements ImporterInterface
         return $date;
     }
 
-    /**
-     * @param Project|Customer $value
-     * @return void
-     */
-    private function validate($value): void
+    private function validate(Project|Customer $value): void
     {
         $errors = $this->validator->validate($value);
 
