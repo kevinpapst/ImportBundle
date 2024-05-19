@@ -36,16 +36,18 @@ class MenuSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($auth->isGranted('importer')) {
-            $system = $event->getSystemMenu();
-            $system->addChild(
-                new MenuItemModel('importer', 'Importer', 'importer', [], 'fas fa-file-import')
-            );
-            $system->addChildRoute('importer_timesheet');
-            $system->addChildRoute('importer_customer');
-            $system->addChildRoute('importer_project');
-            $system->addChildRoute('importer_grandtotal');
-            $system->addChildRoute('importer_clockify');
+        if (!$auth->isGranted('importer')) {
+            return;
         }
+
+        $system = $event->getSystemMenu();
+        $system->addChild(
+            new MenuItemModel('importer', 'Importer', 'importer', [], 'fas fa-file-import')
+        );
+        $system->addChildRoute('importer_timesheet');
+        $system->addChildRoute('importer_customer');
+        $system->addChildRoute('importer_project');
+        $system->addChildRoute('importer_grandtotal');
+        $system->addChildRoute('importer_clockify');
     }
 }
