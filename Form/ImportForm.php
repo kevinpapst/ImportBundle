@@ -10,6 +10,7 @@
 
 namespace KimaiPlugin\ImportBundle\Form;
 
+use KimaiPlugin\ImportBundle\Importer\ImporterService;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -49,7 +50,7 @@ class ImportForm extends AbstractType
                 'constraints' => [
                     new NotNull(),
                     new File([
-                        'maxSize' => '1024k',
+                        'maxSize' => $options['max_file_size'],
                     ])
                 ],
             ])
@@ -64,6 +65,7 @@ class ImportForm extends AbstractType
             'csrf_field_name' => '_token',
             'csrf_token_id' => 'import_csv_data',
             'method' => 'POST',
+            'max_file_size' => ImporterService::MAX_FILESIZE,
         ]);
     }
 }

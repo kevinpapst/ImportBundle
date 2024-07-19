@@ -1,3 +1,9 @@
+## Version 2.14.0 (unreleased)
+
+Compatibility: requires minimum Kimai 2.17.0
+
+- Make it simpler to increase max row and file size
+
 ## Version 2.13.0
 
 Compatibility: requires minimum Kimai 2.17.0
