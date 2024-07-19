@@ -3,6 +3,7 @@
 Compatibility: requires minimum Kimai 2.17.0
 
 - Make it simpler to increase max row and file size
+- Allow 4MB upload file size and 5000 rows per file
 
 ## Version 2.13.0
 

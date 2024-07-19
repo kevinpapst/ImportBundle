@@ -20,8 +20,8 @@ use Psr\Log\LoggerInterface;
 
 final class ImporterService
 {
-    public const MAX_ROWS = 1000;
-    public const MAX_FILESIZE = '1024k';
+    public const MAX_ROWS = 5000;
+    public const MAX_FILESIZE = '4096k';
 
     /**
      * @param iterable<ImporterInterface> $importer
