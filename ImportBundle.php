@@ -28,6 +28,5 @@ class ImportBundle extends Bundle implements PluginInterface
         TimesheetDeactivated::DISABLED_ACTIVITY_ERROR, TimesheetDeactivated::DISABLED_PROJECT_ERROR, TimesheetDeactivated::DISABLED_CUSTOMER_ERROR, // timesheet deactivated current codes
         TimesheetLockdown::PERIOD_LOCKED, // lockdown is obviously not necessary to check here
         TimesheetLongRunning::LONG_RUNNING, TimesheetLongRunning::MAXIMUM, TimesheetZeroDuration::ZERO_DURATION_ERROR, // if this was allowed in the past, it should be imported
-
     ];
 }
