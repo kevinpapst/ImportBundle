@@ -84,7 +84,7 @@ final class ImporterService
         }
 
         throw new ImportException(
-            sprintf('Unsupported file given, invalid mimetype (%s / %s). Try to use another browser.', $mimetype, $userMimetype)
+            \sprintf('Unsupported file given, invalid mimetype (%s / %s). Try to use another browser.', $mimetype, $userMimetype)
         );
     }
 
@@ -176,7 +176,7 @@ final class ImporterService
             }
 
             if (\count($header) === 1 && stripos($header[0], $oppositeDelimiter) !== false) {
-                throw new ImportException(sprintf('Unsupported file given: retry with the "%s" delimiter', $oppositeDelimiter));
+                throw new ImportException(\sprintf('Unsupported file given: retry with the "%s" delimiter', $oppositeDelimiter));
             }
 
             if ($csv->count() > self::MAX_ROWS) {

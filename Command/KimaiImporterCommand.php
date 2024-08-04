@@ -318,7 +318,7 @@ final class KimaiImporterCommand extends Command
                 $this->activities = [];
             }
 
-            $io->title(sprintf('Handling data from table prefix: %s', $this->dbPrefix));
+            $io->title(\sprintf('Handling data from table prefix: %s', $this->dbPrefix));
 
             if ($options['fix-email'] !== null) {
                 $io->text('Fixing email addresses');
@@ -501,7 +501,7 @@ final class KimaiImporterCommand extends Command
             foreach ($users as $oldUser) {
                 $userIds[] = $oldUser['userID'];
                 if (empty($oldUser['mail'])) {
-                    $validationMessages[] = sprintf(
+                    $validationMessages[] = \sprintf(
                         'User "%s" with ID %s has no email',
                         $oldUser['name'],
                         $oldUser['userID']
@@ -509,7 +509,7 @@ final class KimaiImporterCommand extends Command
                     continue;
                 }
                 if (\in_array($oldUser['mail'], $usedEmails)) {
-                    $validationMessages[] = sprintf(
+                    $validationMessages[] = \sprintf(
                         'Email "%s" for user "%s" with ID %s is already used',
                         $oldUser['mail'],
                         $oldUser['name'],
@@ -517,7 +517,7 @@ final class KimaiImporterCommand extends Command
                     );
                 }
                 if ($this->options['alias-as-account-number'] && mb_strlen($oldUser['alias']) > 30) {
-                    $validationMessages[] = sprintf(
+                    $validationMessages[] = \sprintf(
                         'Alias "%s" for user "%s" with ID %s, which should be used as account number, is longer than 30 character',
                         $oldUser['alias'],
                         $oldUser['name'],
@@ -531,7 +531,7 @@ final class KimaiImporterCommand extends Command
             foreach ($customer as $oldCustomer) {
                 $customerIds[] = $oldCustomer['customerID'];
                 if (($customerNameLength = mb_strlen($oldCustomer['name'])) > 150) {
-                    $validationMessages[] = sprintf(
+                    $validationMessages[] = \sprintf(
                         'Customer name "%s" (ID %s) is too long. Max. 150 character are allowed, found %s.',
                         $oldCustomer['name'],
                         $oldCustomer['customerID'],
@@ -542,7 +542,7 @@ final class KimaiImporterCommand extends Command
 
             foreach ($projects as $oldProject) {
                 if (!\in_array($oldProject['customerID'], $customerIds)) {
-                    $validationMessages[] = sprintf(
+                    $validationMessages[] = \sprintf(
                         'Project "%s" with ID %s has unknown customer with ID %s',
                         $oldProject['name'],
                         $oldProject['projectID'],
@@ -550,7 +550,7 @@ final class KimaiImporterCommand extends Command
                     );
                 }
                 if (($projectNameLength = mb_strlen($oldProject['name'])) > 150) {
-                    $validationMessages[] = sprintf(
+                    $validationMessages[] = \sprintf(
                         'Project name "%s" (ID %s) is too long. Max. 150 character are allowed, found %s.',
                         $oldProject['name'],
                         $oldProject['projectID'],
@@ -561,7 +561,7 @@ final class KimaiImporterCommand extends Command
 
             foreach ($activities as $oldActivity) {
                 if (($activityNameLength = mb_strlen($oldActivity['name'])) > 150) {
-                    $validationMessages[] = sprintf(
+                    $validationMessages[] = \sprintf(
                         'Activity name "%s" (ID %s) is too long. Max. 150 character are allowed, found %s.',
                         $oldActivity['name'],
                         $oldActivity['activityID'],
@@ -576,7 +576,7 @@ final class KimaiImporterCommand extends Command
                         continue;
                     }
                     if (!\in_array($oldRate['userID'], $userIds)) {
-                        $validationMessages[] = sprintf(
+                        $validationMessages[] = \sprintf(
                             'Unknown user with ID "%s" found for rate with project "%s" and activity "%s"',
                             $oldRate['userID'],
                             $oldRate['projectID'],
@@ -608,7 +608,7 @@ final class KimaiImporterCommand extends Command
                 ->executeQuery();
         } catch (Exception $e) {
             $io->error(
-                sprintf('Cannot read from table "%sconfiguration", make sure that your prefix "%s" is correct.', $this->dbPrefix, $this->dbPrefix)
+                \sprintf('Cannot read from table "%sconfiguration", make sure that your prefix "%s" is correct.', $this->dbPrefix, $this->dbPrefix)
             );
 
             return false;
@@ -819,7 +819,7 @@ final class KimaiImporterCommand extends Command
                 continue;
             }
             if ($newEmail === $oldEmail && $newName !== $oldName) {
-                $io->warning(sprintf(
+                $io->warning(\sprintf(
                     'Found problematic user combination. Username matches, but email does not. Cached user: ID %s, %s, %s. New user: ID %s, %s, %s.',
                     $tmpUser->getId(),
                     $newEmail,
@@ -830,7 +830,7 @@ final class KimaiImporterCommand extends Command
                 ));
             }
             if ($newEmail !== $oldEmail && $newName === $oldName) {
-                $io->warning(sprintf(
+                $io->warning(\sprintf(
                     'Found problematic user combination. Emails matches, but username does not. Cached user: ID %s, %s, %s. New user: ID %s, %s, %s.',
                     $tmpUser->getId(),
                     $newEmail,
@@ -1167,7 +1167,7 @@ final class KimaiImporterCommand extends Command
             $customer = $this->getCachedCustomer($oldProject['customerID']);
             if ($customer === null) {
                 $io->error(
-                    sprintf('Found project with unknown customer. Project ID: "%s", Name: "%s", Customer ID: "%s"', $oldProject['projectID'], $oldProject['name'], $oldProject['customerID'])
+                    \sprintf('Found project with unknown customer. Project ID: "%s", Name: "%s", Customer ID: "%s"', $oldProject['projectID'], $oldProject['name'], $oldProject['customerID'])
                 );
                 continue;
             }
@@ -1224,7 +1224,7 @@ final class KimaiImporterCommand extends Command
                             $io->success('Created fixed project rate: ' . $project->getName() . ' for customer: ' . $customer->getName());
                         }
                     } catch (Exception $ex) {
-                        $io->error(sprintf('Failed to create fixed project rate for %s: %s' . $project->getName(), $ex->getMessage()));
+                        $io->error(\sprintf('Failed to create fixed project rate for %s: %s' . $project->getName(), $ex->getMessage()));
                     }
                 }
             }
@@ -1248,7 +1248,7 @@ final class KimaiImporterCommand extends Command
                             $io->success('Created project rate: ' . $project->getName() . ' for customer: ' . $customer->getName());
                         }
                     } catch (Exception $ex) {
-                        $io->error(sprintf('Failed to create project rate for %s: %s' . $project->getName(), $ex->getMessage()));
+                        $io->error(\sprintf('Failed to create project rate for %s: %s' . $project->getName(), $ex->getMessage()));
                     }
                 }
             }
@@ -1468,7 +1468,7 @@ final class KimaiImporterCommand extends Command
             $project = $this->getCachedProject($oldProjectId);
             if ($project === null) {
                 throw new Exception(
-                    sprintf(
+                    \sprintf(
                         'Did not find project [%s], skipping activity creation [%s] %s',
                         $oldProjectId,
                         $oldActivityId,
@@ -1522,7 +1522,7 @@ final class KimaiImporterCommand extends Command
                         $io->success('Created fixed activity rate: ' . $activity->getName());
                     }
                 } catch (Exception $ex) {
-                    $io->error(sprintf('Failed to create fixed activity rate for %s: %s' . $activity->getName(), $ex->getMessage()));
+                    $io->error(\sprintf('Failed to create fixed activity rate for %s: %s' . $activity->getName(), $ex->getMessage()));
                 }
             }
         }
@@ -1550,7 +1550,7 @@ final class KimaiImporterCommand extends Command
                         $io->success('Created activity rate: ' . $activity->getName());
                     }
                 } catch (Exception $ex) {
-                    $io->error(sprintf('Failed to create activity rate for %s: %s' . $activity->getName(), $ex->getMessage()));
+                    $io->error(\sprintf('Failed to create activity rate for %s: %s' . $activity->getName(), $ex->getMessage()));
                 }
             }
         }
@@ -1809,7 +1809,7 @@ final class KimaiImporterCommand extends Command
             $io->error('Found invalid mapped project - activity combinations in these old timesheet recors: ' . implode(',', $errors['projectActivityMismatch']));
         }
         if ($failed > 0) {
-            $io->error(sprintf('Failed importing %s timesheet records', $failed));
+            $io->error(\sprintf('Failed importing %s timesheet records', $failed));
         }
 
         return $counter;
@@ -1910,7 +1910,7 @@ final class KimaiImporterCommand extends Command
         // create teams just with names of groups
         foreach ($groups as $group) {
             if ($group['trash'] === 1) {
-                $io->warning(sprintf('Skipping team "%s" because it is trashed.', $group['name']));
+                $io->warning(\sprintf('Skipping team "%s" because it is trashed.', $group['name']));
                 $skippedTrashed++;
                 continue;
             }
@@ -1954,7 +1954,7 @@ final class KimaiImporterCommand extends Command
         // if team has no users it will not be persisted
         foreach ($newTeams as $oldId => $team) {
             if (!$team->hasUsers()) {
-                $io->warning(sprintf('Didn\'t import team: %s because it has no users.', $team->getName()));
+                $io->warning(\sprintf('Didn\'t import team: %s because it has no users.', $team->getName()));
                 ++$skippedEmpty;
                 unset($newTeams[$oldId]);
             }
@@ -2031,7 +2031,7 @@ final class KimaiImporterCommand extends Command
                 $entityManager->persist($team);
                 if ($this->debug) {
                     $io->success(
-                        sprintf(
+                        \sprintf(
                             'Created team: %s with %s users, %s projects and %s customers.',
                             $team->getName(),
                             \count($team->getUsers()),
@@ -2089,7 +2089,7 @@ final class KimaiImporterCommand extends Command
     {
         $query = $this->connection->createQueryBuilder()
             ->update($this->dbPrefix . 'users')
-            ->set('mail', sprintf('CONCAT(LOWER(name), "_import@%s")', $domain))
+            ->set('mail', \sprintf('CONCAT(LOWER(name), "_import@%s")', $domain))
             ->where("mail = '' OR mail IS null")
         ;
         $query->executeStatement();
@@ -2148,7 +2148,7 @@ final class KimaiImporterCommand extends Command
                 foreach ($searchReplace as $search => $replace) {
                     $query = $this->connection->createQueryBuilder()
                         ->update($this->dbPrefix . $table, $this->dbPrefix . $table)
-                        ->set($column, sprintf('REPLACE(%s, "%s", "%s")', $column, $search, $replace))
+                        ->set($column, \sprintf('REPLACE(%s, "%s", "%s")', $column, $search, $replace))
                         ->where($column . ' LIKE "%' . $search . '%"')
                     ;
                     $query->executeStatement();

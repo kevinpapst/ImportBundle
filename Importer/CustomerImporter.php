@@ -113,7 +113,7 @@ final class CustomerImporter implements ImporterInterface
         }
 
         if ($createdCustomers > 0) {
-            $data->addStatus(sprintf('created %s customers', $createdCustomers));
+            $data->addStatus(\sprintf('created %s customers', $createdCustomers));
         }
 
         return $data;

@@ -84,7 +84,7 @@ abstract class AbstractTimesheetImporter
 
             if (null === ($user = $this->getUser($record['User'], $record['Email'], $dryRun))) {
                 throw new ImportException(
-                    sprintf('Unknown user %s', $record['User'])
+                    \sprintf('Unknown user %s', $record['User'])
                 );
             }
 
@@ -229,25 +229,25 @@ abstract class AbstractTimesheetImporter
         }
 
         if ($data->countRows() > 0) {
-            $data->addStatus(sprintf('processed %s rows', $data->countRows()));
+            $data->addStatus(\sprintf('processed %s rows', $data->countRows()));
         }
         if ($data->countErrors() > 0) {
-            $data->addStatus(sprintf('failed %s rows', $data->countErrors()));
+            $data->addStatus(\sprintf('failed %s rows', $data->countErrors()));
         }
         if ($this->createdCustomers > 0) {
-            $data->addStatus(sprintf('%s %s customers', $create, $this->createdCustomers));
+            $data->addStatus(\sprintf('%s %s customers', $create, $this->createdCustomers));
         }
         if ($this->createdProjects > 0) {
-            $data->addStatus(sprintf('%s %s projects', $create, $this->createdProjects));
+            $data->addStatus(\sprintf('%s %s projects', $create, $this->createdProjects));
         }
         if ($this->createdActivities > 0) {
-            $data->addStatus(sprintf('%s %s activities', $create, $this->createdActivities));
+            $data->addStatus(\sprintf('%s %s activities', $create, $this->createdActivities));
         }
         if ($this->createdTags > 0) {
-            $data->addStatus(sprintf('%s %s tags', $create, $this->createdTags));
+            $data->addStatus(\sprintf('%s %s tags', $create, $this->createdTags));
         }
         if ($this->createdUsers > 0) {
-            $data->addStatus(sprintf('%s %s users', $create, $this->createdUsers));
+            $data->addStatus(\sprintf('%s %s users', $create, $this->createdUsers));
         }
 
         return $data;
