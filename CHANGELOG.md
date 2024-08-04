@@ -1,4 +1,4 @@
-## Version 2.14.0 (unreleased)
+## Version 2.14.0
 
 Compatibility: requires minimum Kimai 2.17.0
 
