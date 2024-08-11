@@ -7,7 +7,3 @@ services:
     KimaiPlugin\ImportBundle\:
         resource: '../../*'
         exclude: '../../{Model,DependencyInjection,Resources}'
-
-    KimaiPlugin\ImportBundle\Importer\ImporterService:
-        arguments:
-            $importer: !tagged kimai.importer

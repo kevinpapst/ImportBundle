@@ -11,7 +11,6 @@
 namespace KimaiPlugin\ImportBundle\DependencyInjection;
 
 use App\Plugin\AbstractPluginExtension;
-use KimaiPlugin\ImportBundle\Importer\ImporterInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -23,8 +22,6 @@ class ImportExtension extends AbstractPluginExtension implements PrependExtensio
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
-
-        $container->registerForAutoconfiguration(ImporterInterface::class)->addTag('kimai.importer');
     }
 
     public function prepend(ContainerBuilder $container): void

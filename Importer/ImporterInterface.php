@@ -13,7 +13,9 @@ namespace KimaiPlugin\ImportBundle\Importer;
 use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportModelInterface;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag]
 interface ImporterInterface
 {
     /**

@@ -17,6 +17,7 @@ use KimaiPlugin\ImportBundle\Model\ImportModel;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
 use League\Csv\Reader;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 final class ImporterService
 {
@@ -27,6 +28,7 @@ final class ImporterService
      * @param iterable<ImporterInterface> $importer
      */
     public function __construct(
+        #[TaggedIterator(ImporterInterface::class)]
         private readonly iterable $importer,
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger
