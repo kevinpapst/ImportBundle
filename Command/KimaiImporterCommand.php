@@ -625,6 +625,10 @@ final class KimaiImporterCommand extends Command
         $requiredVersion = self::MIN_VERSION;
         $requiredRevision = self::MIN_REVISION;
 
+        if (!\is_string($version)) {
+            $version = '0.0'; // satisfy phpstan and prevent errors
+        }
+
         if (1 === version_compare($requiredVersion, $version)) {
             $io->error(
                 'Import can only performed from an up-to-date Kimai version:' . PHP_EOL .
@@ -641,6 +645,10 @@ final class KimaiImporterCommand extends Command
             ->setParameter('option', 'revision')
             ->executeQuery()
             ->fetchOne();
+
+        if (!\is_string($revision)) {
+            $revision = '0'; // satisfy phpstan and prevent errors
+        }
 
         if (1 === version_compare($requiredRevision, $revision)) {
             $io->error(
