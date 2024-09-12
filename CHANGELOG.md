@@ -1,9 +1,10 @@
-## Version 2.15.0 (unreleased)
+## Version 2.15.0
 
-Compatibility: requires minimum Kimai 2.17.0
+Compatibility: requires minimum Kimai 2.21.0
 
 - Activate PHPStan bleeding edge rules
 - Internal refactoring (use attributes for importer service injection)
+- Use new repository and query methods
 
 ## Version 2.14.0
 

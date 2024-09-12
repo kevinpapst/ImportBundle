@@ -25,9 +25,9 @@ use App\Entity\Timesheet;
 use App\Entity\TimesheetMeta;
 use App\Entity\User;
 use App\Entity\UserPreference;
-use App\Repository\Loader\ActivityLoader;
-use App\Repository\Loader\ProjectLoader;
-use App\Repository\Loader\UserLoader;
+use App\Repository\ActivityRepository;
+use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
 use App\Timesheet\Util;
 use DateTime;
 use DateTimeZone;
@@ -1280,10 +1280,12 @@ final class KimaiImporterCommand extends Command
 
         // re-cache all projects
         $this->projects = [];
-        $projects = $entityManager->getRepository(Project::class)->findAll();
-        $loader = new ProjectLoader($entityManager);
-        $loader->loadResults($projects);
-        /** @var Project $project */
+        /** @var ProjectRepository $repo */
+        $repo = $entityManager->getRepository(Project::class);
+        $qb = $repo->createQueryBuilder('p');
+        $query = $qb->select('p');
+        $projects = $repo->getProjects($query->getQuery());
+
         foreach ($projects as $project) {
             $oldId = $project->getMetaField(self::METAFIELD_NAME)?->getValue();
             if (is_numeric($oldId)) {
@@ -1293,10 +1295,14 @@ final class KimaiImporterCommand extends Command
 
         // re-cache all activities
         $this->activities = [];
-        $activities = $entityManager->getRepository(Activity::class)->findAll();
-        $loader = new ActivityLoader($entityManager);
-        $loader->loadResults($activities);
-        /** @var Activity $activity */
+
+        /** @var ActivityRepository $repo */
+        $repo = $entityManager->getRepository(Activity::class);
+        $qb = $repo->createQueryBuilder('a');
+        $query = $qb->select('a');
+        /** @var array<Activity> $activities */
+        $activities = $repo->getActivities($query->getQuery());
+
         foreach ($activities as $activity) {
             $oldActivity = $activity->getMetaField(self::METAFIELD_NAME)?->getValue();
             $projectId = $activity->getProject()?->getId();
@@ -1307,10 +1313,13 @@ final class KimaiImporterCommand extends Command
 
         // re-cache all users
         $this->users = [];
-        $users = $entityManager->getRepository(User::class)->findAll();
-        $loader = new UserLoader($entityManager);
-        $loader->loadResults($users);
-        /** @var User $user */
+
+        /** @var UserRepository $repo */
+        $repo = $entityManager->getRepository(User::class);
+        $qb = $repo->createQueryBuilder('u');
+        $query = $qb->select('u');
+        $users = $repo->getUsers($query->getQuery());
+
         foreach ($users as $user) {
             $oldId = $user->getPreferenceValue(self::METAFIELD_NAME);
             if (is_numeric($oldId)) {

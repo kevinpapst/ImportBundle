@@ -17,7 +17,7 @@
     ],
     "extra": {
         "kimai": {
-            "require": 21700,
+            "require": 22100,
             "name": "Importer"
         }
     },

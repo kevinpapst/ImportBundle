@@ -25,6 +25,7 @@ use KimaiPlugin\ImportBundle\Importer\TogglTimesheetImporter;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
 use KimaiPlugin\ImportBundle\Model\TimesheetImportModel;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -75,7 +76,7 @@ final class ImportController extends AbstractController
     }
 
     /**
-     * @param class-string $formClass
+     * @param class-string<FormTypeInterface<ImportModel>> $formClass
      * @param class-string $importer
      */
     private function showForm(Request $request, ImportModel $model, string $formClass, string $tab, string $route, string $importer, ImporterService $importerService): Response
