@@ -1,3 +1,9 @@
+## Version 2.16.0
+
+Compatibility: requires minimum Kimai 2.21.0
+
+- Removed "end date" from project import example
+
 ## Version 2.15.0
 
 Compatibility: requires minimum Kimai 2.21.0
