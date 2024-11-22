@@ -152,7 +152,7 @@ abstract class AbstractTimesheetImporter
                 $timesheet->setBillable(ImporterHelper::convertBoolean($record['Billable']));
             }
 
-            if (\array_key_exists('Tags', $record) && is_string($record['Tags'])) {
+            if (\array_key_exists('Tags', $record) && \is_string($record['Tags'])) {
                 foreach (explode(',', $record['Tags']) as $tagName) {
                     if ($tagName === '') {
                         continue;
@@ -435,7 +435,7 @@ abstract class AbstractTimesheetImporter
             $fields[] = $float . 'FixedRate';
         }
 
-        if (count($fields) > 0) {
+        if (\count($fields) > 0) {
             throw new ImportException('Validation failed. ' . implode('. ', $fields));
         }
     }

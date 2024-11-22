@@ -386,7 +386,7 @@ final class KimaiImporterCommand extends Command
 
             $io->success('Fetched Kimai v1 data, validating now');
             $validationMessages = $this->validateKimai1Data($options, $users, $customer, $projects, $activities, $rates);
-            if (count($validationMessages) > 0) {
+            if (\count($validationMessages) > 0) {
                 foreach ($validationMessages as $errorMessage) {
                     $io->error($errorMessage);
                 }
@@ -950,7 +950,7 @@ final class KimaiImporterCommand extends Command
                     continue;
                 }
 
-                if ($pref['value'] === null || $pref['value'] ===  '') {
+                if ($pref['value'] === null || $pref['value'] === '') {
                     continue;
                 }
 

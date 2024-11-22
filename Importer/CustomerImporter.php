@@ -15,7 +15,6 @@ use App\Entity\Customer;
 use App\Entity\CustomerMeta;
 use App\Validator\ValidationFailedException;
 use KimaiPlugin\ImportBundle\Model\ImportData;
-use KimaiPlugin\ImportBundle\Model\ImportModel;
 use KimaiPlugin\ImportBundle\Model\ImportModelInterface;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
 use Symfony\Component\Validator\Validator\ValidatorInterface;

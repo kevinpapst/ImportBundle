@@ -17,7 +17,6 @@ use App\Entity\ProjectMeta;
 use App\Project\ProjectService;
 use App\Validator\ValidationFailedException;
 use KimaiPlugin\ImportBundle\Model\ImportData;
-use KimaiPlugin\ImportBundle\Model\ImportModel;
 use KimaiPlugin\ImportBundle\Model\ImportModelInterface;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
