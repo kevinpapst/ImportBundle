@@ -1287,7 +1287,7 @@ final class KimaiImporterCommand extends Command
         $repo = $entityManager->getRepository(Project::class); // @phpstan-ignore varTag.type
         $qb = $repo->createQueryBuilder('p');
         $query = $qb->select('p');
-        $projects = $repo->getProjects($query->getQuery());
+        $projects = $repo->getProjects($query->getQuery()); // @phpstan-ignore argument.type
 
         foreach ($projects as $project) {
             $oldId = $project->getMetaField(self::METAFIELD_NAME)?->getValue();
@@ -1300,11 +1300,11 @@ final class KimaiImporterCommand extends Command
         $this->activities = [];
 
         /** @var ActivityRepository $repo */
-        $repo = $entityManager->getRepository(Activity::class);
+        $repo = $entityManager->getRepository(Activity::class); // @phpstan-ignore varTag.type
         $qb = $repo->createQueryBuilder('a');
         $query = $qb->select('a');
         /** @var array<Activity> $activities */
-        $activities = $repo->getActivities($query->getQuery());
+        $activities = $repo->getActivities($query->getQuery()); // @phpstan-ignore argument.type
 
         foreach ($activities as $activity) {
             $oldActivity = $activity->getMetaField(self::METAFIELD_NAME)?->getValue();
@@ -1318,10 +1318,10 @@ final class KimaiImporterCommand extends Command
         $this->users = [];
 
         /** @var UserRepository $repo */
-        $repo = $entityManager->getRepository(User::class);
+        $repo = $entityManager->getRepository(User::class); // @phpstan-ignore varTag.type
         $qb = $repo->createQueryBuilder('u');
         $query = $qb->select('u');
-        $users = $repo->getUsers($query->getQuery());
+        $users = $repo->getUsers($query->getQuery()); // @phpstan-ignore argument.type
 
         foreach ($users as $user) {
             $oldId = $user->getPreferenceValue(self::METAFIELD_NAME);
