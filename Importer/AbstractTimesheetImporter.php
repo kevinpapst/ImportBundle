@@ -152,9 +152,9 @@ abstract class AbstractTimesheetImporter
                 $timesheet->setBillable(ImporterHelper::convertBoolean($record['Billable']));
             }
 
-            if (\array_key_exists('Tags', $record) && !empty($record['Tags'])) {
+            if (\array_key_exists('Tags', $record) && is_string($record['Tags'])) {
                 foreach (explode(',', $record['Tags']) as $tagName) {
-                    if (empty($tagName)) {
+                    if ($tagName === '') {
                         continue;
                     }
 
@@ -384,23 +384,23 @@ abstract class AbstractTimesheetImporter
         $negative = 'Negative values not supported: ';
         $float = 'Invalid numeric value: ';
 
-        if (!\array_key_exists('User', $row) || empty($row['User'])) {
+        if (!\array_key_exists('User', $row) || $row['User'] === null || $row['User'] === '') {
             $fields[] = $empty . 'User';
         }
 
-        if (!\array_key_exists('Email', $row) || empty($row['Email'])) {
+        if (!\array_key_exists('Email', $row) || $row['Email'] === null || $row['Email'] === '') {
             $fields[] = $empty . 'Email';
         }
 
-        if (!\array_key_exists('Begin', $row) || empty($row['Begin'])) {
+        if (!\array_key_exists('Begin', $row) || $row['Begin'] === null || $row['Begin'] === '') {
             $fields[] = $empty . 'Begin';
         }
 
-        if (!\array_key_exists('End', $row) || empty($row['End'])) {
+        if (!\array_key_exists('End', $row) || $row['End'] === null || $row['End'] === '') {
             $fields[] = $empty . 'End';
         }
 
-        if (empty($row['Project'])) {
+        if ($row['Project'] === null || $row['Project'] === '') {
             $fields[] = $empty . 'Project';
         } elseif (mb_detect_encoding($row['Project'], 'UTF-8', true) !== 'UTF-8') {
             $fields[] = $encoding . 'Project';
@@ -413,13 +413,13 @@ abstract class AbstractTimesheetImporter
             $fields[] = $negative . 'Duration';
         }
 
-        if (empty($row['Activity'])) {
+        if ($row['Activity'] === null || $row['Activity'] === '') {
             $fields[] = $empty . 'Activity';
         } elseif (mb_detect_encoding($row['Activity'], 'UTF-8', true) !== 'UTF-8') {
             $fields[] = $encoding . 'Activity';
         }
 
-        if (!empty($row['Description']) && mb_detect_encoding($row['Description'], 'UTF-8', true) !== 'UTF-8') {
+        if ($row['Description'] !== null && $row['Description'] !== '' && mb_detect_encoding($row['Description'], 'UTF-8', true) !== 'UTF-8') {
             $fields[] = $encoding . 'Description';
         }
 
@@ -435,7 +435,7 @@ abstract class AbstractTimesheetImporter
             $fields[] = $float . 'FixedRate';
         }
 
-        if (!empty($fields)) {
+        if (count($fields) > 0) {
             throw new ImportException('Validation failed. ' . implode('. ', $fields));
         }
     }

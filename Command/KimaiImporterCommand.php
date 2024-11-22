@@ -386,7 +386,7 @@ final class KimaiImporterCommand extends Command
 
             $io->success('Fetched Kimai v1 data, validating now');
             $validationMessages = $this->validateKimai1Data($options, $users, $customer, $projects, $activities, $rates);
-            if (!empty($validationMessages)) {
+            if (count($validationMessages) > 0) {
                 foreach ($validationMessages as $errorMessage) {
                     $io->error($errorMessage);
                 }
@@ -395,7 +395,7 @@ final class KimaiImporterCommand extends Command
             }
             $io->success('Pre-validated data, importing now');
 
-            if ($options['check-already-imported']) {
+            if ($options['check-already-imported'] === true) {
                 // Calling clearCache will fill it as well, so we make sure to NOT import data twice for: users, customer, projects, activities
                 // super useful for testing errors in timesheets
                 $this->clearCache();
@@ -491,6 +491,9 @@ final class KimaiImporterCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * @return array<string>
+     */
     private function validateKimai1Data(array $options, array $users, array $customer, array $projects, array $activities, array $rates): array
     {
         $validationMessages = [];
@@ -499,8 +502,8 @@ final class KimaiImporterCommand extends Command
             $usedEmails = [];
             $userIds = [];
             foreach ($users as $oldUser) {
-                $userIds[] = $oldUser['userID'];
-                if (empty($oldUser['mail'])) {
+                $userIds[] = (string) $oldUser['userID'];
+                if ($oldUser['mail'] === null || $oldUser['mail'] === '') {
                     $validationMessages[] = \sprintf(
                         'User "%s" with ID %s has no email',
                         $oldUser['name'],
@@ -508,7 +511,7 @@ final class KimaiImporterCommand extends Command
                     );
                     continue;
                 }
-                if (\in_array($oldUser['mail'], $usedEmails)) {
+                if (\in_array((string) $oldUser['mail'], $usedEmails, true)) {
                     $validationMessages[] = \sprintf(
                         'Email "%s" for user "%s" with ID %s is already used',
                         $oldUser['mail'],
@@ -516,7 +519,7 @@ final class KimaiImporterCommand extends Command
                         $oldUser['userID']
                     );
                 }
-                if ($this->options['alias-as-account-number'] && mb_strlen($oldUser['alias']) > 30) {
+                if ($this->options['alias-as-account-number'] === true && mb_strlen($oldUser['alias']) > 30) {
                     $validationMessages[] = \sprintf(
                         'Alias "%s" for user "%s" with ID %s, which should be used as account number, is longer than 30 character',
                         $oldUser['alias'],
@@ -524,12 +527,12 @@ final class KimaiImporterCommand extends Command
                         $oldUser['userID']
                     );
                 }
-                $usedEmails[] = $oldUser['mail'];
+                $usedEmails[] = (string) $oldUser['mail'];
             }
 
             $customerIds = [];
             foreach ($customer as $oldCustomer) {
-                $customerIds[] = $oldCustomer['customerID'];
+                $customerIds[] = (string) $oldCustomer['customerID'];
                 if (($customerNameLength = mb_strlen($oldCustomer['name'])) > 150) {
                     $validationMessages[] = \sprintf(
                         'Customer name "%s" (ID %s) is too long. Max. 150 character are allowed, found %s.',
@@ -541,7 +544,7 @@ final class KimaiImporterCommand extends Command
             }
 
             foreach ($projects as $oldProject) {
-                if (!\in_array($oldProject['customerID'], $customerIds)) {
+                if (!\in_array((string) $oldProject['customerID'], $customerIds, true)) {
                     $validationMessages[] = \sprintf(
                         'Project "%s" with ID %s has unknown customer with ID %s',
                         $oldProject['name'],
@@ -575,7 +578,7 @@ final class KimaiImporterCommand extends Command
                     if ($oldRate['userID'] === null) {
                         continue;
                     }
-                    if (!\in_array($oldRate['userID'], $userIds)) {
+                    if (!\in_array((string) $oldRate['userID'], $userIds, true)) {
                         $validationMessages[] = \sprintf(
                             'Unknown user with ID "%s" found for rate with project "%s" and activity "%s"',
                             $oldRate['userID'],
@@ -923,7 +926,7 @@ final class KimaiImporterCommand extends Command
             $user->addPreference($newPref);
 
             if ($oldUser['alias'] !== null) {
-                if ($this->options['alias-as-account-number']) {
+                if ($this->options['alias-as-account-number'] === true) {
                     $user->setAccountNumber(mb_substr($oldUser['alias'], 0, 30));
                 } else {
                     $user->setAlias($oldUser['alias']);
@@ -947,7 +950,7 @@ final class KimaiImporterCommand extends Command
                     continue;
                 }
 
-                if (empty($pref['value'])) {
+                if ($pref['value'] === null || $pref['value'] ===  '') {
                     continue;
                 }
 
@@ -1059,13 +1062,13 @@ final class KimaiImporterCommand extends Command
 
             $isActive = (bool) $oldCustomer['visible'] && !(bool) $oldCustomer['trash'];
             $name = $oldCustomer['name'];
-            if (empty($name)) {
+            if ($name === null || $name === '') {
                 $name = uniqid();
                 $io->warning('Found empty customer name, setting it to: ' . $name);
             }
 
             $newTimezone = $oldCustomer['timezone'];
-            if (empty($newTimezone)) {
+            if ($newTimezone === null || $newTimezone === '') {
                 $newTimezone = $timezone;
             }
 
@@ -1181,7 +1184,7 @@ final class KimaiImporterCommand extends Command
             }
 
             $name = $oldProject['name'];
-            if (empty($name)) {
+            if ($name === null || $name === '') {
                 $name = uniqid();
                 $io->warning('Found empty project name, setting it to: ' . $name);
             }
@@ -1189,9 +1192,9 @@ final class KimaiImporterCommand extends Command
             $project = new Project();
             $project->setCustomer($customer);
             $project->setName($name);
-            $project->setComment($oldProject['comment'] ?: null);
+            $project->setComment($oldProject['comment']);
             $project->setVisible($isActive);
-            $project->setBudget($oldProject['budget'] ?: 0);
+            $project->setBudget($oldProject['budget'] ?? 0);
 
             $metaField = new ProjectMeta();
             $metaField->setName(self::METAFIELD_NAME);
@@ -1281,7 +1284,7 @@ final class KimaiImporterCommand extends Command
         // re-cache all projects
         $this->projects = [];
         /** @var ProjectRepository $repo */
-        $repo = $entityManager->getRepository(Project::class);
+        $repo = $entityManager->getRepository(Project::class); // @phpstan-ignore varTag.type
         $qb = $repo->createQueryBuilder('p');
         $query = $qb->select('p');
         $projects = $repo->getProjects($query->getQuery());
@@ -1398,7 +1401,7 @@ final class KimaiImporterCommand extends Command
 
         // remember which activity has at least one assigned project
         $oldActivityMapping = [];
-        if ($this->options['unknownAsGlobal']) {
+        if ($this->options['unknownAsGlobal'] === true) {
             $oldActivityMapping['___GLOBAL___'][] = PHP_INT_MAX;
         } else {
             foreach ($activityToProject as $mapping) {
@@ -1470,7 +1473,7 @@ final class KimaiImporterCommand extends Command
 
         $isActive = ((bool) $oldActivity['visible']) && !(bool) $oldActivity['trash'];
         $name = $oldActivity['name'];
-        if (empty($name)) {
+        if ($name === null || $name === '') {
             $name = uniqid();
             $io->warning('Found empty activity name, setting it to: ' . $name);
         }
@@ -1630,7 +1633,7 @@ final class KimaiImporterCommand extends Command
         $progressBar = new ProgressBar($output, $total);
 
         foreach ($records as $oldRecord) {
-            if (empty($oldRecord['end'])) {
+            if ($oldRecord['end'] === null || $oldRecord['end'] === '') {
                 $io->error('Cannot import running timesheet record, skipping: ' . $oldRecord['timeEntryID']);
                 $failed++;
                 continue;
@@ -1711,13 +1714,13 @@ final class KimaiImporterCommand extends Command
             $timesheet = new Timesheet();
 
             $fixedRate = $oldRecord['fixedRate'];
-            if (!empty($fixedRate) && 0.00 < (float) $fixedRate) {
-                $timesheet->setFixedRate($fixedRate);
+            if (is_numeric($fixedRate) && 0.00 < (float) $fixedRate) {
+                $timesheet->setFixedRate((float) $fixedRate);
             }
 
             $hourlyRate = $oldRecord['rate'];
-            if (!empty($hourlyRate) && 0.00 < (float) $hourlyRate) {
-                $timesheet->setHourlyRate($hourlyRate);
+            if (is_numeric($hourlyRate) && 0.00 < (float) $hourlyRate) {
+                $timesheet->setHourlyRate((float) $hourlyRate);
             }
 
             if ($timesheet->getFixedRate() !== null) {
@@ -1908,13 +1911,13 @@ final class KimaiImporterCommand extends Command
         $groupToProject = [];
         $groupToActivity = [];
 
-        if (!$this->options['skip-team-customers']) {
+        if ($this->options['skip-team-customers'] === false) {
             $groupToCustomer = $this->fetchAllFromImport('groups_customers');
         }
-        if (!$this->options['skip-team-projects']) {
+        if ($this->options['skip-team-projects'] === false) {
             $groupToProject = $this->fetchAllFromImport('groups_projects');
         }
-        if (!$this->options['skip-team-activities']) {
+        if ($this->options['skip-team-activities'] === false) {
             $groupToActivity = $this->fetchAllFromImport('groups_activities');
         }
 

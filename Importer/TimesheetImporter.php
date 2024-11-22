@@ -126,7 +126,7 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
             $len = \strlen($rawData['From']);
             if ($len === 1) {
                 $rawData['From'] = '0' . $rawData['From'] . ':00';
-            } elseif ($len == 2) {
+            } elseif ($len === 2) {
                 $rawData['From'] = $rawData['From'] . ':00';
             }
         }
@@ -135,7 +135,7 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
             $len = \strlen($rawData['To']);
             if ($len === 1) {
                 $rawData['To'] = '0' . $rawData['To'] . ':00';
-            } elseif ($len == 2) {
+            } elseif ($len === 2) {
                 $rawData['To'] = $rawData['To'] . ':00';
             }
         }

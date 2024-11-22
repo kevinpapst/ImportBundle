@@ -94,9 +94,7 @@ final class ProjectImporter implements ImporterInterface
     }
 
     /**
-     * @param ImportModel $model
      * @param array<ImportRow> $rows
-     * @return ImportData
      */
     public function import(ImportModelInterface $model, array $rows): ImportData
     {
@@ -232,7 +230,7 @@ final class ProjectImporter implements ImporterInterface
                     break;
 
                 case 'orderdate':
-                    if (empty($value)) {
+                    if ($value === null) {
                         $project->setOrderDate(null);
                     } else {
                         $newDate = $this->mapDateTime($project, $value);
@@ -244,7 +242,7 @@ final class ProjectImporter implements ImporterInterface
                     break;
 
                 case 'startdate':
-                    if (empty($value)) {
+                    if ($value === null) {
                         $project->setStart(null);
                     } else {
                         $newDate = $this->mapDateTime($project, $value);
@@ -256,7 +254,7 @@ final class ProjectImporter implements ImporterInterface
                     break;
 
                 case 'enddate':
-                    if (empty($value)) {
+                    if ($value === null) {
                         $project->setEnd(null);
                     } else {
                         $newDate = $this->mapDateTime($project, $value);

@@ -82,9 +82,7 @@ final class CustomerImporter implements ImporterInterface
     }
 
     /**
-     * @param ImportModel $model
      * @param array<ImportRow> $rows
-     * @return ImportData
      */
     public function import(ImportModelInterface $model, array $rows): ImportData
     {

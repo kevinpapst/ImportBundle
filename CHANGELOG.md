@@ -3,6 +3,7 @@
 Compatibility: requires minimum Kimai 2.21.0
 
 - Removed "end date" from project import example
+- PHPStan v2 with strict and deprecation rules
 
 ## Version 2.15.0
 
