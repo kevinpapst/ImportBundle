@@ -141,7 +141,7 @@ abstract class AbstractTimesheetImporter
             if ($foundDuration !== null) {
                 $timesheet->setDuration($foundDuration);
             } else {
-                $timesheet->setDuration($timesheet->getDuration());
+                $timesheet->setDuration($timesheet->getCalculatedDuration());
             }
 
             if (\array_key_exists('Exported', $record)) {
@@ -406,11 +406,13 @@ abstract class AbstractTimesheetImporter
             $fields[] = $encoding . 'Project';
         }
 
-        // negative durations are not supported ...
-        if (\is_string($row['Duration']) && $row['Duration'][0] === '-') {
-            $fields[] = $negative . 'Duration';
-        } elseif (\is_int($row['Duration']) && $row['Duration'] < 0) {
-            $fields[] = $negative . 'Duration';
+        if (\array_key_exists('Duration', $row)) {
+            // negative durations are not supported ...
+            if (\is_string($row['Duration']) && $row['Duration'][0] === '-') {
+                $fields[] = $negative . 'Duration';
+            } elseif (\is_int($row['Duration']) && $row['Duration'] < 0) {
+                $fields[] = $negative . 'Duration';
+            }
         }
 
         if ($row['Activity'] === null || $row['Activity'] === '') {

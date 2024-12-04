@@ -1,3 +1,9 @@
+## Version 2.17.0
+
+Compatibility: requires minimum Kimai 2.21.0
+
+- Fixed: missing duration caused 0 duration
+
 ## Version 2.16.0
 
 Compatibility: requires minimum Kimai 2.21.0
