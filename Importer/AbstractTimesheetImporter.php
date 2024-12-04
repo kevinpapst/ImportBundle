@@ -136,7 +136,7 @@ abstract class AbstractTimesheetImporter
             $timesheet->setProject($project);
             $timesheet->setBegin($begin);
             $timesheet->setEnd($end);
-            if (array_key_exists('Description', $record)) {
+            if (\array_key_exists('Description', $record)) {
                 $timesheet->setDescription($record['Description']);
             }
 
