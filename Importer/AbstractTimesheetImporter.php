@@ -136,7 +136,9 @@ abstract class AbstractTimesheetImporter
             $timesheet->setProject($project);
             $timesheet->setBegin($begin);
             $timesheet->setEnd($end);
-            $timesheet->setDescription($record['Description']);
+            if (array_key_exists('Description', $record)) {
+                $timesheet->setDescription($record['Description']);
+            }
 
             if ($foundDuration !== null) {
                 $timesheet->setDuration($foundDuration);
@@ -421,7 +423,7 @@ abstract class AbstractTimesheetImporter
             $fields[] = $encoding . 'Activity';
         }
 
-        if ($row['Description'] !== null && $row['Description'] !== '' && mb_detect_encoding($row['Description'], 'UTF-8', true) !== 'UTF-8') {
+        if (\array_key_exists('Description', $row) && $row['Description'] !== null && $row['Description'] !== '' && mb_detect_encoding($row['Description'], 'UTF-8', true) !== 'UTF-8') {
             $fields[] = $encoding . 'Description';
         }
 

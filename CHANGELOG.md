@@ -2,7 +2,9 @@
 
 Compatibility: requires minimum Kimai 2.21.0
 
-- Fixed: missing duration caused 0 duration
+- Fixed: missing `duration` caused 0 duration
+- Fixed: missing `duration` caused "undefined index"
+- Fixed: missing `description` caused "undefined index"
 
 ## Version 2.16.0
 

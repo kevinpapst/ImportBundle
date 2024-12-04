@@ -105,6 +105,7 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
 
         foreach ($row->getData() as $key => $value) {
             $k = strtolower($key);
+            // next time I debug here: make sure to add a comment why this skip exists
             if ($k === 'date' || $k === 'from' || $k === 'to') {
                 continue;
             }
