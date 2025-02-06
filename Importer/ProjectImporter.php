@@ -42,6 +42,7 @@ final class ProjectImporter implements ImporterInterface
         'budget',
         'timebudget',
         'budgettype',
+        'projectnumber'
     ];
 
     /**
@@ -282,6 +283,12 @@ final class ProjectImporter implements ImporterInterface
 
                 case 'timebudget':
                     $project->setTimeBudget((int) $value);
+                    break;
+
+                case 'projectnumber':
+                    if (\is_string($value)) {
+                        $project->setNumber(mb_substr($value, 0, 10));
+                    }
                     break;
             }
 

@@ -46,9 +46,13 @@ final class CustomerImporter implements ImporterInterface
         'budget',
         'budgettype',
         'timebudget',
+        'customernumber'
     ];
 
-    public function __construct(private CustomerService $customerService, private ValidatorInterface $validator)
+    public function __construct(
+        private readonly CustomerService $customerService,
+        private readonly ValidatorInterface $validator
+    )
     {
     }
 
@@ -169,8 +173,11 @@ final class CustomerImporter implements ImporterInterface
                     $customer->setCountry($value);
                     break;
 
+                case 'customernumber':
                 case 'account':
-                    $customer->setNumber($value);
+                    if (\is_string($value)) {
+                        $customer->setNumber($value);
+                    }
                     break;
 
                 case 'tax':
