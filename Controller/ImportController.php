@@ -120,7 +120,7 @@ final class ImportController extends AbstractController
     #[Route(path: '/example/toggl', name: 'importer_example_toggl', methods: ['GET'])]
     public function demoFiles(Request $request): Response
     {
-        switch ($request->get('_route')) {
+        switch ($request->attributes->get('_route')) {
             case 'importer_example_customer_csv':
                 return $this->file(__DIR__ . '/../Resources/demo/customer.csv');
 

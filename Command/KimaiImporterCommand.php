@@ -1759,7 +1759,7 @@ final class KimaiImporterCommand extends Command
             $timesheet->setActivity($activity);
             $timesheet->setProject($project);
             $timesheet->setExported(\intval($oldRecord['cleared']) !== 0);
-            $timesheet->setTimezone($user->getTimezone());
+            $timesheet->setTimezone($user->getTimezone()); // @phpstan-ignore method.internal
 
             if ($this->options['meta-comment'] !== null) {
                 $timesheet->setDescription($oldRecord['description']);
