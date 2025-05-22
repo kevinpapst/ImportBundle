@@ -16,6 +16,7 @@ use App\Entity\Activity;
 use App\Entity\Customer;
 use App\Entity\Project;
 use App\Entity\Tag;
+use App\Entity\TimesheetMeta;
 use App\Entity\User;
 use App\Project\ProjectService;
 use App\Repository\ProjectRepository;
@@ -191,6 +192,19 @@ abstract class AbstractTimesheetImporter
 
                                 $timesheet->addTag($this->getTag($tagName, $dryRun));
                             }
+                        }
+                        break;
+
+                    default:
+                        if (str_starts_with($key, 'meta.')) {
+                            $metaName = str_replace('meta.', '', $key);
+                            $meta = $timesheet->getMetaField($metaName);
+                            if ($meta === null) {
+                                $meta = new TimesheetMeta();
+                                $meta->setName($metaName);
+                            }
+                            $meta->setValue($value);
+                            $timesheet->setMetaField($meta);
                         }
                         break;
                 }
