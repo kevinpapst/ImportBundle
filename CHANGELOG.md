@@ -3,6 +3,7 @@
 Compatibility: requires minimum Kimai 2.35.0
 
 - Support custom-field import for timesheets
+- Identify existing projects and customers by name and update instead of creating duplicates
 - Only try to match custom-field if the column name wasn't matched before
 
 ## Version 2.18.0

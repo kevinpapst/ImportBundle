@@ -154,7 +154,13 @@ final class CustomerImporter implements ImporterInterface
             throw new ImportException('Invalid customer name, maximum 150 character allowed');
         }
 
-        $customer = $this->customerService->createNewCustomer(mb_substr($name, 0, 149));
+        $name = mb_substr($name, 0, 149);
+
+        // allow updating existing customers
+        $customer = $this->customerService->findCustomerByName($name);
+        if ($customer === null) {
+            $customer = $this->customerService->createNewCustomer($name);
+        }
 
         $this->mapEntryToCustomer($customer, $entry);
 

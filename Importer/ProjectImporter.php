@@ -182,8 +182,15 @@ final class ProjectImporter implements ImporterInterface
             throw new ImportException('Cannot use empty project name');
         }
 
-        $project = $this->projectService->createNewProject($customer);
-        $project->setName($name);
+        // allow updating existing projects
+        $project = null;
+        if (!$customer->isNew()) {
+            $project = $this->projectService->findProjectByName($name, $customer);
+        }
+        if ($project === null) {
+            $project = $this->projectService->createNewProject($customer);
+            $project->setName($name);
+        }
 
         $this->mapEntryToProject($project, $entry);
 
