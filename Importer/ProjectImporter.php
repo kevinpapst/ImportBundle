@@ -290,17 +290,19 @@ final class ProjectImporter implements ImporterInterface
                         $project->setNumber(mb_substr($value, 0, 10));
                     }
                     break;
-            }
 
-            if (str_starts_with($key, 'meta.')) {
-                $metaName = str_replace('meta.', '', $key);
-                $meta = $project->getMetaField($metaName);
-                if ($meta === null) {
-                    $meta = new ProjectMeta();
-                    $meta->setName($metaName);
-                }
-                $meta->setValue($value);
-                $project->setMetaField($meta);
+                default:
+                    if (str_starts_with($key, 'meta.')) {
+                        $metaName = str_replace('meta.', '', $key);
+                        $meta = $project->getMetaField($metaName);
+                        if ($meta === null) {
+                            $meta = new ProjectMeta();
+                            $meta->setName($metaName);
+                        }
+                        $meta->setValue($value);
+                        $project->setMetaField($meta);
+                    }
+                    break;
             }
         }
     }

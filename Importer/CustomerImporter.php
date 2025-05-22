@@ -243,17 +243,19 @@ final class CustomerImporter implements ImporterInterface
                 case 'timebudget':
                     $customer->setTimeBudget((int) $value);
                     break;
-            }
 
-            if (str_starts_with($key, 'meta.')) {
-                $metaName = str_replace('meta.', '', $key);
-                $meta = $customer->getMetaField($metaName);
-                if ($meta === null) {
-                    $meta = new CustomerMeta();
-                    $meta->setName($metaName);
-                }
-                $meta->setValue($value);
-                $customer->setMetaField($meta);
+                default:
+                    if (str_starts_with($key, 'meta.')) {
+                        $metaName = str_replace('meta.', '', $key);
+                        $meta = $customer->getMetaField($metaName);
+                        if ($meta === null) {
+                            $meta = new CustomerMeta();
+                            $meta->setName($metaName);
+                        }
+                        $meta->setValue($value);
+                        $customer->setMetaField($meta);
+                    }
+                    break;
             }
         }
     }
