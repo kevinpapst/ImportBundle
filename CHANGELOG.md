@@ -2,8 +2,8 @@
 
 Compatibility: requires minimum Kimai 2.21.0
 
-- Only try to match custom-field if the column name wasn't matched before (Project and Customer)
-- 
+- Support custom-field import for timesheets
+- Only try to match custom-field if the column name wasn't matched before
 
 ## Version 2.18.0
 
