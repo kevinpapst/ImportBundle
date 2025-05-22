@@ -102,7 +102,6 @@ final class ProjectImporter implements ImporterInterface
         $data = new ImportData('projects', array_keys($rows[0]->getData()));
 
         $createdCustomer = 0;
-        $updatedCustomer = 0;
         $createdProject = 0;
         $updatedProject = 0;
 
@@ -117,8 +116,6 @@ final class ProjectImporter implements ImporterInterface
                 if ($customer->isNew()) {
                     $this->validate($customer);
                     $createdCustomer++;
-                } else {
-                    $updatedCustomer++;
                 }
 
                 if ($project->isNew()) {
@@ -145,10 +142,6 @@ final class ProjectImporter implements ImporterInterface
 
         if ($createdCustomer > 0) {
             $data->addStatus(\sprintf('created %s customers', $createdCustomer));
-        }
-
-        if ($updatedCustomer > 0) {
-            $data->addStatus(\sprintf('updated %s customers', $updatedCustomer));
         }
 
         if ($createdProject > 0) {
