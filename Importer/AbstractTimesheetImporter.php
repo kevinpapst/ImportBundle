@@ -236,9 +236,7 @@ abstract class AbstractTimesheetImporter
     abstract protected function createImportData(ImportRow $row): ImportData;
 
     /**
-     * @param TimesheetImportModel $model
      * @param array<ImportRow> $rows
-     * @return ImportData
      */
     public function import(ImportModelInterface $model, array $rows): ImportData
     {
