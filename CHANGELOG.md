@@ -1,6 +1,6 @@
 ## Version 2.19.0
 
-Compatibility: requires minimum Kimai 2.21.0
+Compatibility: requires minimum Kimai 2.35.0
 
 - Support custom-field import for timesheets
 - Only try to match custom-field if the column name wasn't matched before
