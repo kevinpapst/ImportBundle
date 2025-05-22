@@ -196,33 +196,6 @@ abstract class AbstractTimesheetImporter
                 }
             }
 
-            if (\array_key_exists('Billable', $record)) {
-                $timesheet->setBillable(ImporterHelper::convertBoolean($record['Billable']));
-            }
-
-            if (\array_key_exists('Tags', $record) && \is_string($record['Tags'])) {
-                foreach (explode(',', $record['Tags']) as $tagName) {
-                    if ($tagName === '') {
-                        continue;
-                    }
-
-                    $timesheet->addTag($this->getTag($tagName, $dryRun));
-                }
-            }
-
-            if (\array_key_exists('Rate', $record) && is_numeric($record['Rate'])) {
-                $timesheet->setRate((float) $record['Rate']);
-            }
-            if (\array_key_exists('HourlyRate', $record) && is_numeric($record['HourlyRate'])) {
-                $timesheet->setHourlyRate((float) $record['HourlyRate']);
-            }
-            if (\array_key_exists('FixedRate', $record) && is_numeric($record['FixedRate'])) {
-                $timesheet->setFixedRate((float) $record['FixedRate']);
-            }
-            if (\array_key_exists('InternalRate', $record) && is_numeric($record['InternalRate'])) {
-                $timesheet->setInternalRate((float) $record['InternalRate']);
-            }
-
             if (!$dryRun) {
                 $this->timesheetService->saveNewTimesheet($timesheet);
             }
