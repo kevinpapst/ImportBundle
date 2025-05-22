@@ -136,9 +136,6 @@ abstract class AbstractTimesheetImporter
             $timesheet->setProject($project);
             $timesheet->setBegin($begin);
             $timesheet->setEnd($end);
-            if (\array_key_exists('Description', $record)) {
-                $timesheet->setDescription($record['Description']);
-            }
 
             if ($foundDuration !== null) {
                 $timesheet->setDuration($foundDuration);
@@ -146,8 +143,56 @@ abstract class AbstractTimesheetImporter
                 $timesheet->setDuration($timesheet->getCalculatedDuration());
             }
 
-            if (\array_key_exists('Exported', $record)) {
-                $timesheet->setExported(ImporterHelper::convertBoolean($record['Exported']));
+            foreach ($record as $key => $value) {
+                switch ($key) {
+                    case 'Description':
+                        $timesheet->setDescription($record['Description']);
+                        break;
+
+                    case 'Exported':
+                        $timesheet->setExported(ImporterHelper::convertBoolean($value));
+                        break;
+
+                    case 'Billable':
+                        $timesheet->setBillable(ImporterHelper::convertBoolean($value));
+                        break;
+
+                    case 'Rate':
+                        if (\array_key_exists('Rate', $record) && is_numeric($value)) {
+                            $timesheet->setRate((float) $value);
+                        }
+                        break;
+
+                    case 'HourlyRate':
+                        if (is_numeric($value)) {
+                            $timesheet->setHourlyRate((float) $value);
+                        }
+                        break;
+
+                    case 'FixedRate':
+                        if (is_numeric($value)) {
+                            $timesheet->setFixedRate((float) $value);
+                        }
+                        break;
+
+                    case 'InternalRate':
+                        if (is_numeric($value)) {
+                            $timesheet->setInternalRate((float) $value);
+                        }
+                        break;
+
+                    case 'Tags':
+                        if (\is_string($value)) {
+                            foreach (explode(',', $value) as $tagName) {
+                                if ($tagName === '') {
+                                    continue;
+                                }
+
+                                $timesheet->addTag($this->getTag($tagName, $dryRun));
+                            }
+                        }
+                        break;
+                }
             }
 
             if (\array_key_exists('Billable', $record)) {
