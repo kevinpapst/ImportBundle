@@ -102,27 +102,37 @@ final class ProjectImporter implements ImporterInterface
         $data = new ImportData('projects', array_keys($rows[0]->getData()));
 
         $createdCustomer = 0;
+        $updatedCustomer = 0;
         $createdProject = 0;
+        $updatedProject = 0;
 
         foreach ($rows as $row) {
             try {
                 $project = $this->convertEntryToProject($row->getData());
                 $this->validate($project);
+
                 /** @var Customer $customer */
                 $customer = $project->getCustomer();
-                if ($customer->getId() === null) {
+
+                if ($customer->isNew()) {
                     $this->validate($customer);
-                }
-                if ($customer->getId() === null) {
                     $createdCustomer++;
+                } else {
+                    $updatedCustomer++;
                 }
+
+                if ($project->isNew()) {
+                    $createdProject++;
+                } else {
+                    $updatedProject++;
+                }
+
                 if (!$dryRun) {
-                    if ($customer->getId() === null) {
-                        $this->customerService->saveNewCustomer($customer);
+                    if ($customer->isNew()) {
+                        $this->customerService->saveCustomer($customer);
                     }
-                    $this->projectService->saveNewProject($project);
+                    $this->projectService->saveProject($project);
                 }
-                $createdProject++;
             } catch (ImportException $exception) {
                 $row->addError($exception->getMessage());
             } catch (ValidationFailedException $exception) {
@@ -134,11 +144,19 @@ final class ProjectImporter implements ImporterInterface
         }
 
         if ($createdCustomer > 0) {
-            $data->addStatus('created ' . $createdCustomer . ' customers');
+            $data->addStatus(\sprintf('created %s customers', $createdCustomer));
+        }
+
+        if ($updatedCustomer > 0) {
+            $data->addStatus(\sprintf('updated %s customers', $updatedCustomer));
         }
 
         if ($createdProject > 0) {
-            $data->addStatus('created ' . $createdProject . ' projects');
+            $data->addStatus(\sprintf('created %s projects', $createdProject));
+        }
+
+        if ($updatedProject > 0) {
+            $data->addStatus(\sprintf('updated %s projects', $updatedProject));
         }
 
         return $data;

@@ -93,15 +93,22 @@ final class CustomerImporter implements ImporterInterface
         $data = new ImportData('customers', array_keys($rows[0]->getData()));
 
         $createdCustomers = 0;
+        $updatedCustomers = 0;
 
         foreach ($rows as $row) {
             try {
                 $customer = $this->convertEntryToCustomer($row->getData());
                 $this->validate($customer);
-                if (!$dryRun) {
-                    $this->customerService->saveNewCustomer($customer);
+
+                if ($customer->isNew()) {
+                    $createdCustomers++;
+                } else {
+                    $updatedCustomers++;
                 }
-                $createdCustomers++;
+
+                if (!$dryRun) {
+                    $this->customerService->saveCustomer($customer);
+                }
             } catch (ImportException $exception) {
                 $row->addError($exception->getMessage());
             } catch (ValidationFailedException $exception) {
@@ -115,6 +122,10 @@ final class CustomerImporter implements ImporterInterface
 
         if ($createdCustomers > 0) {
             $data->addStatus(\sprintf('created %s customers', $createdCustomers));
+        }
+
+        if ($updatedCustomers > 0) {
+            $data->addStatus(\sprintf('updated %s customers', $updatedCustomers));
         }
 
         return $data;
