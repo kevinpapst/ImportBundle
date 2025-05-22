@@ -144,44 +144,45 @@ abstract class AbstractTimesheetImporter
             }
 
             foreach ($record as $key => $value) {
+                $key = strtolower($key);
                 switch ($key) {
-                    case 'Description':
+                    case 'description':
                         $timesheet->setDescription($record['Description']);
                         break;
 
-                    case 'Exported':
+                    case 'exported':
                         $timesheet->setExported(ImporterHelper::convertBoolean($value));
                         break;
 
-                    case 'Billable':
+                    case 'billable':
                         $timesheet->setBillable(ImporterHelper::convertBoolean($value));
                         break;
 
-                    case 'Rate':
+                    case 'rate':
                         if (\array_key_exists('Rate', $record) && is_numeric($value)) {
                             $timesheet->setRate((float) $value);
                         }
                         break;
 
-                    case 'HourlyRate':
+                    case 'hourlyrate':
                         if (is_numeric($value)) {
                             $timesheet->setHourlyRate((float) $value);
                         }
                         break;
 
-                    case 'FixedRate':
+                    case 'fixedrate':
                         if (is_numeric($value)) {
                             $timesheet->setFixedRate((float) $value);
                         }
                         break;
 
-                    case 'InternalRate':
+                    case 'internalrate':
                         if (is_numeric($value)) {
                             $timesheet->setInternalRate((float) $value);
                         }
                         break;
 
-                    case 'Tags':
+                    case 'tags':
                         if (\is_string($value)) {
                             foreach (explode(',', $value) as $tagName) {
                                 if ($tagName === '') {
