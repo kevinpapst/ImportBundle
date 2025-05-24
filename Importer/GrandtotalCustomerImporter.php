@@ -103,7 +103,7 @@ final class GrandtotalCustomerImporter implements ImporterInterface
                 $customer = $this->convertEntryToCustomer($row->getData());
                 $this->validate($customer);
                 if (!$dryRun) {
-                    $this->customerService->saveNewCustomer($customer);
+                    $this->customerService->saveCustomer($customer);
                 }
                 $createdCustomers++;
             } catch (ImportException $exception) {

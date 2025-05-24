@@ -352,7 +352,7 @@ abstract class AbstractTimesheetImporter
                 $tmpActivity = $this->activityService->createNewActivity($newProject);
                 $tmpActivity->setName($activity);
                 if (!$dryRun) {
-                    $this->activityService->saveNewActivity($tmpActivity);
+                    $this->activityService->saveActivity($tmpActivity);
                 }
                 $this->createdActivities++;
             }
@@ -375,7 +375,7 @@ abstract class AbstractTimesheetImporter
                 $tmpProject = $this->projectService->createNewProject($tmpCustomer);
                 $tmpProject->setName($project);
                 if (!$dryRun) {
-                    $this->projectService->saveNewProject($tmpProject);
+                    $this->projectService->saveProject($tmpProject);
                 }
                 $this->createdProjects++;
             }
@@ -394,7 +394,7 @@ abstract class AbstractTimesheetImporter
             if ($tmpCustomer === null) {
                 $tmpCustomer = $this->customerService->createNewCustomer($customer);
                 if (!$dryRun) {
-                    $this->customerService->saveNewCustomer($tmpCustomer);
+                    $this->customerService->saveCustomer($tmpCustomer);
                 }
                 $this->createdCustomers++;
             }
