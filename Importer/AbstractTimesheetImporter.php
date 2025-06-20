@@ -83,9 +83,12 @@ abstract class AbstractTimesheetImporter
 
             $this->validateRow($record);
 
-            if (null === ($user = $this->getUser($record['User'], $record['Email'], $dryRun))) {
+            $userIdentifier = $record['User'];
+            $userName = \array_key_exists('Username', $record) ? $record['Username'] : $userIdentifier;
+
+            if (null === ($user = $this->getUser($userIdentifier, $record['Email'], $userName, $dryRun))) {
                 throw new ImportException(
-                    \sprintf('Unknown user %s', $record['User'])
+                    \sprintf('Unknown user %s', $userIdentifier)
                 );
             }
 
@@ -286,7 +289,7 @@ abstract class AbstractTimesheetImporter
         return $data;
     }
 
-    private function getUser(string $user, string $email, bool $dryRun): ?User
+    private function getUser(string $user, string $email, string $alias, bool $dryRun): ?User
     {
         if (!\array_key_exists($user, $this->userCache)) {
             $tmpUser = $this->userService->findUserByEmail($email);
@@ -296,6 +299,7 @@ abstract class AbstractTimesheetImporter
 
             if ($tmpUser === null) {
                 $tmpUser = $this->userService->createNewUser();
+                $tmpUser->setAlias($alias);
                 $tmpUser->setEmail($email);
                 $tmpUser->setUserIdentifier($user);
                 $tmpUser->setPlainPassword(uniqid());
