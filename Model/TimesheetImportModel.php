@@ -14,6 +14,11 @@ class TimesheetImportModel extends ImportModel
 {
     private bool $globalActivities = true;
 
+    public function __construct(string $delimiter = ',')
+    {
+        $this->setDelimiter($delimiter);
+    }
+
     public function isGlobalActivities(): bool
     {
         return $this->globalActivities;

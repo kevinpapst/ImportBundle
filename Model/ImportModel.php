@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class ImportModel implements ImportModelInterface
 {
     private ?UploadedFile $importFile = null;
-    private ?string $delimiter = ';';
+    private ?string $delimiter = ',';
     private bool $preview = true;
 
     public function getImportFile(): ?UploadedFile

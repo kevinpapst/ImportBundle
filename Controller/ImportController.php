@@ -24,6 +24,7 @@ use KimaiPlugin\ImportBundle\Importer\TimesheetImporter;
 use KimaiPlugin\ImportBundle\Importer\TogglTimesheetImporter;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
 use KimaiPlugin\ImportBundle\Model\TimesheetImportModel;
+use KimaiPlugin\ImportBundle\Model\ToggleImportModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -69,10 +70,7 @@ final class ImportController extends AbstractController
     #[Route(path: '/toggl', name: 'importer_toggl', methods: ['GET', 'POST'])]
     public function toggl(Request $request, ImporterService $importerService): Response
     {
-        $model = new TimesheetImportModel();
-        $model->setDelimiter(',');
-
-        return $this->showForm($request, $model, TimesheetImportForm::class, 'toggl', 'importer_toggl', TogglTimesheetImporter::class, $importerService);
+        return $this->showForm($request, new ToggleImportModel(), TimesheetImportForm::class, 'toggl', 'importer_toggl', TogglTimesheetImporter::class, $importerService);
     }
 
     /**

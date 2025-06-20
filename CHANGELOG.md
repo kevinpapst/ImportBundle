@@ -1,3 +1,10 @@
+## Version 2.20.0
+
+Compatibility: requires minimum Kimai 2.35.0
+
+- Switch default separator to comma `,`
+- Fix invalid reported plugin version
+
 ## Version 2.19.0
 
 Compatibility: requires minimum Kimai 2.35.0
