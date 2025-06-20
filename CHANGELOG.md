@@ -1,6 +1,6 @@
 ## Version 2.20.0
 
-Compatibility: requires minimum Kimai 2.35.0
+Compatibility: requires minimum Kimai 2.36.0
 
 - Switch default separator to comma `,`
 - Support `e-mail` in addition to `email` as column name

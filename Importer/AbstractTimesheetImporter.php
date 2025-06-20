@@ -214,7 +214,7 @@ abstract class AbstractTimesheetImporter
             }
 
             if (!$dryRun) {
-                $this->timesheetService->saveNewTimesheet($timesheet);
+                $this->timesheetService->saveTimesheet($timesheet);
             }
         } catch (ImportException $exception) {
             $row->addError($exception->getMessage());
