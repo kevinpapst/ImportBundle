@@ -3,7 +3,8 @@
 Compatibility: requires minimum Kimai 2.35.0
 
 - Switch default separator to comma `,`
-- Fix invalid reported plugin version
+- Support `e-mail` in addition to `email` as column name
+- Fix an invalid reported plugin version
 
 ## Version 2.19.0
 

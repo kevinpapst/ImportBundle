@@ -33,6 +33,7 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
         'username' => 'User',
         'name' => 'User',
         'email' => 'Email',
+        'e-mail' => 'Email',
         'date' => 'Date',
         'from' => 'From',
         'to' => 'To',
