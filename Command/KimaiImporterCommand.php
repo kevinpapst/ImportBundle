@@ -57,7 +57,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Command used to import data from a Kimai v1 installation.
  */
-#[AsCommand(name: 'kimai:import:v1', aliases: ['kimai:import-v1'])]
+#[AsCommand(name: 'kimai:import:v1', aliases: ['kimai:import-v1'], description: 'Import data from a Kimai v1 installation')]
 final class KimaiImporterCommand extends Command
 {
     // minimum required Kimai and database version, lower versions are not supported by this command
@@ -142,13 +142,8 @@ final class KimaiImporterCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Import data from a Kimai v1 installation')
             ->setHelp('This command allows you to import the most important data from a Kimai v1 installation.')
-            ->addArgument(
-                'connection',
-                InputArgument::REQUIRED,
-                'The database connection as URL, e.g.: mysql://user:password@127.0.0.1:3306/kimai?charset=utf8'
-            )
+            ->addArgument('connection', InputArgument::REQUIRED, 'The database connection as URL, e.g.: mysql://user:password@127.0.0.1:3306/kimai?charset=utf8')
             ->addArgument('password', InputArgument::REQUIRED, 'The new password for all imported user')
             ->addOption('country', null, InputOption::VALUE_OPTIONAL, 'The default country for customer (2-character uppercase)', 'DE')
             ->addOption('currency', null, InputOption::VALUE_OPTIONAL, 'The default currency for customer (code like EUR, CHF, GBP or USD)', 'EUR')
