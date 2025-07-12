@@ -7,6 +7,7 @@ Compatibility: requires minimum Kimai 2.36.0
 - Use `User` column for `User identifier`
 - Use `Username` and `Name` columns for `User alias`
 - Fix an invalid reported plugin version
+- Support `break` column
 
 ## Version 2.19.0
 

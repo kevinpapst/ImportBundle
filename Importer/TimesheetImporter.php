@@ -46,6 +46,8 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
         'exported' => 'Exported',
         'billable' => 'Billable',
         'tags' => 'Tags',
+        'break' => 'Break',
+        'pause' => 'Break',
     ];
 
     public function supports(array $header): bool

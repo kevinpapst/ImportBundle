@@ -162,6 +162,10 @@ abstract class AbstractTimesheetImporter
                         $timesheet->setBillable(ImporterHelper::convertBoolean($value));
                         break;
 
+                    case 'break':
+                        $timesheet->setBreak($this->parseDuration($durationParser, $value));
+                        break;
+
                     case 'rate':
                         if (\array_key_exists('Rate', $record) && is_numeric($value)) {
                             $timesheet->setRate((float) $value);
