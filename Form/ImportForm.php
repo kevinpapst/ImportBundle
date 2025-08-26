@@ -44,6 +44,10 @@ class ImportForm extends AbstractType
             ->add('importFile', FileType::class, [
                 'label' => 'importer.file_chooser',
                 'help' => 'importer.file_chooser_help',
+                'help_translation_parameters' => [
+                    '{{rows}}' => $options['max_row_size'],
+                    '{{size}}' => $options['max_file_size'],
+                ],
                 'attr' => [
                     'accept' => 'text/csv,application/json',
                 ],
@@ -66,6 +70,7 @@ class ImportForm extends AbstractType
             'csrf_token_id' => 'import_csv_data',
             'method' => 'POST',
             'max_file_size' => ImporterService::MAX_FILESIZE,
+            'max_row_size' => ImporterService::MAX_ROWS,
         ]);
     }
 }

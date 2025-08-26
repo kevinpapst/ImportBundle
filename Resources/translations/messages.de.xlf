@@ -20,7 +20,7 @@
       </trans-unit>
       <trans-unit id="l9hFsOV" resname="importer.file_chooser_help">
         <source>importer.file_chooser_help</source>
-        <target>Max. Dateigröße: 1MB - Max. 1000 Zeilen</target>
+        <target>Max. Dateigröße: {{size}} - Max. {{rows}} Zeilen</target>
       </trans-unit>
       <trans-unit id="B_9NJtI" resname="importer.button">
         <source>importer.button</source>
