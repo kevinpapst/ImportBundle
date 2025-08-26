@@ -119,7 +119,7 @@ final class ImporterService
             $header = array_keys($data[0]);
 
             if ($totalRows > self::MAX_ROWS) {
-                throw new ImportException(sprintf('Maximum of %s rows allowed per import', self::MAX_ROWS));
+                throw new ImportException(\sprintf('Maximum of %s rows allowed per import', self::MAX_ROWS));
             }
 
             foreach ($this->importer as $importer) {
@@ -182,7 +182,7 @@ final class ImporterService
             }
 
             if ($csv->count() > self::MAX_ROWS) {
-                throw new ImportException(sprintf('Maximum of %s rows allowed per import', self::MAX_ROWS));
+                throw new ImportException(\sprintf('Maximum of %s rows allowed per import', self::MAX_ROWS));
             }
 
             foreach ($this->importer as $importer) {
