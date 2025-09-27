@@ -827,7 +827,7 @@ final class KimaiImporterCommand extends Command
             if ($newEmail === $oldEmail && $newName !== $oldName) {
                 $io->warning(\sprintf(
                     'Found problematic user combination. Username matches, but email does not. Cached user: ID %s, %s, %s. New user: ID %s, %s, %s.',
-                    $tmpUser->getId(),
+                    $tmpUser->getId() ?? 'unknown',
                     $newEmail,
                     $newName,
                     $oldUser['userID'],
@@ -838,7 +838,7 @@ final class KimaiImporterCommand extends Command
             if ($newEmail !== $oldEmail && $newName === $oldName) {
                 $io->warning(\sprintf(
                     'Found problematic user combination. Emails matches, but username does not. Cached user: ID %s, %s, %s. New user: ID %s, %s, %s.',
-                    $tmpUser->getId(),
+                    $tmpUser->getId() ?? 'unknown',
                     $newEmail,
                     $newName,
                     $oldUser['userID'],
@@ -1969,7 +1969,7 @@ final class KimaiImporterCommand extends Command
         // if team has no users it will not be persisted
         foreach ($newTeams as $oldId => $team) {
             if (!$team->hasUsers()) {
-                $io->warning(\sprintf('Didn\'t import team: %s because it has no users.', $team->getName()));
+                $io->warning(\sprintf('Didn\'t import team: %s because it has no users.', $team->getName() ?? 'unknown'));
                 ++$skippedEmpty;
                 unset($newTeams[$oldId]);
             }
@@ -2048,7 +2048,7 @@ final class KimaiImporterCommand extends Command
                     $io->success(
                         \sprintf(
                             'Created team: %s with %s users, %s projects and %s customers.',
-                            $team->getName(),
+                            $team->getName() ?? 'unknown',
                             \count($team->getUsers()),
                             \count($team->getProjects()),
                             \count($team->getCustomers())

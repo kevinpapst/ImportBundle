@@ -72,7 +72,7 @@ final class ImporterService
             }
         }
 
-        $mimetype = $file->getMimeType();
+        $mimetype = $file->getMimeType() ?? 'unknown';
         $userMimetype = $file->getClientMimeType();
 
         $this->logger->info('Received file "{file}" ({bytes} bytes). Mimetype "{mimetype}", reported by user as "{user_mimetype}".', ['file' => $file->getClientOriginalName(), 'mimetype' => $mimetype, 'user_mimetype' => $userMimetype, 'bytes' => $file->getSize(), 'bundle' => 'importer']);

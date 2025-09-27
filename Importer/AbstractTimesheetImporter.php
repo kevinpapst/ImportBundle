@@ -414,7 +414,7 @@ abstract class AbstractTimesheetImporter
     }
 
     /**
-     * @param array<string, string> $row
+     * @param array<string, string|int|null> $row
      */
     private function validateRow(array $row): void
     {
@@ -443,26 +443,27 @@ abstract class AbstractTimesheetImporter
 
         if ($row['Project'] === null || $row['Project'] === '') {
             $fields[] = $empty . 'Project';
-        } elseif (mb_detect_encoding($row['Project'], 'UTF-8', true) !== 'UTF-8') {
+        } elseif (\is_string($row['Project']) && mb_detect_encoding($row['Project'], 'UTF-8', true) !== 'UTF-8') {
             $fields[] = $encoding . 'Project';
         }
 
         if (\array_key_exists('Duration', $row)) {
+            $duration = $row['Duration'];
             // negative durations are not supported ...
-            if (\is_string($row['Duration']) && $row['Duration'][0] === '-') {
+            if (\is_string($duration) && $duration[0] === '-') {
                 $fields[] = $negative . 'Duration';
-            } elseif (\is_int($row['Duration']) && $row['Duration'] < 0) {
+            } elseif (\is_int($duration) && $duration < 0) {
                 $fields[] = $negative . 'Duration';
             }
         }
 
         if ($row['Activity'] === null || $row['Activity'] === '') {
             $fields[] = $empty . 'Activity';
-        } elseif (mb_detect_encoding($row['Activity'], 'UTF-8', true) !== 'UTF-8') {
+        } elseif (\is_string($row['Activity']) && mb_detect_encoding($row['Activity'], 'UTF-8', true) !== 'UTF-8') {
             $fields[] = $encoding . 'Activity';
         }
 
-        if (\array_key_exists('Description', $row) && $row['Description'] !== null && $row['Description'] !== '' && mb_detect_encoding($row['Description'], 'UTF-8', true) !== 'UTF-8') {
+        if (\array_key_exists('Description', $row) && \is_string($row['Description']) && $row['Description'] !== '' && mb_detect_encoding($row['Description'], 'UTF-8', true) !== 'UTF-8') {
             $fields[] = $encoding . 'Description';
         }
 
