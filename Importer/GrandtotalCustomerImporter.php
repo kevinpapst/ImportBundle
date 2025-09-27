@@ -160,6 +160,9 @@ final class GrandtotalCustomerImporter implements ImporterInterface
         $address = ['street' => '',  'city' => '', 'code' => ''];
 
         foreach ($row as $name => $value) {
+            if (\is_array($value)) {
+                continue;
+            }
             if ($value !== null) {
                 $value = trim($value);
             }

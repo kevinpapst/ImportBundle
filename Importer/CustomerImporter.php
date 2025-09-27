@@ -170,6 +170,9 @@ final class CustomerImporter implements ImporterInterface
     private function mapEntryToCustomer(Customer $customer, array $row): void
     {
         foreach ($row as $key => $value) {
+            if (\is_array($value)) {
+                continue;
+            }
             if ($value !== null) {
                 $value = trim($value);
             }

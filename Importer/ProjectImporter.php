@@ -227,6 +227,9 @@ final class ProjectImporter implements ImporterInterface
     private function mapEntryToProject(Project $project, array $row): void
     {
         foreach ($row as $name => $value) {
+            if (\is_array($value)) {
+                continue;
+            }
             if ($value !== null) {
                 $value = trim($value);
             }
