@@ -28,7 +28,7 @@ use App\Entity\UserPreference;
 use App\Repository\ActivityRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
-use App\Timesheet\Util;
+use App\Timesheet\RateCalculator\ClassicRateCalculator;
 use DateTime;
 use DateTimeZone;
 use Doctrine\DBAL\Connection;
@@ -1627,6 +1627,8 @@ final class KimaiImporterCommand extends Command
 
         $progressBar = new ProgressBar($output, $total);
 
+        $roundingMode = new ClassicRateCalculator();
+
         foreach ($records as $oldRecord) {
             if ($oldRecord['end'] === null || $oldRecord['end'] === '') {
                 $io->error('Cannot import running timesheet record, skipping: ' . $oldRecord['timeEntryID']);
@@ -1722,7 +1724,7 @@ final class KimaiImporterCommand extends Command
                 $timesheet->setRate($timesheet->getFixedRate());
             } elseif ($timesheet->getHourlyRate() !== null) {
                 $hourlyRate = $timesheet->getHourlyRate();
-                $rate = Util::calculateRate($hourlyRate, $duration);
+                $rate = $roundingMode->calculateRate($hourlyRate, $duration);
                 $timesheet->setRate($rate);
             }
 
