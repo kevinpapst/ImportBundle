@@ -53,9 +53,7 @@ class ImportForm extends AbstractType
                 ],
                 'constraints' => [
                     new NotNull(),
-                    new File([
-                        'maxSize' => $options['max_file_size'],
-                    ])
+                    new File(maxSize: $options['max_file_size'])
                 ],
             ])
         ;
