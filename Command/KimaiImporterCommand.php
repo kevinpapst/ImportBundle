@@ -2164,7 +2164,7 @@ final class KimaiImporterCommand extends Command
             foreach ($columns as $column) {
                 foreach ($searchReplace as $search => $replace) {
                     $query = $this->connection->createQueryBuilder()
-                        ->update($this->dbPrefix . $table, $this->dbPrefix . $table)
+                        ->update($this->dbPrefix . $table)
                         ->set($column, \sprintf('REPLACE(%s, "%s", "%s")', $column, $search, $replace))
                         ->where($column . ' LIKE "%' . $search . '%"')
                     ;
