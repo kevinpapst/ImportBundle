@@ -22,9 +22,7 @@ class ImportBundle extends Bundle implements PluginInterface
     // some validator rules that we skip during import, because they are not relevant here
     // do not use the class name directly, because that would raise the required kimai version
 
-    public const SKIP_VALIDATOR_CODES = [
-        'kimai-timesheet-87', 'kimai-timesheet-88', 'kimai-timesheet-89', // timesheet deactivated before 2.0.16
-        'kimai-timesheet-deactivated-activity', 'kimai-timesheet-deactivated-project', 'kimai-timesheet-deactivated-customer', // timesheet deactivated after 2.0.16
+    public const array SKIP_VALIDATOR_CODES = [
         TimesheetDeactivated::DISABLED_ACTIVITY_ERROR, TimesheetDeactivated::DISABLED_PROJECT_ERROR, TimesheetDeactivated::DISABLED_CUSTOMER_ERROR, // timesheet deactivated current codes
         TimesheetLockdown::PERIOD_LOCKED, // lockdown is obviously not necessary to check here
         TimesheetLongRunning::LONG_RUNNING, TimesheetLongRunning::MAXIMUM, TimesheetZeroDuration::ZERO_DURATION_ERROR, // if this was allowed in the past, it should be imported
