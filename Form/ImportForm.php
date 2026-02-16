@@ -26,6 +26,11 @@ class ImportForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $maxSize = $options['max_file_size'];
+        if (!\is_string($maxSize)) {
+            $maxSize = ImporterService::MAX_FILESIZE;
+        }
+
         $builder
             ->add('delimiter', ChoiceType::class, [
                 'label' => 'importer.delimiter',
@@ -46,16 +51,14 @@ class ImportForm extends AbstractType
                 'help' => 'importer.file_chooser_help',
                 'help_translation_parameters' => [
                     '{{rows}}' => $options['max_row_size'],
-                    '{{size}}' => $options['max_file_size'],
+                    '{{size}}' => $maxSize,
                 ],
                 'attr' => [
                     'accept' => 'text/csv,application/json',
                 ],
                 'constraints' => [
                     new NotNull(),
-                    new File([
-                        'maxSize' => $options['max_file_size'],
-                    ])
+                    new File(maxSize: $maxSize)
                 ],
             ])
         ;

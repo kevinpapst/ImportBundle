@@ -3,7 +3,7 @@
     "description": "Import data from CSV files via Web UI",
     "homepage": "https://www.kimai.org/store/keleo-importer-bundle.html",
     "type": "kimai-plugin",
-    "version": "2.22.1",
+    "version": "3.0.0",
     "keywords": [
         "kimai",
         "kimai-plugin"
@@ -17,7 +17,7 @@
     ],
     "extra": {
         "kimai": {
-            "require": 23600,
+            "require": 30000,
             "name": "Importer"
         }
     },
@@ -32,7 +32,7 @@
             "symfony/runtime": false
         },
         "platform": {
-            "php": "8.1.3"
+            "php": "8.4.4"
         },
         "preferred-install": {
             "*": "dist"
@@ -50,15 +50,16 @@
             "@phpstan"
         ]
     },
+    "minimum-stability": "beta",
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
-        "kimai/kimai": "dev-main",
+        "kimai/kimai": "dev-dev",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
-        "symfony/console": "^6.0",
-        "symfony/event-dispatcher": "^6.0"
+        "symfony/console": "^7.0",
+        "symfony/event-dispatcher": "^7.0"
     }
 }

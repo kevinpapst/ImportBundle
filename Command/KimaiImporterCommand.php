@@ -117,7 +117,7 @@ final class KimaiImporterCommand extends Command
      * @var array<Activity[]>
      */
     private array $activities = [];
-    private bool $debug = false;
+    private bool $debug = false; // @phpstan-ignore property.tooWideBool
     /**
      * Global activities (either because they were global OR because --global was used).
      *
@@ -596,13 +596,13 @@ final class KimaiImporterCommand extends Command
      */
     private function checkDatabaseVersion(Connection $connection, SymfonyStyle $io): bool
     {
-        $optionColumn = $connection->quoteIdentifier('option');
+        $optionColumn = $connection->quoteSingleIdentifier('option');
         $qb = $connection->createQueryBuilder();
 
         try {
             $connection->createQueryBuilder()
                 ->select('1')
-                ->from($connection->quoteIdentifier($this->dbPrefix . 'configuration'))
+                ->from($connection->quoteSingleIdentifier($this->dbPrefix . 'configuration'))
                 ->executeQuery();
         } catch (Exception $e) {
             $io->error(
@@ -614,7 +614,7 @@ final class KimaiImporterCommand extends Command
 
         $version = $connection->createQueryBuilder()
             ->select('value')
-            ->from($connection->quoteIdentifier($this->dbPrefix . 'configuration'))
+            ->from($connection->quoteSingleIdentifier($this->dbPrefix . 'configuration'))
             ->where($qb->expr()->eq($optionColumn, ':option'))
             ->setParameter('option', 'version')
             ->executeQuery()
@@ -638,7 +638,7 @@ final class KimaiImporterCommand extends Command
 
         $revision = $connection->createQueryBuilder()
             ->select('value')
-            ->from($connection->quoteIdentifier($this->dbPrefix . 'configuration'))
+            ->from($connection->quoteSingleIdentifier($this->dbPrefix . 'configuration'))
             ->where($qb->expr()->eq($optionColumn, ':option'))
             ->setParameter('option', 'revision')
             ->executeQuery()
@@ -728,7 +728,7 @@ final class KimaiImporterCommand extends Command
     {
         $query = $this->connection->createQueryBuilder()
             ->select('*')
-            ->from($this->connection->quoteIdentifier($this->dbPrefix . $table));
+            ->from($this->connection->quoteSingleIdentifier($this->dbPrefix . $table));
 
         foreach ($where as $column => $value) {
             $query->andWhere($query->expr()->eq($column, $value));
@@ -741,7 +741,7 @@ final class KimaiImporterCommand extends Command
     {
         $query = $this->connection->createQueryBuilder()
             ->select('COUNT(*)')
-            ->from($this->connection->quoteIdentifier($this->dbPrefix . $table));
+            ->from($this->connection->quoteSingleIdentifier($this->dbPrefix . $table));
 
         foreach ($where as $column => $value) {
             $query->andWhere($query->expr()->eq($column, $value));
@@ -754,7 +754,7 @@ final class KimaiImporterCommand extends Command
     {
         $query = $this->connection->createQueryBuilder()
             ->select('*')
-            ->from($this->connection->quoteIdentifier($this->dbPrefix . $table));
+            ->from($this->connection->quoteSingleIdentifier($this->dbPrefix . $table));
 
         return $query->executeQuery()->iterateAssociative();
     }
@@ -2164,7 +2164,7 @@ final class KimaiImporterCommand extends Command
             foreach ($columns as $column) {
                 foreach ($searchReplace as $search => $replace) {
                     $query = $this->connection->createQueryBuilder()
-                        ->update($this->dbPrefix . $table, $this->dbPrefix . $table)
+                        ->update($this->dbPrefix . $table)
                         ->set($column, \sprintf('REPLACE(%s, "%s", "%s")', $column, $search, $replace))
                         ->where($column . ' LIKE "%' . $search . '%"')
                     ;
