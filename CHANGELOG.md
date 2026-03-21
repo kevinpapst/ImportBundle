@@ -1,3 +1,10 @@
+## Version 2.23.0
+
+Compatibility: requires minimum Kimai 2.36.0
+
+- Normalize tags during timesheet import
+- Fix importer command
+
 ## Version 2.22.1
 
 Compatibility: requires minimum Kimai 2.36.0
