@@ -321,22 +321,26 @@ abstract class AbstractTimesheetImporter
 
     private function getTag(string $tagName, bool $dryRun): Tag
     {
-        if (!\array_key_exists($tagName, $this->tagCache)) {
-            $tag = $this->tagRepository->findTagByName($tagName);
+        $normalizedTagName = trim(mb_substr($tagName, 0, 100));
+
+        if (!\array_key_exists($normalizedTagName, $this->tagCache)) {
+            $tag = $this->tagRepository->findTagByName($normalizedTagName);
 
             if ($tag === null) {
                 $tag = new Tag();
-                $tag->setName(mb_substr($tagName, 0, 100));
+                $tag->setName($normalizedTagName);
+
                 if (!$dryRun) {
                     $this->tagRepository->saveTag($tag);
                 }
+
                 $this->createdTags++;
             }
 
-            $this->tagCache[$tagName] = $tag;
+            $this->tagCache[$normalizedTagName] = $tag;
         }
 
-        return $this->tagCache[$tagName];
+        return $this->tagCache[$normalizedTagName];
     }
 
     private function getActivity(string $activity, Project $project, bool $dryRun): Activity
