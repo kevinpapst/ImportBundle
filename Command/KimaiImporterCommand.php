@@ -1328,6 +1328,10 @@ final class KimaiImporterCommand extends Command
 
     private function getCachedActivity(int|string $id, null|int|string $projectId = null): ?Activity
     {
+        if ($projectId === null) {
+            return null;
+        }
+
         $id = (string) $id;
         $projectId = (string) $projectId;
 
@@ -1340,6 +1344,10 @@ final class KimaiImporterCommand extends Command
 
     private function isKnownActivity(array|int|string $oldActivity, null|int|string $projectId = null): bool
     {
+        if ($projectId === null) {
+            return false;
+        }
+
         $cacheId = (string) (\is_array($oldActivity) ? $oldActivity['activityID'] : $oldActivity);
         $projectId = (string) $projectId;
 
@@ -1352,6 +1360,10 @@ final class KimaiImporterCommand extends Command
 
     private function setActivityCache(array|int|string $oldActivity, Activity $activity, null|int|string $projectId = null): void
     {
+        if ($projectId === null) {
+            return;
+        }
+
         $cacheId = (string) (\is_array($oldActivity) ? $oldActivity['activityID'] : $oldActivity);
         $projectId = (string) $projectId;
 
@@ -1651,8 +1663,6 @@ final class KimaiImporterCommand extends Command
 
             if (isset($this->activities[$activityId][$projectId])) {
                 $activity = $this->activities[$activityId][$projectId];
-            } elseif (isset($this->activities[$activityId][null])) {
-                $activity = $this->activities[$activityId][null];
             }
 
             if (null === $activity && isset($this->oldActivities[$activityId])) {
@@ -2083,11 +2093,14 @@ final class KimaiImporterCommand extends Command
     private function createInstanceTeam(SymfonyStyle $io, array $users, array $activities, string $name): void
     {
         $team = new Team($name);
-        $teamlead = $users[array_key_first($users)];
-        $teamlead = $this->getCachedUser($teamlead['userID']);
-        $team->addTeamlead($teamlead);
+        $i = 0;
         foreach ($users as $oldUser) {
-            $team->addUser($this->getCachedUser($oldUser['userID']));
+            $user = $this->getCachedUser($oldUser['userID']);
+            if ($i++ === 0) {
+                $team->addTeamlead($user);
+            } else {
+                $team->addUser($user);
+            }
             foreach ($activities as $oldActivity) {
                 $activity = $this->getCachedActivity($oldActivity['activityID'], null);
                 if ($activity !== null) {
