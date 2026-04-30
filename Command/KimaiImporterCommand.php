@@ -117,7 +117,7 @@ final class KimaiImporterCommand extends Command
      * @var array<Activity[]>
      */
     private array $activities = [];
-    private bool $debug = false;
+    private bool $debug = false; // @phpstan-ignore property.tooWideBool
     /**
      * Global activities (either because they were global OR because --global was used).
      *
