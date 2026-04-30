@@ -46,7 +46,18 @@ final class CustomerImporter implements ImporterInterface
         'budget',
         'budgettype',
         'timebudget',
-        'customernumber'
+        'customernumber',
+        'budget_type',
+        'time_budget',
+        'customer_number',
+        'number',
+        'address_line1',
+        'address_line2',
+        'address_line3',
+        'postcode',
+        'city',
+        'buyerreference',
+        'buyer_reference',
     ];
 
     public function __construct(
@@ -195,6 +206,8 @@ final class CustomerImporter implements ImporterInterface
 
                 case 'customernumber':
                 case 'account':
+                case 'number':
+                case 'customer_number':
                     if (\is_string($value)) {
                         $customer->setNumber($value);
                     }
@@ -257,11 +270,38 @@ final class CustomerImporter implements ImporterInterface
                     break;
 
                 case 'budgettype':
+                case 'budget_type':
                     $customer->setBudgetType($value);
                     break;
 
                 case 'timebudget':
+                case 'time_budget':
                     $customer->setTimeBudget((int) $value);
+                    break;
+
+                case 'address_line1':
+                    $customer->setAddressLine1($value);
+                    break;
+
+                case 'address_line2':
+                    $customer->setAddressLine2($value);
+                    break;
+
+                case 'address_line3':
+                    $customer->setAddressLine3($value);
+                    break;
+
+                case 'postcode':
+                    $customer->setPostCode($value);
+                    break;
+
+                case 'city':
+                    $customer->setCity($value);
+                    break;
+
+                case 'buyerreference':
+                case 'buyer_reference':
+                    $customer->setBuyerReference($value);
                     break;
 
                 default:
