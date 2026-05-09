@@ -1838,7 +1838,7 @@ final class KimaiImporterCommand extends Command
             $io->success('Created new activities during timesheet import: ' . $activityCounter);
         }
         if (\count($errors['projectActivityMismatch']) > 0) {
-            $io->error('Found invalid mapped project - activity combinations in these old timesheet recors: ' . implode(',', $errors['projectActivityMismatch']));
+            $io->error('Found invalid mapped project - activity combinations in these old timesheet records: ' . implode(',', $errors['projectActivityMismatch']));
         }
         if ($failed > 0) {
             $io->error(\sprintf('Failed importing %s timesheet records', $failed));
