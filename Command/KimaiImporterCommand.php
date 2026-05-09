@@ -66,6 +66,7 @@ final class KimaiImporterCommand extends Command
 
     public const BATCH_SIZE = 1000;
     private const METAFIELD_NAME = '_imported_id';
+    private const GLOBAL_ID = '___GLOBAL___';
 
     private Connection $connection;
     /**
@@ -1334,7 +1335,7 @@ final class KimaiImporterCommand extends Command
     private function getCachedActivity(int|string $id, null|int|string $projectId = null): ?Activity
     {
         if ($projectId === null) {
-            return null;
+            $projectId = self::GLOBAL_ID;
         }
 
         $id = (string) $id;
@@ -1350,7 +1351,7 @@ final class KimaiImporterCommand extends Command
     private function isKnownActivity(array|int|string $oldActivity, null|int|string $projectId = null): bool
     {
         if ($projectId === null) {
-            return false;
+            $projectId = self::GLOBAL_ID;
         }
 
         $cacheId = (string) (\is_array($oldActivity) ? $oldActivity['activityID'] : $oldActivity);
@@ -1366,7 +1367,7 @@ final class KimaiImporterCommand extends Command
     private function setActivityCache(array|int|string $oldActivity, Activity $activity, null|int|string $projectId = null): void
     {
         if ($projectId === null) {
-            return;
+            $projectId = self::GLOBAL_ID;
         }
 
         $cacheId = (string) (\is_array($oldActivity) ? $oldActivity['activityID'] : $oldActivity);
@@ -1414,7 +1415,7 @@ final class KimaiImporterCommand extends Command
         // remember which activity has at least one assigned project
         $oldActivityMapping = [];
         if ($this->options['unknownAsGlobal'] === true) {
-            $oldActivityMapping['___GLOBAL___'][] = PHP_INT_MAX;
+            $oldActivityMapping[self::GLOBAL_ID][] = PHP_INT_MAX;
         } else {
             foreach ($activityToProject as $mapping) {
                 $oldActivityMapping[$mapping['activityID']][] = $mapping['projectID'];
@@ -1668,6 +1669,8 @@ final class KimaiImporterCommand extends Command
 
             if (isset($this->activities[$activityId][$projectId])) {
                 $activity = $this->activities[$activityId][$projectId];
+            } elseif (isset($this->activities[$activityId][self::GLOBAL_ID])) {
+                $activity = $this->activities[$activityId][self::GLOBAL_ID];
             }
 
             if (null === $activity && isset($this->oldActivities[$activityId])) {
