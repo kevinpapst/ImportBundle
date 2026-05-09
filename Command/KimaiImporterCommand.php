@@ -1067,11 +1067,16 @@ final class KimaiImporterCommand extends Command
                 $newTimezone = $timezone;
             }
 
+            $homepage = $oldCustomer['homepage'];
+            if (!filter_var($homepage, FILTER_VALIDATE_URL)) {
+                $homepage = null;
+            }
+
             $customer = new Customer($name);
             $customer->setComment($oldCustomer['comment']);
             $customer->setCompany($oldCustomer['company']);
             $customer->setFax($oldCustomer['fax']);
-            $customer->setHomepage($oldCustomer['homepage']);
+            $customer->setHomepage($homepage);
             $customer->setMobile($oldCustomer['mobile']);
             $customer->setEmail($oldCustomer['mail']);
             $customer->setPhone($oldCustomer['phone']);
