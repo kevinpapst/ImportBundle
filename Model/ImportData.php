@@ -76,4 +76,15 @@ final class ImportData
 
         return $errors;
     }
+
+    public function hasErrors(): bool
+    {
+        foreach ($this->rows as $row) {
+            if (\count($row->getErrors()) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
