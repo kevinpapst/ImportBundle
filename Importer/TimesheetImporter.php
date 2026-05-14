@@ -121,7 +121,7 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
         return new ImportData('time_tracking', $converted);
     }
 
-    public function importRow(Duration $durationParser, ImportData $data, ImportRow $row, bool $dryRun): void
+    public function importRow(Duration $durationParser, ImportData $data, ImportRow $row): ?\App\Entity\Timesheet
     {
         $rawData = $row->getData();
         $translated = $this->getTranslatedHeaders();
@@ -166,6 +166,6 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
             }
         }
 
-        parent::importRow($durationParser, $data, new ImportRow($converted), $dryRun);
+        return parent::importRow($durationParser, $data, new ImportRow($converted));
     }
 }

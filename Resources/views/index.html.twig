@@ -106,29 +106,35 @@
                         </thead>
                         <tbody>
                         {% for row in importData.rows %}
-                            {% set hasError = row.hasError() %}
-                            {% if countErrors == 0 or hasError %}
-                                <tr{% if hasError %} class="text-warning"{% endif %}>
+                            {% if row.hasError() %}
+                                {% set fieldErrors = row.fieldErrors %}
+                                {% set generalErrors = fieldErrors['__EMPTY__']|default([]) %}
+                                {% set displayRow = row.hasProcessedData() ? row.processedData : row.data %}
+                                <tr>
                                     <td>{{ loop.index + 1 }}</td>
-                                    {% for key, data in row.data %}
-                                        <td>
-                                            {% if key == 'Begin' or key == 'End' %}
-                                                {{ data|date_time }}
-                                            {% elseif key == 'Billable' or key == 'Exported' %}
-                                                {{ label_boolean(data) }}
-                                            {% elseif key == 'Duration' %}
-                                                {{ data|duration }}
+                                    {% for key, value in displayRow %}
+                                        {% set cellErrors = fieldErrors[key|lower]|default([]) %}
+                                        <td{% if cellErrors|length > 0 %} class="table-danger"{% endif %}>
+                                            {% if value is same as(true) or value is same as(false) %}
+                                                {{ label_boolean(value) }}
+                                            {% elseif key == 'Duration' or key == 'Break' or key == 'timebudget' %}
+                                                {{ value|duration }}
+                                            {% elseif key == 'Begin' or key == 'End' %}
+                                                {{ value|date_time }}
                                             {% else %}
-                                                {{ data }}
+                                                {{ value }}
                                             {% endif %}
+                                            {% for err in cellErrors %}
+                                                <br><small class="text-danger fw-bold">{{ err }}</small>
+                                            {% endfor %}
                                         </td>
                                     {% endfor %}
                                 </tr>
-                                {% if hasError %}
+                                {% if generalErrors|length > 0 %}
                                 <tr class="text-danger">
                                     <td colspan="{{ headerLength + 1 }}">
-                                        <ul>
-                                            {% for error in row.getErrors() %}
+                                        <ul class="mb-0">
+                                            {% for error in generalErrors %}
                                                 <li>{{ error }}</li>
                                             {% endfor %}
                                         </ul>

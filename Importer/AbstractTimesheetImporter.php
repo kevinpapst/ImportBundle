@@ -16,6 +16,7 @@ use App\Entity\Activity;
 use App\Entity\Customer;
 use App\Entity\Project;
 use App\Entity\Tag;
+use App\Entity\Timesheet;
 use App\Entity\TimesheetMeta;
 use App\Entity\User;
 use App\Project\ProjectService;
@@ -30,32 +31,22 @@ use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportModelInterface;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
 use KimaiPlugin\ImportBundle\Model\TimesheetImportModel;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractTimesheetImporter
 {
-    /**
-     * @var Customer[]
-     */
+    /** @var Customer[] */
     private array $customerCache = [];
-    /**
-     * @var Project[]
-     */
+    /** @var Project[] */
     private array $projectCache = [];
-    /**
-     * @var Activity[]
-     */
+    /** @var Activity[] */
     private array $activityCache = [];
-    /**
-     * @var array<User|null>
-     */
+    /** @var array<User|null> */
     private array $userCache = [];
-    /**
-     * @var Tag[]
-     */
+    /** @var Tag[] */
     private array $tagCache = [];
 
-    // some statistics to display to the user
     private int $createdUsers = 0;
     private int $createdProjects = 0;
     private int $createdCustomers = 0;
@@ -72,36 +63,48 @@ abstract class AbstractTimesheetImporter
         private readonly TagRepository $tagRepository,
         private readonly TimesheetService $timesheetService,
         protected readonly TranslatorInterface $translator,
+        private readonly ValidatorInterface $validator,
     ) {
     }
 
-    public function importRow(Duration $durationParser, ImportData $data, ImportRow $row, bool $dryRun): void
+    /**
+     * Build and validate one timesheet row (no saves). Subclasses override this to
+     * handle format-specific transformations and call parent::importRow() with a
+     * normalised ImportRow.
+     *
+     * Returns the built Timesheet on success, null on validation error.
+     * Always adds the row to $data.
+     */
+    public function importRow(Duration $durationParser, ImportData $data, ImportRow $row): ?Timesheet
     {
+        $timesheet = null;
         try {
-            /** @var array<string, string> $record */
+            /** @var array<string, bool|string|int> $record */
             $record = $row->getData();
 
-            $this->validateRow($record);
+            foreach ($this->collectFieldErrors($record) as $field => $message) {
+                $row->addError($message, $field);
+            }
+            if ($row->hasError()) {
+                $data->addRow($row);
+
+                return null;
+            }
 
             $userIdentifier = $record['User'];
             $userName = \array_key_exists('Username', $record) ? $record['Username'] : $userIdentifier;
 
-            if (null === ($user = $this->getUser($userIdentifier, $record['Email'], $userName, $dryRun))) {
-                throw new ImportException(
-                    \sprintf('Unknown user %s', $userIdentifier)
-                );
+            if (null === ($user = $this->getUser((string) $userIdentifier, (string) $record['Email'], (string) $userName))) {
+                throw new ImportException(\sprintf('Unknown user %s', (string) $userIdentifier), 'User');
             }
 
-            $project = $this->getProject($record['Project'], $record['Customer'], $dryRun);
-            $activity = $this->getActivity($record['Activity'], $project, $dryRun);
+            $project = $this->getProject((string) $record['Project'], (string) $record['Customer']);
+            $activity = $this->getActivity((string) $record['Activity'], $project);
 
-            $begin = null;
-            $end = null;
             $duration = 0;
             $foundDuration = null;
 
             if (\array_key_exists('Duration', $record)) {
-                // most importers should provide seconds via int
                 if (\is_int($record['Duration'])) {
                     $duration = $record['Duration'];
                     $foundDuration = $duration;
@@ -114,17 +117,17 @@ abstract class AbstractTimesheetImporter
             $timezone = new \DateTimeZone($user->getTimezone());
 
             try {
-                $begin = new \DateTime($record['Begin'], $timezone);
+                $begin = new \DateTime((string) $record['Begin'], $timezone);
             } catch (\Exception $exception) {
-                throw new ImportException($exception->getMessage());
+                throw new ImportException($exception->getMessage(), 'Begin');
             }
             try {
-                $end = new \DateTime($record['End'], $timezone);
+                $end = new \DateTime((string) $record['End'], $timezone);
             } catch (\Exception $exception) {
-                throw new ImportException($exception->getMessage());
+                throw new ImportException($exception->getMessage(), 'End');
             }
 
-            // fix dates, which are running over midnight
+            // fix dates running over midnight
             if ($end < $begin) {
                 if ($duration > 0) {
                     $end = (new \DateTime())->setTimezone($timezone)->setTimestamp($begin->getTimestamp() + $duration);
@@ -148,10 +151,10 @@ abstract class AbstractTimesheetImporter
             }
 
             foreach ($record as $key => $value) {
-                $key = strtolower($key);
-                switch ($key) {
+                $k = strtolower($key);
+                switch ($k) {
                     case 'description':
-                        $timesheet->setDescription($record['Description']);
+                        $timesheet->setDescription($value !== null ? (string) $value : null);
                         break;
 
                     case 'exported':
@@ -163,11 +166,11 @@ abstract class AbstractTimesheetImporter
                         break;
 
                     case 'break':
-                        $timesheet->setBreak($this->parseDuration($durationParser, $value));
+                        $timesheet->setBreak($this->parseDuration($durationParser, (string) $value));
                         break;
 
                     case 'rate':
-                        if (\array_key_exists('Rate', $record) && is_numeric($value)) {
+                        if (is_numeric($value)) {
                             $timesheet->setRate((float) $value);
                         }
                         break;
@@ -196,15 +199,14 @@ abstract class AbstractTimesheetImporter
                                 if ($tagName === '') {
                                     continue;
                                 }
-
-                                $timesheet->addTag($this->getTag($tagName, $dryRun));
+                                $timesheet->addTag($this->getTag($tagName));
                             }
                         }
                         break;
 
                     default:
-                        if (str_starts_with($key, 'meta.')) {
-                            $metaName = str_replace('meta.', '', $key);
+                        if (str_starts_with($k, 'meta.')) {
+                            $metaName = substr($k, 5);
                             $meta = $timesheet->getMetaField($metaName);
                             if ($meta === null) {
                                 $meta = new TimesheetMeta();
@@ -217,22 +219,57 @@ abstract class AbstractTimesheetImporter
                 }
             }
 
-            if (!$dryRun) {
-                $this->timesheetService->saveTimesheet($timesheet);
+            $errors = $this->validator->validate($timesheet);
+            if ($errors->count() > 0) {
+                throw new ValidationFailedException($errors, 'Validation Failed');
             }
+
+            // Build processedData keyed by same fields as $record so column count matches the header.
+            $processedData = [];
+            foreach ($record as $key => $rawValue) {
+                $processedData[$key] = match (strtolower($key)) {
+                    'begin' => $timesheet->getBegin(),
+                    'end' => $timesheet->getEnd(),
+                    'duration' => $timesheet->getDuration(),
+                    'user' => $user->getUserIdentifier(),
+                    'username' => $user->getUserIdentifier(),
+                    'email' => $user->getEmail(),
+                    'customer' => $project->getCustomer()?->getName(),
+                    'project' => $project->getName(),
+                    'activity' => $activity->getName(),
+                    'description' => $timesheet->getDescription(),
+                    'exported' => $timesheet->isExported(),
+                    'billable' => $timesheet->isBillable(),
+                    'rate' => $timesheet->getRate(),
+                    'hourlyrate' => $timesheet->getHourlyRate(),
+                    'fixedrate' => $timesheet->getFixedRate(),
+                    'internalrate' => $timesheet->getInternalRate(),
+                    'break' => $timesheet->getBreak(),
+                    'tags' => implode(', ', $timesheet->getTagsAsArray()),
+                    default => str_starts_with(strtolower($key), 'meta.')
+                        ? $timesheet->getMetaField(substr(strtolower($key), 5))?->getValue()
+                        : $rawValue,
+                };
+            }
+            $row->setProcessedData($processedData);
         } catch (ImportException $exception) {
-            $row->addError($exception->getMessage());
+            $row->addError($exception->getMessage(), $exception->getField());
+            $timesheet = null;
         } catch (ValidationFailedException $exception) {
             for ($i = 0; $i < $exception->getViolations()->count(); $i++) {
-                $row->addError($exception->getViolations()->get($i)->getMessage());
+                $violation = $exception->getViolations()->get($i);
+                $row->addError($violation->getMessage(), $violation->getPropertyPath());
             }
+            $timesheet = null;
         }
+
         $data->addRow($row);
+
+        return $timesheet;
     }
 
     protected function parseDuration(Duration $durationParser, string $duration): int
     {
-        // we expect plain seconds
         if (is_numeric($duration) && !str_contains($duration, '.') && !str_contains($duration, ',')) {
             return (int) $duration;
         }
@@ -251,122 +288,143 @@ abstract class AbstractTimesheetImporter
             throw new ImportException('Invalid import model given, expected TimesheetImportModel');
         }
 
-        $dryRun = $model->isPreview();
         $data = $this->createImportData($rows[0]);
-
         $this->timesheetService->setIgnoreValidationCodes(ImportBundle::SKIP_VALIDATOR_CODES);
-
         $durationParser = new Duration();
         $this->globalActivity = $model->isGlobalActivities();
 
+        // Pass 1: build + validate all rows — nothing is saved
+        $timesheets = [];
+        $failureRows = 0;
         foreach ($rows as $row) {
-            $this->importRow($durationParser, $data, $row, $dryRun);
+            $timesheet = $this->importRow($durationParser, $data, $row);
+            if ($timesheet !== null) {
+                $timesheets[] = $timesheet;
+            } else {
+                $failureRows++;
+            }
         }
 
-        $create = 'created';
-        if ($dryRun) {
-            $create = 'create';
+        // Pass 2: save only when every row passed validation
+        if ($data->hasErrors()) {
+            $data->addStatus(\sprintf('Found %s rows with errors', $failureRows));
+        } elseif (\count($timesheets) === 0) {
+            $data->addStatus('Found no rows to import');
+        } else {
+            // Save in dependency order: tags → customers → projects → activities → users → timesheets
+            foreach ($this->tagCache as $tag) {
+                if ($tag->getId() === null) {
+                    $this->tagRepository->saveTag($tag);
+                    $this->createdTags++;
+                }
+            }
+            foreach ($this->customerCache as $customer) {
+                if ($customer->isNew()) {
+                    $this->customerService->saveCustomer($customer);
+                    $this->createdCustomers++;
+                }
+            }
+            foreach ($this->projectCache as $project) {
+                if ($project->isNew()) {
+                    $this->projectService->saveProject($project);
+                    $this->createdProjects++;
+                }
+            }
+            foreach ($this->activityCache as $activity) {
+                if ($activity->isNew()) {
+                    $this->activityService->saveActivity($activity);
+                    $this->createdActivities++;
+                }
+            }
+            foreach ($this->userCache as $user) {
+                if ($user !== null && $user->getId() === null) {
+                    $this->userService->saveUser($user);
+                    $this->createdUsers++;
+                }
+            }
+            foreach ($timesheets as $timesheet) {
+                $this->timesheetService->saveTimesheet($timesheet);
+            }
         }
 
-        if ($data->countRows() > 0) {
-            $data->addStatus(\sprintf('processed %s rows', $data->countRows()));
+        if (($rowCount = $data->countRows()) > 0) {
+            $data->addStatus(\sprintf('processed %s rows', $rowCount));
         }
-        if ($data->countErrors() > 0) {
-            $data->addStatus(\sprintf('failed %s rows', $data->countErrors()));
+        if (($errors = $data->countErrors()) > 0) {
+            $data->addStatus(\sprintf('failed %s rows', $errors));
         }
         if ($this->createdCustomers > 0) {
-            $data->addStatus(\sprintf('%s %s customers', $create, $this->createdCustomers));
+            $data->addStatus(\sprintf('created %s customers', $this->createdCustomers));
         }
         if ($this->createdProjects > 0) {
-            $data->addStatus(\sprintf('%s %s projects', $create, $this->createdProjects));
+            $data->addStatus(\sprintf('created %s projects', $this->createdProjects));
         }
         if ($this->createdActivities > 0) {
-            $data->addStatus(\sprintf('%s %s activities', $create, $this->createdActivities));
+            $data->addStatus(\sprintf('created %s activities', $this->createdActivities));
         }
         if ($this->createdTags > 0) {
-            $data->addStatus(\sprintf('%s %s tags', $create, $this->createdTags));
+            $data->addStatus(\sprintf('created %s tags', $this->createdTags));
         }
         if ($this->createdUsers > 0) {
-            $data->addStatus(\sprintf('%s %s users', $create, $this->createdUsers));
+            $data->addStatus(\sprintf('created %s users', $this->createdUsers));
         }
 
         return $data;
     }
 
-    private function getUser(string $user, string $email, string $alias, bool $dryRun): ?User
+    private function getUser(string $user, string $email, string $alias): ?User
     {
         if (!\array_key_exists($user, $this->userCache)) {
             $tmpUser = $this->userService->findUserByEmail($email);
             if ($tmpUser === null) {
                 $tmpUser = $this->userService->findUserByName($user);
             }
-
             if ($tmpUser === null) {
                 $tmpUser = $this->userService->createNewUser();
                 $tmpUser->setAlias($alias);
                 $tmpUser->setEmail($email);
                 $tmpUser->setUserIdentifier($user);
                 $tmpUser->setPlainPassword(uniqid());
-                if (!$dryRun) {
-                    $this->userService->saveUser($tmpUser);
-                }
-                $this->createdUsers++;
+                // saved in pass 2
             }
-
             $this->userCache[$user] = $tmpUser;
         }
 
         return $this->userCache[$user];
     }
 
-    private function getTag(string $tagName, bool $dryRun): Tag
+    private function getTag(string $tagName): Tag
     {
         $normalizedTagName = trim(mb_substr($tagName, 0, 100));
 
         if (!\array_key_exists($normalizedTagName, $this->tagCache)) {
             $tag = $this->tagRepository->findTagByName($normalizedTagName);
-
             if ($tag === null) {
                 $tag = new Tag();
                 $tag->setName($normalizedTagName);
-
-                if (!$dryRun) {
-                    $this->tagRepository->saveTag($tag);
-                }
-
-                $this->createdTags++;
+                // saved in pass 2
             }
-
             $this->tagCache[$normalizedTagName] = $tag;
         }
 
         return $this->tagCache[$normalizedTagName];
     }
 
-    private function getActivity(string $activity, Project $project, bool $dryRun): Activity
+    private function getActivity(string $activity, Project $project): Activity
     {
-        $cacheKey = $activity;
-        if (!$this->globalActivity) {
-            $cacheKey = $cacheKey . '_____' . $project->getId();
-        } else {
-            $cacheKey = $cacheKey . '_____GLOBAL_____';
-        }
+        $cacheKey = $this->globalActivity
+            ? $activity . '_____GLOBAL_____'
+            : $activity . '_____' . $project->getId();
 
         if (!\array_key_exists($cacheKey, $this->activityCache)) {
-            if (!$this->globalActivity) {
-                $tmpActivity = $this->activityService->findActivityByName($activity, $project);
-            } else {
-                $tmpActivity = $this->activityService->findActivityByName($activity, null);
-            }
+            $tmpActivity = $this->globalActivity
+                ? $this->activityService->findActivityByName($activity, null)
+                : $this->activityService->findActivityByName($activity, $project);
 
             if (null === $tmpActivity) {
-                $newProject = !$this->globalActivity ? $project : null;
-                $tmpActivity = $this->activityService->createNewActivity($newProject);
+                $tmpActivity = $this->activityService->createNewActivity($this->globalActivity ? null : $project);
                 $tmpActivity->setName($activity);
-                if (!$dryRun) {
-                    $this->activityService->saveActivity($tmpActivity);
-                }
-                $this->createdActivities++;
+                // saved in pass 2
             }
 
             $this->activityCache[$cacheKey] = $tmpActivity;
@@ -375,21 +433,20 @@ abstract class AbstractTimesheetImporter
         return $this->activityCache[$cacheKey];
     }
 
-    private function getProject(string $project, string $customer, bool $dryRun): Project
+    private function getProject(string $project, string $customer): Project
     {
         $cacheKey = $project . '_____' . $customer;
 
         if (!\array_key_exists($cacheKey, $this->projectCache)) {
-            $tmpCustomer = $this->getCustomer($customer, $dryRun);
-            $tmpProject = $this->projectRepository->findOneBy(['name' => $project, 'customer' => $tmpCustomer->getId()]);
+            $tmpCustomer = $this->getCustomer($customer);
+            $tmpProject = $tmpCustomer->isNew()
+                ? null
+                : $this->projectRepository->findOneBy(['name' => $project, 'customer' => $tmpCustomer->getId()]);
 
             if ($tmpProject === null) {
                 $tmpProject = $this->projectService->createNewProject($tmpCustomer);
                 $tmpProject->setName($project);
-                if (!$dryRun) {
-                    $this->projectService->saveProject($tmpProject);
-                }
-                $this->createdProjects++;
+                // saved in pass 2
             }
 
             $this->projectCache[$cacheKey] = $tmpProject;
@@ -398,19 +455,14 @@ abstract class AbstractTimesheetImporter
         return $this->projectCache[$cacheKey];
     }
 
-    private function getCustomer(string $customer, bool $dryRun): Customer
+    private function getCustomer(string $customer): Customer
     {
         if (!\array_key_exists($customer, $this->customerCache)) {
             $tmpCustomer = $this->customerService->findCustomerByName($customer);
-
             if ($tmpCustomer === null) {
                 $tmpCustomer = $this->customerService->createNewCustomer($customer);
-                if (!$dryRun) {
-                    $this->customerService->saveCustomer($tmpCustomer);
-                }
-                $this->createdCustomers++;
+                // saved in pass 2
             }
-
             $this->customerCache[$customer] = $tmpCustomer;
         }
 
@@ -418,73 +470,63 @@ abstract class AbstractTimesheetImporter
     }
 
     /**
-     * @param array<string, string|int|null> $row
+     * Returns field-level validation errors for a normalised record row.
+     * Keys are field names matching the ImportData header; values are error messages.
+     *
+     * @param array<string, string|int|null|bool> $row
+     * @return array<string, string>
      */
-    private function validateRow(array $row): void
+    private function collectFieldErrors(array $row): array
     {
-        $fields = [];
-
-        $empty = 'Empty or missing field: ';
-        $encoding = 'Invalid encoding, requires UTF-8: ';
-        $negative = 'Negative values not supported: ';
-        $float = 'Invalid numeric value: ';
+        $errors = [];
+        $empty = 'Empty or missing field';
+        $encoding = 'Invalid encoding, requires UTF-8';
+        $negative = 'Negative values not supported';
+        $float = 'Invalid numeric value';
 
         if (!\array_key_exists('User', $row) || $row['User'] === null || $row['User'] === '') {
-            $fields[] = $empty . 'User';
+            $errors['User'] = $empty;
         }
-
         if (!\array_key_exists('Email', $row) || $row['Email'] === null || $row['Email'] === '') {
-            $fields[] = $empty . 'Email';
+            $errors['Email'] = $empty;
         }
-
         if (!\array_key_exists('Begin', $row) || $row['Begin'] === null || $row['Begin'] === '') {
-            $fields[] = $empty . 'Begin';
+            $errors['Begin'] = $empty;
         }
-
         if (!\array_key_exists('End', $row) || $row['End'] === null || $row['End'] === '') {
-            $fields[] = $empty . 'End';
+            $errors['End'] = $empty;
         }
-
-        if ($row['Project'] === null || $row['Project'] === '') {
-            $fields[] = $empty . 'Project';
+        if (!isset($row['Project']) || $row['Project'] === '') {
+            $errors['Project'] = $empty;
         } elseif (\is_string($row['Project']) && mb_detect_encoding($row['Project'], 'UTF-8', true) !== 'UTF-8') {
-            $fields[] = $encoding . 'Project';
+            $errors['Project'] = $encoding;
         }
-
+        if (!isset($row['Activity']) || $row['Activity'] === '') {
+            $errors['Activity'] = $empty;
+        } elseif (\is_string($row['Activity']) && mb_detect_encoding($row['Activity'], 'UTF-8', true) !== 'UTF-8') {
+            $errors['Activity'] = $encoding;
+        }
         if (\array_key_exists('Duration', $row)) {
-            $duration = $row['Duration'];
-            // negative durations are not supported ...
-            if (\is_string($duration) && $duration[0] === '-') {
-                $fields[] = $negative . 'Duration';
-            } elseif (\is_int($duration) && $duration < 0) {
-                $fields[] = $negative . 'Duration';
+            $dur = $row['Duration'];
+            if (\is_string($dur) && $dur !== '' && $dur[0] === '-') {
+                $errors['Duration'] = $negative;
+            } elseif (\is_int($dur) && $dur < 0) {
+                $errors['Duration'] = $negative;
             }
         }
-
-        if ($row['Activity'] === null || $row['Activity'] === '') {
-            $fields[] = $empty . 'Activity';
-        } elseif (\is_string($row['Activity']) && mb_detect_encoding($row['Activity'], 'UTF-8', true) !== 'UTF-8') {
-            $fields[] = $encoding . 'Activity';
-        }
-
         if (\array_key_exists('Description', $row) && \is_string($row['Description']) && $row['Description'] !== '' && mb_detect_encoding($row['Description'], 'UTF-8', true) !== 'UTF-8') {
-            $fields[] = $encoding . 'Description';
+            $errors['Description'] = $encoding;
         }
-
         if (\array_key_exists('HourlyRate', $row) && $row['HourlyRate'] !== null && $row['HourlyRate'] !== '' && !is_numeric($row['HourlyRate'])) {
-            $fields[] = $float . 'HourlyRate';
+            $errors['HourlyRate'] = $float;
         }
-
         if (\array_key_exists('InternalRate', $row) && $row['InternalRate'] !== null && $row['InternalRate'] !== '' && !is_numeric($row['InternalRate'])) {
-            $fields[] = $float . 'InternalRate';
+            $errors['InternalRate'] = $float;
         }
-
         if (\array_key_exists('FixedRate', $row) && $row['FixedRate'] !== null && $row['FixedRate'] !== '' && !is_numeric($row['FixedRate'])) {
-            $fields[] = $float . 'FixedRate';
+            $errors['FixedRate'] = $float;
         }
 
-        if (\count($fields) > 0) {
-            throw new ImportException('Validation failed. ' . implode('. ', $fields));
-        }
+        return $errors;
     }
 }

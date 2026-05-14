@@ -93,32 +93,41 @@ final class GrandtotalCustomerImporter implements ImporterInterface
      */
     public function import(ImportModelInterface $model, array $rows): ImportData
     {
-        $dryRun = $model->isPreview();
         $data = new ImportData('importer.grandtotal', array_keys($rows[0]->getData()));
 
-        $createdCustomers = 0;
-
+        // Pass 1: build + validate all rows — nothing is saved
+        $customers = []; // [ImportRow, Customer|null]
         foreach ($rows as $row) {
+            $customer = null;
             try {
                 $customer = $this->convertEntryToCustomer($row->getData());
                 $this->validate($customer);
-                if (!$dryRun) {
-                    $this->customerService->saveCustomer($customer);
-                }
-                $createdCustomers++;
             } catch (ImportException $exception) {
-                $row->addError($exception->getMessage());
+                $row->addError($exception->getMessage(), $exception->getField());
+                $customer = null;
             } catch (ValidationFailedException $exception) {
                 for ($i = 0; $i < $exception->getViolations()->count(); $i++) {
-                    $row->addError($exception->getViolations()->get($i)->getMessage());
+                    $violation = $exception->getViolations()->get($i);
+                    $row->addError($violation->getMessage(), $violation->getPropertyPath());
                 }
+                $customer = null;
             }
-
             $data->addRow($row);
+            $customers[] = [$row, $customer];
         }
 
-        if ($createdCustomers > 0) {
-            $data->addStatus(\sprintf('created %s customers', $createdCustomers));
+        // Pass 2: save only when every row passed validation
+        if (!$data->hasErrors()) {
+            $createdCustomers = 0;
+            foreach ($customers as [$row, $customer]) {
+                if ($customer !== null) {
+                    $this->customerService->saveCustomer($customer);
+                    $createdCustomers++;
+                }
+            }
+            if ($createdCustomers > 0) {
+                $data->addStatus(\sprintf('created %s customers', $createdCustomers));
+            }
         }
 
         return $data;

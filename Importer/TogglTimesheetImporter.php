@@ -10,6 +10,7 @@
 
 namespace KimaiPlugin\ImportBundle\Importer;
 
+use App\Entity\Timesheet;
 use App\Utils\Duration;
 use KimaiPlugin\ImportBundle\Model\ImportData;
 use KimaiPlugin\ImportBundle\Model\ImportRow;
@@ -68,7 +69,7 @@ final class TogglTimesheetImporter extends AbstractTimesheetImporter implements 
         return new ImportData('Toggl', $header);
     }
 
-    public function importRow(Duration $durationParser, ImportData $data, ImportRow $row, bool $dryRun): void
+    public function importRow(Duration $durationParser, ImportData $data, ImportRow $row): ?Timesheet
     {
         $rawData = $row->getData();
         $values = [
@@ -125,6 +126,6 @@ final class TogglTimesheetImporter extends AbstractTimesheetImporter implements 
             }
         }
 
-        parent::importRow($durationParser, $data, new ImportRow($values), $dryRun);
+        return parent::importRow($durationParser, $data, new ImportRow($values));
     }
 }

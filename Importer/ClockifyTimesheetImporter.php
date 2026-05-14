@@ -72,7 +72,7 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
         return new ImportData('Clockify', $header);
     }
 
-    public function importRow(Duration $durationParser, ImportData $data, ImportRow $row, bool $dryRun): void
+    public function importRow(Duration $durationParser, ImportData $data, ImportRow $row): ?\App\Entity\Timesheet
     {
         $rawData = $row->getData();
         $values = [
@@ -138,6 +138,6 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
             }
         }
 
-        parent::importRow($durationParser, $data, new ImportRow($values), $dryRun);
+        return parent::importRow($durationParser, $data, new ImportRow($values));
     }
 }

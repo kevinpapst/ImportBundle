@@ -45,10 +45,22 @@ final class ProjectImporter implements ImporterInterface
         'projectnumber'
     ];
 
-    /**
-     * @var Customer[]
-     */
+    private static array $propertyToColumns = [
+        'name' => ['name', 'project'],
+        'comment' => ['description'],
+        'number' => ['projectnumber'],
+        'orderNumber' => ['ordernumber'],
+        'orderDate' => ['orderdate'],
+        'start' => ['startdate'],
+        'end' => ['enddate'],
+        'budgetType' => ['budgettype'],
+        'timeBudget' => ['timebudget'],
+    ];
+
+    /** @var Customer[] */
     private array $customerCache = [];
+    /** @var Project[] */
+    private array $projectCache = [];
 
     public function __construct(
         private readonly ProjectService $projectService,
@@ -88,9 +100,7 @@ final class ProjectImporter implements ImporterInterface
             }
         }
 
-        return
-            $foundCustomer && $foundProject && !$foundTimesheet
-        ;
+        return $foundCustomer && $foundProject && !$foundTimesheet;
     }
 
     /**
@@ -98,58 +108,93 @@ final class ProjectImporter implements ImporterInterface
      */
     public function import(ImportModelInterface $model, array $rows): ImportData
     {
-        $dryRun = $model->isPreview();
         $data = new ImportData('projects', array_keys($rows[0]->getData()));
 
-        $createdCustomer = 0;
-        $createdProject = 0;
-        $updatedProject = 0;
-
+        // Pass 1: build + validate all rows — nothing is saved
+        $projects = []; // [ImportRow, Project|null]
+        $failureRows = 0;
         foreach ($rows as $row) {
+            $project = null;
             try {
                 $project = $this->convertEntryToProject($row->getData());
                 $this->validate($project);
 
                 /** @var Customer $customer */
                 $customer = $project->getCustomer();
-
                 if ($customer->isNew()) {
                     $this->validate($customer);
-                    $createdCustomer++;
                 }
 
-                if ($project->isNew()) {
-                    $createdProject++;
-                } else {
-                    $updatedProject++;
+                $processedData = [];
+                foreach ($row->getData() as $key => $rawValue) {
+                    $normalizedKey = strtolower($key);
+                    $processedData[$key] = match ($normalizedKey) {
+                        'name', 'project' => $project->getName(),
+                        'customer' => $customer->getName(),
+                        'description' => $project->getComment(),
+                        'color' => $project->getColor(),
+                        'visible' => $project->isVisible(),
+                        'budget' => $project->getBudget(),
+                        'budgettype' => $project->getBudgetType(),
+                        'timebudget' => $project->getTimeBudget(),
+                        'ordernumber' => $project->getOrderNumber(),
+                        'orderdate' => $project->getOrderDate(),
+                        'startdate' => $project->getStart(),
+                        'enddate' => $project->getEnd(),
+                        'projectnumber' => $project->getNumber(),
+                        default => $rawValue,
+                    };
                 }
+                $row->setProcessedData($processedData);
+            } catch (ImportException $exception) {
+                $row->addError($exception->getMessage(), $exception->getField());
+                $project = null;
+                $failureRows++;
+            } catch (ValidationFailedException $exception) {
+                for ($i = 0; $i < $exception->getViolations()->count(); $i++) {
+                    $violation = $exception->getViolations()->get($i);
+                    $field = $this->resolveFieldKey($violation->getPropertyPath(), $row->getData());
+                    $row->addError($violation->getMessage(), $field);
+                }
+                $project = null;
+                $failureRows++;
+            }
+            $data->addRow($row);
+            $projects[] = [$row, $project];
+        }
 
-                if (!$dryRun) {
+        // Pass 2: save only when every row passed validation
+        if (!$data->hasErrors()) {
+            $createdCustomers = 0;
+            $createdProjects = 0;
+            $updatedProjects = 0;
+            foreach ($projects as [$row, $project]) {
+                if ($project !== null) {
+                    /** @var Customer $customer */
+                    $customer = $project->getCustomer();
                     if ($customer->isNew()) {
                         $this->customerService->saveCustomer($customer);
+                        $createdCustomers++;
+                    }
+                    if ($project->isNew()) {
+                        $createdProjects++;
+                    } else {
+                        $updatedProjects++;
                     }
                     $this->projectService->saveProject($project);
                 }
-            } catch (ImportException $exception) {
-                $row->addError($exception->getMessage());
-            } catch (ValidationFailedException $exception) {
-                for ($i = 0; $i < $exception->getViolations()->count(); $i++) {
-                    $row->addError($exception->getViolations()->get($i)->getMessage());
-                }
             }
-            $data->addRow($row);
-        }
-
-        if ($createdCustomer > 0) {
-            $data->addStatus(\sprintf('created %s customers', $createdCustomer));
-        }
-
-        if ($createdProject > 0) {
-            $data->addStatus(\sprintf('created %s projects', $createdProject));
-        }
-
-        if ($updatedProject > 0) {
-            $data->addStatus(\sprintf('updated %s projects', $updatedProject));
+            if ($createdCustomers > 0) {
+                $data->addStatus(\sprintf('created %s customers', $createdCustomers));
+            }
+            if ($createdProjects > 0) {
+                $data->addStatus(\sprintf('created %s projects', $createdProjects));
+            }
+            if ($updatedProjects > 0) {
+                $data->addStatus(\sprintf('updated %s projects', $updatedProjects));
+            }
+        } else {
+            $data->addStatus(\sprintf('Found %s rows with errors', $failureRows));
         }
 
         return $data;
@@ -160,10 +205,12 @@ final class ProjectImporter implements ImporterInterface
         $customer = $this->findCustomer($entry);
 
         $name = null;
+        $nameColumn = 'name';
         foreach ($entry as $key => $value) {
             switch (strtolower($key)) {
                 case 'name':
                 case 'project':
+                    $nameColumn = $key;
                     if ($value !== null) {
                         $name = trim($value);
                     }
@@ -172,19 +219,23 @@ final class ProjectImporter implements ImporterInterface
         }
 
         if ($name === null || $name === '') {
-            throw new ImportException('Cannot use empty project name');
+            throw new ImportException('Cannot use empty project name', $nameColumn);
         }
 
-        // allow updating existing projects
-        $project = null;
-        if (!$customer->isNew()) {
-            $project = $this->projectService->findProjectByName($name, $customer);
-        }
-        if ($project === null) {
-            $project = $this->projectService->createNewProject($customer);
-            $project->setName($name);
+        $cacheKey = $name . '_____' . $customer->getName();
+        if (!\array_key_exists($cacheKey, $this->projectCache)) {
+            $project = null;
+            if (!$customer->isNew()) {
+                $project = $this->projectService->findProjectByName($name, $customer);
+            }
+            if ($project === null) {
+                $project = $this->projectService->createNewProject($customer);
+                $project->setName($name);
+            }
+            $this->projectCache[$cacheKey] = $project;
         }
 
+        $project = $this->projectCache[$cacheKey];
         $this->mapEntryToProject($project, $entry);
 
         return $project;
@@ -193,9 +244,11 @@ final class ProjectImporter implements ImporterInterface
     private function findCustomer(array $entry): Customer
     {
         $name = null;
+        $nameColumn = 'customer';
         foreach ($entry as $key => $value) {
             switch (strtolower($key)) {
                 case 'customer':
+                    $nameColumn = $key;
                     if ($value !== null) {
                         $name = trim($value);
                     }
@@ -204,20 +257,17 @@ final class ProjectImporter implements ImporterInterface
         }
 
         if ($name === null || $name === '') {
-            throw new ImportException('Cannot use empty customer name');
+            throw new ImportException('Cannot use empty customer name', $nameColumn);
         }
 
         if (!\array_key_exists($name, $this->customerCache)) {
             $customer = $this->customerService->findCustomerByName($name);
-
             if ($customer === null) {
                 if (mb_strlen($name) > 149) {
-                    throw new ImportException('Invalid customer name, maximum 150 character allowed');
+                    throw new ImportException('Invalid customer name, maximum 150 character allowed', 'customer');
                 }
-
                 $customer = $this->customerService->createNewCustomer(mb_substr($name, 0, 149));
             }
-
             $this->customerCache[$name] = $customer;
         }
 
@@ -346,6 +396,26 @@ final class ProjectImporter implements ImporterInterface
         }
 
         return $date;
+    }
+
+    private function resolveFieldKey(string $propertyPath, array $csvRow): ?string
+    {
+        $csvKeysLower = array_map('strtolower', array_keys($csvRow));
+
+        if (isset(self::$propertyToColumns[$propertyPath])) {
+            foreach (self::$propertyToColumns[$propertyPath] as $candidate) {
+                if (\in_array($candidate, $csvKeysLower, true)) {
+                    return $candidate;
+                }
+            }
+        }
+
+        $propertyLower = strtolower($propertyPath);
+        if (\in_array($propertyLower, $csvKeysLower, true)) {
+            return $propertyLower;
+        }
+
+        return null;
     }
 
     private function validate(Project|Customer $value): void

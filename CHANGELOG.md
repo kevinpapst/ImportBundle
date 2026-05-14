@@ -5,6 +5,9 @@ Compatibility: requires minimum Kimai 2.41.0
 - Fix Kimai 1 importer: 
   - broken global activity imports
   - invalid URLs in customer homepage
+- Use the core validations on all import objects before persisting them
+  - Removed preview mode
+  - Show errors on their respective fields
 
 ## Version 2.24.0
 
