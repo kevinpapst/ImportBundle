@@ -19,7 +19,7 @@ jobs:
                     php-version: ${{ matrix.php }}
                     coverage: none
                     extensions: intl
-            -   run: composer install --no-progress
+            -   run: composer install --no-progress --prefer-lowest --prefer-stable
             -   run: composer validate --strict --no-check-version
             -   run: composer codestyle-check
             -   run: composer phpstan
