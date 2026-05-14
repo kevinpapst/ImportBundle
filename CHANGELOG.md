@@ -1,3 +1,11 @@
+## Version 2.25.0
+
+Compatibility: requires minimum Kimai 2.41.0
+
+- Fix Kimai 1 importer: 
+  - broken global activity imports
+  - invalid URLs in customer homepage
+
 ## Version 2.24.0
 
 Compatibility: requires minimum Kimai 2.41.0
