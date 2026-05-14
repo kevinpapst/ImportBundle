@@ -1069,7 +1069,7 @@ final class KimaiImporterCommand extends Command
             }
 
             $homepage = $oldCustomer['homepage'];
-            if (!filter_var($homepage, FILTER_VALIDATE_URL)) {
+            if (filter_var($homepage, FILTER_VALIDATE_URL) === false) {
                 $homepage = null;
             }
 
