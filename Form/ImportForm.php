@@ -13,7 +13,6 @@ namespace KimaiPlugin\ImportBundle\Form;
 use KimaiPlugin\ImportBundle\Importer\ImporterService;
 use KimaiPlugin\ImportBundle\Model\ImportModel;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -36,10 +35,6 @@ class ImportForm extends AbstractType
                     'Comma ,' => ',',
                 ],
                 'constraints' => [new NotBlank()]
-            ])
-            ->add('preview', CheckboxType::class, [
-                'label' => 'preview',
-                'required' => false,
             ])
             ->add('importFile', FileType::class, [
                 'label' => 'importer.file_chooser',

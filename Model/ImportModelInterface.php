@@ -17,6 +17,4 @@ interface ImportModelInterface
     public function getImportFile(): ?UploadedFile;
 
     public function getDelimiter(): ?string;
-
-    public function isPreview(): bool;
 }

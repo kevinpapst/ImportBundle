@@ -16,7 +16,6 @@ class ImportModel implements ImportModelInterface
 {
     private ?UploadedFile $importFile = null;
     private ?string $delimiter = ',';
-    private bool $preview = true;
 
     public function getImportFile(): ?UploadedFile
     {
@@ -36,15 +35,5 @@ class ImportModel implements ImportModelInterface
     public function setDelimiter(?string $delimiter): void
     {
         $this->delimiter = $delimiter;
-    }
-
-    public function isPreview(): bool
-    {
-        return $this->preview;
-    }
-
-    public function setPreview(bool $preview): void
-    {
-        $this->preview = $preview;
     }
 }

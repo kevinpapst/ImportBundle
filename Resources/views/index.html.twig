@@ -57,9 +57,7 @@
             {{ form_errors(form) }}
             {{ form_row(form.importFile) }}
             {{ form_row(form.delimiter) }}
-            {% set preview = form_row(form.preview) %}
             {{ form_rest(form) }}
-            {{ preview|raw }}
 
             {% if tab == 'clockify' %}
                 {{ callout('info', 'importer.clockify_info', null, 'details', false) }}
@@ -76,8 +74,7 @@
 
     {% if data is not null %}
         {% set importData = data %}
-        {% set countErrors = importData.countErrors() %}
-        {% set boxtype = countErrors > 0 ? 'danger' : 'success' %}
+        {% set hasErrors = importData.hasErrors() %}
         {% set headerLength = importData.header|length %}
 
         {% set statusTrans = '' %}
@@ -88,17 +85,14 @@
             {% set statusTrans = statusTrans ~ status %}
         {% endfor %}
 
-        {% if model.preview %}
-            {{ widgets.callout('info', 'importer.how_to_upload', null, 'help') }}
-            {{ widgets.callout('warning', 'preview'|trans ~ ': ' ~ statusTrans) }}
-        {% elseif countErrors > 0 %}
+        {% if hasErrors %}
             {{ widgets.callout('warning', statusTrans) }}
         {% else %}
             {{ widgets.callout('success', statusTrans) }}
         {% endif %}
 
-        {% if countErrors > 0 or model.preview %}
-            {% embed '@theme/embeds/card.html.twig' with {'boxtype': boxtype} %}
+        {% if hasErrors %}
+            {% embed '@theme/embeds/card.html.twig' with {'boxtype': 'danger'} %}
                 {% from "macros/widgets.html.twig" import label_boolean %}
                 {% block box_title %}{{ (importData.title)|trans }}{% endblock %}
                 {% block box_body_class %}p-0 table-responsive{% endblock %}
