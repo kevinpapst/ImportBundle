@@ -40,7 +40,6 @@ final class ImporterService
      * @param ImportModel $model
      * @param class-string $importer
      * @return ImportData
-     * @throws ImportException
      */
     public function import(ImportModel $model, string $importer): ImportData
     {
@@ -92,7 +91,6 @@ final class ImporterService
 
     /**
      * @param class-string $import
-     * @throws ImportException
      */
     private function importJson(ImportModel $model, string $import): ImportData
     {
