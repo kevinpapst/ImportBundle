@@ -28,7 +28,7 @@
     },
     "config": {
         "allow-plugins": {
-            "symfony/flex": false,
+            "symfony/flex": true,
             "symfony/runtime": false
         },
         "platform": {
