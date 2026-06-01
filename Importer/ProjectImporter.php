@@ -264,7 +264,7 @@ final class ProjectImporter implements ImporterInterface
             $customer = $this->customerService->findCustomerByName($name);
             if ($customer === null) {
                 if (mb_strlen($name) > 149) {
-                    throw new ImportException('Invalid customer name, maximum 150 character allowed', 'customer');
+                    throw new ImportException('Invalid customer name, maximum 149 character allowed', 'customer');
                 }
                 $customer = $this->customerService->createNewCustomer(mb_substr($name, 0, 149));
             }

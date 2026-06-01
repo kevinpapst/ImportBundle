@@ -12,6 +12,7 @@ namespace KimaiPlugin\ImportBundle\Controller;
 
 use App\Controller\AbstractController;
 use App\Utils\PageSetup;
+use App\Validator\ValidationFailedException;
 use KimaiPlugin\ImportBundle\Form\ImportForm;
 use KimaiPlugin\ImportBundle\Form\TimesheetImportForm;
 use KimaiPlugin\ImportBundle\Importer\ClockifyTimesheetImporter;
@@ -90,6 +91,11 @@ final class ImportController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             try {
                 $data = $importerService->import($model, $importer);
+            } catch (ValidationFailedException $importException) {
+                $editForm->addError(new FormError($importException->getMessage()));
+                foreach ($importException->getViolations() as $violation) {
+                    $editForm->addError(new FormError($violation->getMessage()));
+                }
             } catch (ImportException $importException) {
                 $editForm->addError(new FormError($importException->getMessage()));
             }
