@@ -3,6 +3,7 @@
 Compatibility: requires minimum Kimai 2.41.0
 
 - Better customer CSV example
+- Removed customer and project JSON examples
 
 ## Version 2.25.0
 

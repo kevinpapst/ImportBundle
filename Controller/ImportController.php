@@ -114,9 +114,7 @@ final class ImportController extends AbstractController
     }
 
     #[Route(path: '/example/customer-csv', name: 'importer_example_customer_csv', methods: ['GET'])]
-    #[Route(path: '/example/customer-json', name: 'importer_example_customer_json', methods: ['GET'])]
     #[Route(path: '/example/project-csv', name: 'importer_example_project_csv', methods: ['GET'])]
-    #[Route(path: '/example/project-json', name: 'importer_example_project_json', methods: ['GET'])]
     #[Route(path: '/example/timesheet-csv', name: 'importer_example_timesheet_csv', methods: ['GET'])]
     #[Route(path: '/example/timesheet-json', name: 'importer_example_timesheet_json', methods: ['GET'])]
     #[Route(path: '/example/grandtotal', name: 'importer_example_grandtotal', methods: ['GET'])]
@@ -128,14 +126,8 @@ final class ImportController extends AbstractController
             case 'importer_example_customer_csv':
                 return $this->file(__DIR__ . '/../Resources/demo/customer.csv');
 
-            case 'importer_example_customer_json':
-                return $this->file(__DIR__ . '/../Resources/demo/customer.json');
-
             case 'importer_example_project_csv':
                 return $this->file(__DIR__ . '/../Resources/demo/project.csv');
-
-            case 'importer_example_project_json':
-                return $this->file(__DIR__ . '/../Resources/demo/project.json');
 
             case 'importer_example_timesheet_csv':
                 return $this->file(__DIR__ . '/../Resources/demo/timesheet.csv');
