@@ -1,3 +1,9 @@
+## Version 2.26.0
+
+Compatibility: requires minimum Kimai 2.41.0
+
+- Better customer CSV example
+
 ## Version 2.25.0
 
 Compatibility: requires minimum Kimai 2.41.0
