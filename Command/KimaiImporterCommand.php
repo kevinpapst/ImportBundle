@@ -1655,7 +1655,9 @@ final class KimaiImporterCommand extends Command
             }
 
             $activity = null;
+            /** @var string $activityId */
             $activityId = $oldRecord['activityID'];
+            /** @var string $projectId */
             $projectId = $oldRecord['projectID'];
             $project = $this->getCachedProject($projectId);
 
@@ -1675,7 +1677,7 @@ final class KimaiImporterCommand extends Command
 
             if (null === $activity && isset($this->oldActivities[$activityId])) {
                 $oldActivity = $this->oldActivities[$activityId];
-                $activity = $this->createActivity($io, $entityManager, $oldActivity, $fixedRates, $rates, $projectId);
+                $activity = $this->createActivity($io, $entityManager, $oldActivity, $fixedRates, $rates, (int) $projectId);
                 ++$activityCounter;
             }
 
