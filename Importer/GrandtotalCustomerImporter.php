@@ -101,7 +101,12 @@ final class GrandtotalCustomerImporter implements ImporterInterface
             $customer = null;
             try {
                 $customer = $this->convertEntryToCustomer($row->getData());
-                $this->validate($customer);
+
+                $errors = $this->validator->validate($customer);
+
+                if ($errors->count() > 0) {
+                    throw new ValidationFailedException($errors, 'Customer validation failed in row ' . $row->getRowNumber());
+                }
             } catch (ImportException $exception) {
                 $row->addError($exception->getMessage(), $exception->getField());
                 $customer = null;
@@ -274,15 +279,6 @@ final class GrandtotalCustomerImporter implements ImporterInterface
 
         if ($names['title'] !== '' || $names['first'] !== '' || $names['middle'] !== '' || $names['last'] !== '') {
             $customer->setContact(trim(str_replace('  ', ' ', $calculatedContact)));
-        }
-    }
-
-    private function validate(Customer $value): void
-    {
-        $errors = $this->validator->validate($value);
-
-        if ($errors->count() > 0) {
-            throw new ValidationFailedException($errors, 'Validation Failed');
         }
     }
 }

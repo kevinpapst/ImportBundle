@@ -166,6 +166,6 @@ final class TimesheetImporter extends AbstractTimesheetImporter implements Impor
             }
         }
 
-        return parent::importRow($durationParser, $data, new ImportRow($converted));
+        return parent::importRow($durationParser, $data, new ImportRow($row->getRowNumber(), $converted));
     }
 }

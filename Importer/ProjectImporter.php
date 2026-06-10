@@ -117,12 +117,20 @@ final class ProjectImporter implements ImporterInterface
             $project = null;
             try {
                 $project = $this->convertEntryToProject($row->getData());
-                $this->validate($project);
+                $errors = $this->validator->validate($project);
+
+                if ($errors->count() > 0) {
+                    throw new ValidationFailedException($errors, 'Project validation failed in row ' . $row->getRowNumber());
+                }
 
                 /** @var Customer $customer */
                 $customer = $project->getCustomer();
                 if ($customer->isNew()) {
-                    $this->validate($customer);
+                    $errors = $this->validator->validate($customer);
+
+                    if ($errors->count() > 0) {
+                        throw new ValidationFailedException($errors, 'Customer validation failed in row ' . $row->getRowNumber());
+                    }
                 }
 
                 $processedData = [];
@@ -416,14 +424,5 @@ final class ProjectImporter implements ImporterInterface
         }
 
         return null;
-    }
-
-    private function validate(Project|Customer $value): void
-    {
-        $errors = $this->validator->validate($value);
-
-        if ($errors->count() > 0) {
-            throw new ValidationFailedException($errors, 'Validation Failed');
-        }
     }
 }

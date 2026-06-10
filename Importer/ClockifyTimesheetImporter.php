@@ -138,6 +138,6 @@ final class ClockifyTimesheetImporter extends AbstractTimesheetImporter implemen
             }
         }
 
-        return parent::importRow($durationParser, $data, new ImportRow($values));
+        return parent::importRow($durationParser, $data, new ImportRow($row->getRowNumber(), $values));
     }
 }

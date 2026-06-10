@@ -24,7 +24,7 @@ final class ImportRow
     /**
      * @param array<string, bool|int|string> $row
      */
-    public function __construct(private readonly array $row)
+    public function __construct(private readonly int $rowNumber, private readonly array $row)
     {
     }
 
@@ -91,5 +91,10 @@ final class ImportRow
     public function hasProcessedData(): bool
     {
         return $this->processedData !== null;
+    }
+
+    public function getRowNumber(): int
+    {
+        return $this->rowNumber;
     }
 }

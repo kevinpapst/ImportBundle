@@ -124,7 +124,11 @@ final class CustomerImporter implements ImporterInterface
             $customer = null;
             try {
                 $customer = $this->convertEntryToCustomer($row->getData());
-                $this->validate($customer);
+                $errors = $this->validator->validate($customer);
+
+                if ($errors->count() > 0) {
+                    throw new ValidationFailedException($errors, 'Customer validation failed in row ' . $row->getRowNumber());
+                }
 
                 $processedData = [];
                 foreach ($row->getData() as $key => $rawValue) {
@@ -406,14 +410,5 @@ final class CustomerImporter implements ImporterInterface
         }
 
         return null;
-    }
-
-    private function validate(Customer $value): void
-    {
-        $errors = $this->validator->validate($value);
-
-        if ($errors->count() > 0) {
-            throw new ValidationFailedException($errors, 'Validation Failed');
-        }
     }
 }

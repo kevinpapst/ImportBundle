@@ -221,7 +221,7 @@ abstract class AbstractTimesheetImporter
 
             $errors = $this->validator->validate($timesheet);
             if ($errors->count() > 0) {
-                throw new ValidationFailedException($errors, 'Validation Failed');
+                throw new ValidationFailedException($errors, 'Timesheet validation failed in row ' . $row->getRowNumber());
             }
 
             // Build processedData keyed by same fields as $record so column count matches the header.
@@ -385,6 +385,11 @@ abstract class AbstractTimesheetImporter
                 $tmpUser->setEmail($email);
                 $tmpUser->setUserIdentifier($user);
                 $tmpUser->setPlainPassword(uniqid());
+
+                $errors = $this->validator->validate($tmpUser, null, ['Registration', 'UserCreate']);
+                if ($errors->count() > 0) {
+                    throw new ValidationFailedException($errors, 'User validation failed for email: ' . $email);
+                }
                 // saved in pass 2
             }
             $this->userCache[$user] = $tmpUser;
@@ -487,8 +492,11 @@ abstract class AbstractTimesheetImporter
         if (!\array_key_exists('User', $row) || $row['User'] === null || $row['User'] === '') {
             $errors['User'] = $empty;
         }
-        if (!\array_key_exists('Email', $row) || $row['Email'] === null || $row['Email'] === '') {
-            $errors['Email'] = $empty;
+        if (!\array_key_exists('Email', $row)) {
+            $errors['Email'] = 'Missing email address';
+        }
+        if (filter_var($row['Email'], FILTER_VALIDATE_EMAIL) === false) {
+            $errors['Email'] = 'Invalid email address';
         }
         if (!\array_key_exists('Begin', $row) || $row['Begin'] === null || $row['Begin'] === '') {
             $errors['Begin'] = $empty;

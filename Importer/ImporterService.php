@@ -123,9 +123,10 @@ final class ImporterService
                     throw new ImportException('Invalid file given, missing and/or invalid columns: ' . implode(', ', $importer->checkHeader($header)));
                 }
                 $rows = [];
+                $i = 0;
                 /** @var array<string, string> $record */
                 foreach ($data as $record) {
-                    $rows[] = new ImportRow($record);
+                    $rows[] = new ImportRow($i++, $record);
                 }
 
                 @unlink($model->getImportFile()->getRealPath());
@@ -184,9 +185,10 @@ final class ImporterService
                     throw new ImportException('Invalid file given, missing and/or invalid columns: ' . implode(', ', $importer->checkHeader($header)));
                 }
                 $rows = [];
+                $i = 0;
                 /** @var array<string, string> $record */
                 foreach ($csv->getRecords() as $record) {
-                    $rows[] = new ImportRow($record);
+                    $rows[] = new ImportRow($i++, $record);
                 }
 
                 @unlink($model->getImportFile()->getRealPath());

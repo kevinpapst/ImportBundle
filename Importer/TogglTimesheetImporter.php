@@ -126,6 +126,6 @@ final class TogglTimesheetImporter extends AbstractTimesheetImporter implements 
             }
         }
 
-        return parent::importRow($durationParser, $data, new ImportRow($values));
+        return parent::importRow($durationParser, $data, new ImportRow($row->getRowNumber(), $values));
     }
 }
