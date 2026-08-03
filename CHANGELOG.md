@@ -1,3 +1,9 @@
+## Version 2.28.0
+
+Compatibility: requires minimum Kimai 2.63.0
+
+- Support new `Customer` fields `invoice_email` and `language`
+
 ## Version 2.27.0
 
 Compatibility: requires minimum Kimai 2.41.0

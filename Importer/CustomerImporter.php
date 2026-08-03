@@ -58,6 +58,9 @@ final class CustomerImporter implements ImporterInterface
         'city',
         'buyerreference',
         'buyer_reference',
+        'invoiceemail',
+        'invoice_email',
+        'language',
     ];
 
     private static array $propertyToColumns = [
@@ -72,6 +75,8 @@ final class CustomerImporter implements ImporterInterface
         'postCode' => ['postcode'],
         'budgetType' => ['budgettype', 'budget_type'],
         'timeBudget' => ['timebudget', 'time_budget'],
+        'invoiceEmail' => ['invoiceemail', 'invoice_email'],
+        'language' => ['language'],
     ];
 
     /** @var Customer[] */
@@ -160,6 +165,8 @@ final class CustomerImporter implements ImporterInterface
                         'customernumber', 'account', 'number', 'customer_number' => $customer->getNumber(),
                         'tax' => $customer->getVatId(),
                         'buyerreference', 'buyer_reference' => $customer->getBuyerReference(),
+                        'invoiceemail', 'invoice_email' => $customer->getInvoiceEmail(),
+                        'language', 'language' => $customer->getLanguage(),
                         default => $rawValue,
                     };
                 }
@@ -374,6 +381,15 @@ final class CustomerImporter implements ImporterInterface
                 case 'buyerreference':
                 case 'buyer_reference':
                     $customer->setBuyerReference($value);
+                    break;
+
+                case 'invoiceemail':
+                case 'invoice_email':
+                    $customer->setInvoiceEmail($value);
+                    break;
+
+                case 'language':
+                    $customer->setLanguage($value);
                     break;
 
                 default:
