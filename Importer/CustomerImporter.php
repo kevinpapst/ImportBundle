@@ -166,7 +166,7 @@ final class CustomerImporter implements ImporterInterface
                         'tax' => $customer->getVatId(),
                         'buyerreference', 'buyer_reference' => $customer->getBuyerReference(),
                         'invoiceemail', 'invoice_email' => $customer->getInvoiceEmail(),
-                        'language', 'language' => $customer->getLanguage(),
+                        'language' => $customer->getLanguage(),
                         default => $rawValue,
                     };
                 }
