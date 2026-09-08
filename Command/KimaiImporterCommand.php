@@ -1699,7 +1699,7 @@ final class KimaiImporterCommand extends Command
                 $user->setAlias('Import: ' . $tempUserName);
                 $user->setPlainPassword($tempPassword);
                 $user->setEnabled(false);
-                $user->setRoles([USER::ROLE_USER]);
+                $user->setRoles([User::ROLE_USER]);
 
                 $pwd = $this->passwordHasher->hashPassword($user, $user->getPlainPassword());
                 $user->setPassword($pwd);
