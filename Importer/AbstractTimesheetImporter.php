@@ -415,20 +415,20 @@ abstract class AbstractTimesheetImporter
         return $this->tagCache[$normalizedTagName];
     }
 
-    private function getActivity(string $activity, Project $project): Activity
+    private function getActivity(string $name, Project $project): Activity
     {
         $cacheKey = $this->globalActivity
-            ? $activity . '_____GLOBAL_____'
-            : $activity . '_____' . $project->getId();
+            ? $name . '_____GLOBAL_____'
+            : $name . '_____' . $project->getId();
 
         if (!\array_key_exists($cacheKey, $this->activityCache)) {
-            $tmpActivity = $this->globalActivity
-                ? $this->activityService->findActivityByName($activity, null)
-                : $this->activityService->findActivityByName($activity, $project);
+            $activity = $this->globalActivity
+                ? $this->activityService->findActivityByName($name, null)
+                : $this->activityService->findActivityByName($name, $project);
 
-            if (null === $tmpActivity) {
-                $tmpActivity = $this->activityService->createNewActivity($this->globalActivity ? null : $project);
-                $tmpActivity->setName($activity);
+            if (null === $activity) {
+                $activity = $this->activityService->createNewActivity($this->globalActivity ? null : $project);
+                $activity->setName($name);
                 // saved in pass 2
             }
             $this->activityService->loadMetaFields($activity);
@@ -460,19 +460,19 @@ abstract class AbstractTimesheetImporter
         return $this->projectCache[$cacheKey];
     }
 
-    private function getCustomer(string $customer): Customer
+    private function getCustomer(string $name): Customer
     {
-        if (!\array_key_exists($customer, $this->customerCache)) {
-            $tmpCustomer = $this->customerService->findCustomerByName($customer);
-            if ($tmpCustomer === null) {
-                $tmpCustomer = $this->customerService->createNewCustomer($customer);
+        if (!\array_key_exists($name, $this->customerCache)) {
+            $customer = $this->customerService->findCustomerByName($name);
+            if ($customer === null) {
+                $customer = $this->customerService->createNewCustomer($name);
                 // saved in pass 2
             }
             $this->customerService->loadMetaFields($customer);
             $this->customerCache[$name] = $customer;
         }
 
-        return $this->customerCache[$customer];
+        return $this->customerCache[$name];
     }
 
     /**
