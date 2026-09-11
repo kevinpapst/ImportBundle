@@ -431,9 +431,8 @@ abstract class AbstractTimesheetImporter
                 $tmpActivity->setName($activity);
                 // saved in pass 2
             }
-
-            $this->activityCache[$cacheKey] = $tmpActivity;
             $this->activityService->loadMetaFields($activity);
+            $this->activityCache[$cacheKey] = $activity;
         }
 
         return $this->activityCache[$cacheKey];
@@ -469,8 +468,8 @@ abstract class AbstractTimesheetImporter
                 $tmpCustomer = $this->customerService->createNewCustomer($customer);
                 // saved in pass 2
             }
-            $this->customerCache[$customer] = $tmpCustomer;
             $this->customerService->loadMetaFields($customer);
+            $this->customerCache[$name] = $customer;
         }
 
         return $this->customerCache[$customer];
