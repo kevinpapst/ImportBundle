@@ -433,6 +433,7 @@ abstract class AbstractTimesheetImporter
             }
 
             $this->activityCache[$cacheKey] = $tmpActivity;
+            $this->activityService->loadMetaFields($activity);
         }
 
         return $this->activityCache[$cacheKey];
@@ -453,7 +454,7 @@ abstract class AbstractTimesheetImporter
                 $tmpProject->setName($project);
                 // saved in pass 2
             }
-
+            $this->projectService->loadMetaFields($tmpProject);
             $this->projectCache[$cacheKey] = $tmpProject;
         }
 
@@ -469,6 +470,7 @@ abstract class AbstractTimesheetImporter
                 // saved in pass 2
             }
             $this->customerCache[$customer] = $tmpCustomer;
+            $this->customerService->loadMetaFields($customer);
         }
 
         return $this->customerCache[$customer];

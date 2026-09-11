@@ -248,6 +248,7 @@ final class CustomerImporter implements ImporterInterface
             if ($customer === null) {
                 $customer = $this->customerService->createNewCustomer($name);
             }
+            $this->customerService->loadMetaFields($customer);
             $this->customerCache[$cacheKey] = $customer;
         }
 

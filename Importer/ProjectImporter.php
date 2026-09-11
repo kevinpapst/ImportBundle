@@ -240,6 +240,7 @@ final class ProjectImporter implements ImporterInterface
                 $project = $this->projectService->createNewProject($customer);
                 $project->setName($name);
             }
+            $this->projectService->loadMetaFields($project);
             $this->projectCache[$cacheKey] = $project;
         }
 
@@ -276,6 +277,7 @@ final class ProjectImporter implements ImporterInterface
                 }
                 $customer = $this->customerService->createNewCustomer(mb_substr($name, 0, 149));
             }
+            $this->customerService->loadMetaFields($customer);
             $this->customerCache[$name] = $customer;
         }
 
